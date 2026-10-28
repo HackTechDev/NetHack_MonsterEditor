@@ -6,6 +6,9 @@ externe) pour créer les **robots et mechas** de NetHack 5.0 cyberpunk
 
 Il complète l'éditeur de cartes `../NetHack_MapEditor`.
 
+**Premiers pas :** le [tutoriel](TUTORIAL.md) crée un robot de A à Z ;
+la liste complète des fonctions est dans [FEATURES.md](FEATURES.md).
+
 ## Lancement
 
 ```sh
