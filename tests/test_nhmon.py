@@ -18,6 +18,7 @@ import nhmon_data as D  # noqa: E402
 import nhmon_install as I  # noqa: E402
 import nhmon_templates as T  # noqa: E402
 import nhmonedit as E  # noqa: E402
+import nhmon_ui as U  # noqa: E402
 
 SRC = os.environ.get("NHMONEDIT_SRC") or os.path.normpath(
     os.path.join(HERE, "..", "..", "NetHack-5.0.0"))
@@ -283,6 +284,10 @@ class TestEditor(unittest.TestCase):
         ed.mon()["level"] = 3
         ed.undo(redo=True)
         self.assertEqual(ed.mon()["level"], 3)
+
+    def test_filter_ignores_accents(self):
+        self.assertIn(U.fold("securite"), U.fold("Robot de Sécurité"))
+        self.assertEqual(U.fold("araignée-robot"), "araignee-robot")
 
 
 if __name__ == "__main__":

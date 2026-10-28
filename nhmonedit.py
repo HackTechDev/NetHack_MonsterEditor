@@ -129,6 +129,7 @@ HELP = [
     "  i            importer un monstre du jeu comme base",
     "  Suppr / X    supprimer le monstre (dans la liste)",
     "  < >          déplacer le monstre dans la liste",
+    "  /            aller à un monstre (tapez une partie de son nom)",
     "  t            dessiner la tuile à la main (versions graphiques",
     "               seulement ; sinon la silhouette suffit)",
     "",
@@ -833,6 +834,23 @@ class Editor(Popups):
         self.cur = max(0, min(self.cur, len(self.monsters) - 1))
         self.msg = "Supprimé"
 
+    def goto_monster(self):
+        """/ : aller à un monstre ; les lettres tapées filtrent la liste
+        (nom français, nom anglais, identifiant)."""
+        if not self.monsters:
+            self.msg = "Aucun monstre dans le projet"
+            return
+        items = [("%s %s" % (D.CLASS_CHAR.get(m["sym"], "?"),
+                             m["fr_name"] or m["name"]),
+                  "%s, PM_%s" % (m["name"], m["bn"]))
+                 for m in self.monsters]
+        try:
+            self.cur = self.menu("Aller au monstre (%d) — tapez son nom" %
+                                 len(items), items, self.cur)
+        except Cancel:
+            return
+        self.focus = "list"
+
     def move_monster(self, delta):
         j = self.cur + delta
         if not self.monsters or not 0 <= j < len(self.monsters):
@@ -1159,6 +1177,8 @@ class Editor(Popups):
                 self.import_game()
             elif k == "t":
                 self.edit_tile()
+            elif k == "/":
+                self.goto_monster()
             elif k == "v":
                 self.show_validation()
             elif k == "c":

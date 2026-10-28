@@ -104,7 +104,10 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
   début, fin, suppression), nombre borné avec message si la valeur est
   invalide, menu filtrable, cases à cocher.
 - Menus filtrables : quelques lettres tapées réduisent la liste (sur le
-  nom C et sur la description française).
+  nom C et sur la description française), sans tenir compte des
+  accents (« securite » trouve « sécurité »).
+- `/` va à un monstre du projet : la liste se filtre sur le nom
+  français, le nom anglais ou l'identifiant.
 - Attaque en trois temps : type, dégâts, dés ; dans le menu des
   dégâts, ceux que le jeu ne gère pas avec le type choisi sont marqués
   ✖ et le curseur se place sur un choix valide.

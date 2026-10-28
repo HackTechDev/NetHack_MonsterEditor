@@ -88,6 +88,7 @@ grands mechas, `e` aux sphères et drones-caméras, `B` aux drones volants,
 | Suppr | vider le champ (attaque, texte) ; dans la liste : supprimer |
 | `n` `d` `i` | nouveau, dupliquer, importer du jeu |
 | `<` `>` | déplacer le monstre dans la liste |
+| `/` | aller à un monstre (tapez une partie de son nom) |
 | `t` | dessiner la tuile à la main (versions graphiques seulement) |
 | `v` `c` `b` | vérifier, voir le code C, comparer |
 | `I` `R` | intégrer aux sources, retirer des sources |

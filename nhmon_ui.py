@@ -119,6 +119,12 @@ def width(s):
                for c in s)
 
 
+def fold(s):
+    """Minuscules sans accents, pour filtrer (« Sécurité » -> « securite »)."""
+    return "".join(c for c in unicodedata.normalize("NFD", s.lower())
+                   if not unicodedata.combining(c))
+
+
 def clip(s, n):
     if n <= 0:
         return ""
@@ -383,7 +389,7 @@ class Popups:
         try:
             while True:
                 shown = [i for i, (a, b) in enumerate(items)
-                         if flt.lower() in (a + " " + b).lower()]
+                         if fold(flt) in fold(a + " " + b)]
                 if sel not in shown:
                     sel = shown[0] if shown else -1
                 rows = h - 4

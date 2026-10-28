@@ -15,7 +15,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 |---|---|---|
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
-| 3. Saisie et affichage | 2 / 6 | anglais, recherche, fiche comparée, aperçu de l'attaque |
+| 3. Saisie et affichage | 3 / 6 | anglais, fiche comparée, aperçu de l'attaque |
 | 4. Projets et fichiers | 0 / 5 | tout |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
@@ -112,8 +112,11 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    coupe la souris.*
 3. **Interface en anglais** **[moyen]** : textes passés par `_()` et
    catalogue anglais, choisis par la locale, comme l'éditeur de cartes.
-4. **Recherche dans la liste** **[facile]** : `/` pour aller à un
-   monstre par son nom quand le projet en compte beaucoup.
+4. ✅ **Fait** — **Recherche dans la liste** **[facile]** : `/` pour
+   aller à un monstre par son nom quand le projet en compte beaucoup.
+   *Réalisé : `/` ouvre la liste des monstres, que quelques lettres
+   filtrent (nom français, nom anglais, identifiant) ; le filtre de tous
+   les menus ignore désormais les accents.*
 5. **Fiche comparée** **[moyen]** : deux monstres côte à côte (par
    exemple un robot et le monstre du jeu dont il s'inspire), valeurs
    différentes en couleur.
