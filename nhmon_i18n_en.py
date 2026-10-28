@@ -539,12 +539,14 @@ EN = {
         "r: replace this color everywhere",
     "m : symétrie gauche -> droite": "m: mirror left -> right",
     "h : retourner     g : silhouette": "h: flip     g: silhouette",
-    "x : tout effacer  u : annuler": "x: clear all  u: undo",
+    "x : tout effacer  u : annuler  q : abandonner":
+        "x: clear all  u: undo  q: discard",
     "souris : clic peindre, clic droit pipette,":
         "mouse: click paints, right click picks,",
     "         molette couleur     Échap : terminer":
         "       wheel changes color     Esc: done",
-    " Tuile : %s ": " Tile: %s ",
+    " Tuile : %s  (versions graphiques Qt et X11) ":
+        " Tile: %s  (graphical versions Qt and X11) ",
     "Aperçu": "Preview",
     "Palette": "Palette",
     "Couleur %s": "Color %s",
@@ -702,10 +704,8 @@ EN = {
         "  < >          move the monster in the list",
     "  /            aller à un monstre (tapez une partie de son nom)":
         "  /            go to a monster (type part of its name)",
-    "  t            dessiner la tuile à la main (versions graphiques":
-        "  t            draw the tile by hand (graphical versions",
-    "               seulement ; sinon la silhouette suffit)":
-        "               only; otherwise the silhouette is enough)",
+    "  t            dessiner la tuile (aussi : champ « Tuile », Entrée)":
+        "  t            draw the tile (also: « Tile » field, Enter)",
     "Contrôle :": "Checks:",
     "  v            vérifier tous les monstres":
         "  v            check all the monsters",
@@ -786,7 +786,7 @@ EN = {
     "n : nouveau monstre": "n: new monster",
     "i : importer du jeu": "i: import from game",
     "auto (%s, d'après la classe)": "auto (%s, from the class)",
-    "personnalisée (dessinée avec t)": "custom (drawn with t)",
+    "personnalisée (dessinée)": "custom (drawn)",
     "%d (inutilisé hors classe golem)": "%d (unused outside golem class)",
     "%d (calculée)": "%d (computed)",
     "%d (forcée ; calculée : %d)": "%d (forced; computed: %d)",
@@ -820,10 +820,6 @@ EN = {
     "Attaque %d : dés": "Attack %d: dice",
     "NdM : N dés à M faces (2d6) ; 0d0 pour un effet sans dégâts":
         "NdM: N dice with M sides (2d6); 0d0 for an effect without damage",
-    "La tuile n'apparaît que dans les versions graphiques\n(Qt, X11), pas "
-    "dans le terminal. La dessiner quand même ?":
-        "The tile only shows in the graphical versions\n(Qt, X11), not in "
-        "the terminal. Draw it anyway?",
     "Tuile": "Tile",
 
     # --- nhmonedit.py : monstres ---------------------------------------
@@ -1088,4 +1084,12 @@ EN = {
         "  R            remove the monsters from the sources, or restore",
     "               une sauvegarde (annuler une intégration)":
         "               a backup (undo an integration)",
+    # champ « Tuile » et aperçu
+    "Entrée : dessiner la tuile 16×16 (clavier ou souris) ; Suppr : "
+    "revenir à la silhouette":
+        "Enter: draw the 16×16 tile (keyboard or mouse); Del: back to the "
+        "silhouette",
+    "Tuile (t)": "Tile (t)",
+    "dessinée à la main (Entrée : modifier)": "hand drawn (Enter: edit)",
+    "générée (%s) ; Entrée : dessiner": "generated (%s); Enter: draw",
 }

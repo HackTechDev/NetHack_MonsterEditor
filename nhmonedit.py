@@ -106,6 +106,8 @@ FIELDS = [
     ("choice", "tile_shape", _("Silhouette (tuile)"), _("image des versions "
      "graphiques (Qt, X11) seulement, invisible dans le terminal ; "
      "colorée d'après la couleur du monstre")),
+    ("tile", "tile", _("Tuile"), _("Entrée : dessiner la tuile 16×16 "
+     "(clavier ou souris) ; Suppr : revenir à la silhouette")),
     ("longtext", "encyclo_fr", _("Encyclopédie (fr)"), _("texte de « ; » et "
      "« / » dans le jeu, en français")),
     ("longtext", "encyclo_en", _("Encyclopédie (en)"), _("même texte en "
@@ -132,8 +134,7 @@ HELP = [
     _("  Suppr / X    supprimer le monstre (dans la liste)"),
     _("  < >          déplacer le monstre dans la liste"),
     _("  /            aller à un monstre (tapez une partie de son nom)"),
-    _("  t            dessiner la tuile à la main (versions graphiques"),
-    _("               seulement ; sinon la silhouette suffit)"),
+    _("  t            dessiner la tuile (aussi : champ « Tuile », Entrée)"),
     "",
     _("Contrôle :"),
     _("  v            vérifier tous les monstres"),
@@ -420,6 +421,11 @@ class Editor(Popups, Game):
 
     def field_value(self, m, f):
         kind, key = f[0], f[1]
+        if kind == "tile":
+            if m["tile_shape"] == T.SHAPE_CUSTOM:
+                return _("dessinée à la main (Entrée : modifier)"), 0
+            return _("générée (%s) ; Entrée : dessiner") % \
+                T.shape_label(T.shape_of(m)), curses.A_DIM
         if kind == "attack":
             at, ad, n, d = m["attacks"][key]
             if at == "AT_NONE" and ad == "AD_PHYS" and not n and not d:
@@ -437,7 +443,7 @@ class Editor(Popups, Game):
                     return _("auto (%s, d'après la classe)") % \
                         T.shape_label(T.shape_of(m)), 0
                 if v == T.SHAPE_CUSTOM:
-                    return _("personnalisée (dessinée avec t)"), 0
+                    return _("personnalisée (dessinée)"), 0
                 return T.shape_label(v), 0
             if key == "sym":
                 return "%s  %s" % (D.CLASS_CHAR.get(v, "?"), dict(
@@ -565,6 +571,18 @@ class Editor(Popups, Game):
                 self.colors.fg(curses.COLOR_CYAN), cw - 17)
             yy += 1
         yy += 1
+        # tuile en bas du panneau (demi-blocs : 16 x 8), s'il y a la place
+        S = D.TILE_SIZE
+        bottom = y + h - 1
+        if h >= 30 and cw >= S:
+            bottom -= S // 2 + 1
+            tile = T.tile_for(m)
+            put(scr, bottom, x + 2, _("Tuile (t)"), curses.A_DIM)
+            tx = x + w - 2 - S
+            for j in range(0, S, 2):
+                for i in range(S):
+                    put(scr, bottom + 1 + j // 2, tx + i, "▀",
+                        self.colors.halfblock(tile[j][i], tile[j + 1][i]))
         # vérification
         res = D.validate(m, self.game(), self.others(m))
         if not res:
@@ -572,7 +590,7 @@ class Editor(Popups, Game):
                 self.colors.fg(curses.COLOR_GREEN, True))
             return
         for g, msg in res:
-            if yy >= y + h - 1:
+            if yy >= bottom:
                 break
             a = self.colors.fg(curses.COLOR_RED, True) if g == "erreur" \
                 else self.colors.fg(curses.COLOR_YELLOW, True)
@@ -582,11 +600,11 @@ class Editor(Popups, Game):
                     put(scr, yy, x + 2, ("✖ " if g == "erreur" else "⚠ ")
                         + line if first else "  " + line, a)
                     yy, line, first = yy + 1, wd, False
-                    if yy >= y + h - 1:
+                    if yy >= bottom:
                         break
                 else:
                     line = (line + " " + wd).strip()
-            if yy < y + h - 1 and line:
+            if yy < bottom and line:
                 put(scr, yy, x + 2, (("✖ " if g == "erreur" else "⚠ ")
                                      if first else "  ") + line, a)
                 yy += 1
@@ -683,11 +701,17 @@ class Editor(Popups, Game):
         elif f[0] == "after" and m["after"]:
             self.checkpoint()
             m["after"] = ""
+        elif f[0] == "tile" and m["tile_shape"] == T.SHAPE_CUSTOM:
+            self.checkpoint()
+            m["tile_shape"] = T.SHAPE_AUTO
 
     def edit_field(self):
         m = self.mon()
         f = FIELDS[self.field]
         kind, key, label = f[0], f[1], f[2].strip()
+        if kind == "tile":
+            self.edit_tile()
+            return
         try:
             if kind in ("text", "ident"):
                 v = self.input_line(label, m[key], f[3])
@@ -791,11 +815,6 @@ class Editor(Popups, Game):
     def edit_tile(self):
         m = self.mon()
         if not m:
-            return
-        if not self.confirm(
-                _("La tuile n'apparaît que dans les versions graphiques\n"
-                "(Qt, X11), pas dans le terminal. La dessiner quand même ?"),
-                _("Tuile")):
             return
         old = T.tile_for(m)
         new = self.tile_editor(old, m["fr_name"] or m["name"])

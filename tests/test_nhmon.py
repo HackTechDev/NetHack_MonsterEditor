@@ -386,6 +386,23 @@ def bare_editor(monsters=()):
 
 
 class TestEditor(unittest.TestCase):
+    def test_tile_field(self):
+        ed = bare_editor([T.from_template(0)])
+        ed.field = [f[0] for f in E.FIELDS].index("tile")
+        drawn = ["P" * D.TILE_SIZE] * D.TILE_SIZE
+        ed.tile_editor = lambda tile, title: drawn
+        ed.edit_field()
+        self.assertEqual(ed.mon()["tile"], drawn)
+        self.assertEqual(ed.mon()["tile_shape"], T.SHAPE_CUSTOM)
+        self.assertTrue(ed.field_value(ed.mon(), E.FIELDS[ed.field])[0]
+                        .startswith("dessinée"))
+        # Suppr : retour à la tuile générée, annulable
+        ed.clear_field()
+        self.assertEqual(ed.mon()["tile_shape"], T.SHAPE_AUTO)
+        self.assertNotEqual(T.tile_for(ed.mon()), drawn)
+        ed.undo()
+        self.assertEqual(T.tile_for(ed.mon()), drawn)
+
     def test_undo_redo(self):
         ed = bare_editor([T.from_template(0)])
         ed.checkpoint()

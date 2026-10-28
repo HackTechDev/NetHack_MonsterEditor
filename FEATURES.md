@@ -248,7 +248,10 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
 - Silhouette « auto » par défaut : choisie selon la classe (mecha pour
   `H`, sphère pour `e`, drone pour `B`, araignée pour `s`, chenilles
   pour `R`…).
-- Éditeur de pixels facultatif (`t`, après un avertissement) : palette
+- Champ **Tuile** dans la fiche : Entrée ouvre l'éditeur de pixels,
+  Suppr revient à la silhouette ; la tuile est affichée en bas du
+  panneau Aperçu (demi-blocs colorés, si la hauteur le permet).
+- Éditeur de pixels (champ Tuile ou `t`) : palette
   des 29 couleurs de `monsters.txt`, aperçu en taille réelle, pipette,
   remplissage, remplacement d'une couleur, symétrie, retournement,
   silhouettes, annulation ; à la souris, clic ou glissé pour peindre

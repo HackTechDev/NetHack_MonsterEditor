@@ -60,8 +60,10 @@ fabrique donc tout seul à partir d'une **silhouette** (humanoïde,
 mecha, drone, sphère, araignée, chenilles), colorée d'après la couleur
 du monstre. Par défaut (« auto »), la silhouette dépend de la classe.
 
-Pour qui joue en graphique, `t` ouvre un éditeur de pixels ; la tuile
-dessinée (ou importée du jeu avec `i`) est alors « personnalisée ».
+Pour la dessiner soi-même, le champ **Tuile** de la fiche (Entrée) ou
+`t` ouvre l'éditeur de pixels ; le panneau de droite montre la tuile
+en permanence. La tuile dessinée (ou importée du jeu avec `i`) est
+alors « personnalisée » ; Suppr sur le champ revient à la silhouette.
 
 La **difficulté** est calculée comme dans le jeu (`mstrength()` de
 `src/mondata.c` ; le calcul retrouve celle de 380 des 382 monstres du
@@ -111,11 +113,11 @@ ouvre la fiche ou modifie le champ, la molette fait défiler ; dans les
 menus, un second clic valide. Pour sélectionner du texte dans le
 terminal, maintenir Maj ; `NHMONEDIT_MOUSE=0` coupe la souris.
 
-Éditeur de tuile (facultatif) : flèches pour se déplacer, Espace pour peindre, une
+Éditeur de tuile (champ « Tuile » ou `t`) : flèches pour se déplacer, Espace pour peindre, une
 lettre de la palette (`A`–`Z`, `.`, `0`, `1`) pour choisir la couleur
 et peindre, `f` remplir, `p` pipette, `r` remplacer une couleur, `m`
 symétrie, `h` retourner, `g` silhouette (humanoïde, mecha, drone,
-sphère, araignée, chenilles), `u` annuler, Échap pour terminer. À la
+sphère, araignée, chenilles), `u` annuler, Échap pour terminer, `q` pour abandonner le dessin. À la
 souris : clic ou glissé pour peindre, clic droit pipette, molette ou
 clic sur la palette pour la couleur.
 

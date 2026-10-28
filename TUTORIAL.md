@@ -160,8 +160,12 @@ Dans le jeu, `;` sur un monstre affiche sa description.
    paragraphe.
 
 Le champ **Silhouette (tuile)** ne concerne que les versions
-graphiques du jeu (Qt, X11) : laissez-le tel quel. Dans le terminal, la
-sentinelle est un `'` rouge.
+graphiques du jeu (Qt, X11) : la tuile est fabriquée d'après elle, et
+s'affiche en bas du panneau Aperçu. Pour la dessiner vous-même,
+placez-vous sur le champ **Tuile** et `[Entrée]` : flèches et Espace (ou la
+souris) pour peindre, une lettre pour changer de couleur, `[Échap]`
+pour terminer. `[Suppr]` sur ce champ revient à la silhouette. Dans le
+terminal, la sentinelle reste un `'` rouge.
 
 ## 8. Vérifier et équilibrer
 

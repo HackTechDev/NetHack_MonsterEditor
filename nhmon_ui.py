@@ -652,8 +652,8 @@ class Popups:
     # --- éditeur de tuile -------------------------------------------------
 
     def tile_editor(self, tile, title):
-        """Dessin d'une tuile 16x16 ; renvoie la nouvelle tuile ou la
-        tuile d'origine (Échap puis « n »)."""
+        """Dessin d'une tuile 16x16. Échap garde le dessin, q propose de
+        l'abandonner ; renvoie la tuile retenue."""
         pal = [c for c, _ in D.TILE_PALETTE]
         rgb = dict(D.TILE_PALETTE)
         grid = [list(r) for r in tile]
@@ -670,7 +670,7 @@ class Popups:
             _("r : remplacer cette couleur partout"),
             _("m : symétrie gauche -> droite"),
             _("h : retourner     g : silhouette"),
-            _("x : tout effacer  u : annuler"),
+            _("x : tout effacer  u : annuler  q : abandonner"),
             _("souris : clic peindre, clic droit pipette,"),
             _("         molette couleur     Échap : terminer"),
         ]
@@ -679,7 +679,8 @@ class Popups:
             while True:
                 self.stdscr.erase()
                 H, W = self.stdscr.getmaxyx()
-                put(self.stdscr, 0, 0, (_(" Tuile : %s ") % title).ljust(W),
+                put(self.stdscr, 0, 0, (_(" Tuile : %s  (versions graphiques "
+                                          "Qt et X11) ") % title).ljust(W),
                     self.colors.pair(curses.COLOR_BLACK,
                                      curses.COLOR_MAGENTA) | curses.A_BOLD)
                 oy, ox = 2, 2
