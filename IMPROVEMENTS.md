@@ -13,7 +13,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 
 | Thème | Fait | Reste |
 |---|---|---|
-| 1. Limites connues | 0 / 5 | tout |
+| 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 0 / 6 | tout |
 | 4. Projets et fichiers | 0 / 5 | tout |
@@ -22,10 +22,9 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
 | 8. Qualité du projet | 0 / 4 | tout |
 
-Prochaines étapes conseillées : le **pluriel français** (1.3), les
-**sons réservés** (2.2), qui comme les attaques ne se voient qu'en
-jouant, et le **lien avec l'éditeur de cartes** (7.1), qui permettra de
-placer les robots dans les niveaux.
+Prochaines étapes conseillées : les **sons réservés** (2.2), qui comme
+les attaques ne se voient qu'en jouant, et le **lien avec l'éditeur de
+cartes** (7.1), qui permettra de placer les robots dans les niveaux.
 
 ## 1. Limites connues
 
@@ -42,11 +41,19 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    essayé en partie. Un test qui lit le fichier compilé avec la même
    recherche que `pager.c` (premier motif qui correspond, jokers `*` et
    `?`, exclusions `~`) le garantirait.
-3. **Pluriel français** **[facile]**. Le jeu forme le pluriel lui-même
+3. ✅ **Fait** — **Pluriel français** **[facile]**. Le jeu forme le
+   pluriel lui-même
    (`i18n_mon_plural()` : « mecha de combat » → « mechas de combat »),
    mais se trompe sur certains noms (« Exo-Mecha Kenshin », mots en
    -al…). Montrer le pluriel calculé dans la fiche et ajouter un champ
    « pluriel » qui écrit l'exception (contexte `monster-plural`).
+   *Réalisé : `french_plural()` reproduit `i18n_mon_plural()` octet pour
+   octet, `plural_doubts()` signale noms propres, sigles et mots en -al,
+   -ail, -ou ; champ « Pluriel français », exception écrite dans
+   `po/themes/fr@cyber.po`. Le contrôle retrouve les exceptions déjà
+   écrites dans le thème (« motos-chevaux », « IA corrompues ») et
+   signale « pirate neuronal » (pluriel du jeu : « pirates
+   neuronals »).*
 4. **Un seul projet par jeu** **[moyen]**. Une intégration remplace tous
    les monstres ajoutés par une intégration précédente, même venus d'un
    autre projet. Retenir le projet d'origine de chaque monstre intégré

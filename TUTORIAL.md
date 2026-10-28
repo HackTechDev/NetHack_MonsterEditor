@@ -83,7 +83,14 @@ Dans la fiche, `[↑]` et `[↓]` passent d'un champ à l'autre ; `[←]` et
 1. **Genre (français)** : `[↓]` une fois, puis `[→]` pour passer à
    « féminin ». Le jeu en a besoin pour accorder ses phrases : « la
    sentinelle Arasaka est détruite ».
-2. **Couleur** : descendez jusqu'au champ « Couleur » et faites
+2. **Pluriel français** : le champ juste en dessous affiche, en jaune,
+   « auto : sentinelles Arasakas (à vérifier) ». Le jeu forme le
+   pluriel en ajoutant un « s » à chaque mot (il s'en sert par exemple
+   pour « trois sentinelles Arasaka » ou au génocide), et se trompe ici :
+   « Arasaka » est un nom propre. Faites `[Entrée]`, effacez le « s »
+   final pour obtenir `sentinelles Arasaka`, puis `[Entrée]`. Le
+   pluriel corrigé sera écrit dans le catalogue du thème.
+3. **Couleur** : descendez jusqu'au champ « Couleur » et faites
    `[Entrée]`. Tapez `rouge` pour filtrer, puis `[Entrée]`. Le symbole
    `'` passe au rouge dans la liste et la fiche.
 

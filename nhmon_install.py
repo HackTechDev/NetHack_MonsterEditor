@@ -251,7 +251,12 @@ def po_entries(m, kind):
             # fr.po : masculin vide ; thème : « m » explicite (sinon c'est
             # le genre de fr.po qui serait repris)
             gender = g if (g == "f" or kind == "cyber") else ""
-        for ctx, val in (("monster", name_tr), ("gender", gender)):
+        ctxs = [("monster", name_tr), ("gender", gender)]
+        # pluriel corrigé à la main : dans le thème seulement, comme les
+        # autres exceptions « monster-plural » (fr.po n'en a pas)
+        if kind == "cyber" and en == m["name"] and m["fr_plural"].strip():
+            ctxs.append(("monster-plural", m["fr_plural"].strip()))
+        for ctx, val in ctxs:
             out.append("# %s: %s\nmsgctxt \"%s\"\nmsgid %s\nmsgstr %s"
                        % (TAG, m["bn"], ctx, _po_str(en), _po_str(val)))
     return out

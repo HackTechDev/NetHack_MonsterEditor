@@ -129,6 +129,32 @@ class TestTemplates(unittest.TestCase):
         self.assertTrue(D.attack_allows("AT_CLAW", "AD_ELEC"))
         self.assertFalse(D.attack_allows("AT_BREA", "AD_PLYS"))
 
+    def test_french_plural(self):
+        P = D.french_plural
+        self.assertEqual(P("mecha de combat"), "mechas de combat")
+        self.assertEqual(P("drone d'assaut"), "drones d'assaut")
+        self.assertEqual(P("araignée-robot"), "araignées-robots")
+        self.assertEqual(P("loup-garou"), "loups-garous")
+        self.assertEqual(P("nymphe des eaux"), "nymphes des eaux")
+        self.assertEqual(P("jeu"), "jeux")
+        self.assertEqual(P("robot à vapeur"), "robots à vapeur")
+        # comme le jeu : la règle se trompe, le contrôle le signale
+        self.assertEqual(P("sentinelle Arasaka"), "sentinelles Arasakas")
+        self.assertTrue(D.plural_doubts("sentinelle Arasaka"))
+        self.assertTrue(D.plural_doubts("cheval mécanique"))
+        self.assertTrue(D.plural_doubts("IA corrompue"))
+        self.assertFalse(D.plural_doubts("mecha de combat"))
+
+    def test_plural_po_entry(self):
+        m = T.from_template(0)
+        self.assertNotIn("monster-plural",
+                         "".join(I.po_entries(m, "cyber")))
+        m["fr_plural"] = "robots de sécurité"
+        cyber = "".join(I.po_entries(m, "cyber"))
+        self.assertIn('msgctxt "monster-plural"\nmsgid "security bot"\n'
+                      'msgstr "robots de sécurité"', cyber)
+        self.assertNotIn("monster-plural", "".join(I.po_entries(m, "fr")))
+
     def test_derive_bn(self):
         self.assertEqual(D.derive_bn("araignée-robot"), "ARAIGNEE_ROBOT")
         self.assertEqual(D.derive_bn("2 bots"), "M_2_BOTS")

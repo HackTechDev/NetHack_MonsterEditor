@@ -64,7 +64,8 @@ touchés, le [README](README.md) ou `?` dans l'éditeur.
 
 Tous les champs d'une entrée `MON()` de `include/monsters.h`.
 
-- **Identité** : nom français et son genre grammatical, nom anglais
+- **Identité** : nom français, son genre grammatical et son pluriel
+  (calculé comme le jeu, corrigeable ; voir « Pluriel »), nom anglais
   (nom interne), identifiant C, noms anglais et français par genre
   (facultatifs, comme « dwarf lord » / « dwarf lady »).
 - **Classe** : les 57 classes du jeu, avec leur lettre et un conseil
@@ -113,6 +114,25 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
 - Changer le nom anglais met à jour l'identifiant C tant qu'il n'a pas
   été choisi à la main.
 
+## Pluriel
+
+- Le pluriel français que le jeu emploie (« trois mechas de combat »,
+  génocide, avertissements) est calculé exactement comme
+  `i18n_mon_plural()` de `src/do_name.c` : « s » (ou « x » après « au »,
+  « eu ») à chaque mot avant le premier complément (« de », « d' »,
+  « des », « du », « à », « en »), mots séparés par espaces et traits
+  d'union.
+- Affiché dans la fiche (« auto : mechas de combat ») ; en jaune
+  « à vérifier » quand la règle risque de se tromper : nom propre
+  (« sentinelles Arasakas »), sigle (« IAs »), mot en -al ou -ail
+  (« chevals »), mot en -ou qui prend un x, « bleu » et « pneu ».
+- Avertissement correspondant dans la vérification (sauf pour les
+  monstres uniques ou à nom propre, jamais au pluriel).
+- Pluriel corrigeable : il est alors écrit dans
+  `po/themes/fr@cyber.po` (contexte `monster-plural`, comme les
+  exceptions du thème) ; une saisie identique au calcul revient à
+  « auto ».
+
 ## Difficulté et équilibrage
 
 - Difficulté calculée comme dans le jeu (`mstrength()` de
@@ -152,7 +172,8 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
 - Avertissements : arme sans mains, dégâts réservés aux Cavaliers,
   engloutissement par un petit monstre, emplacement d'attaque vide avant
   une attaque, aucune attaque, fréquence nulle sans `G_NOGEN`, cadavre
-  sans valeur nutritive, nom français absent ou avec majuscule, noms par
+  sans valeur nutritive, nom français absent ou avec majuscule, pluriel
+  calculé douteux, noms par
   genre sans traduction, difficulté forcée différente du calcul, tuile
   personnalisée vide.
 
@@ -227,9 +248,9 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
 
 ## Qualité
 
-- 16 tests (`python3 -m unittest discover -s tests`) : lecture de
+- 18 tests (`python3 -m unittest discover -s tests`) : lecture de
   `monsters.h`, constantes connues, difficulté, aller-retour du code C,
-  noms français, combinaisons d'attaques, modèles, tuiles, intégration et retrait sur une copie
+  noms français, combinaisons d'attaques, pluriel, modèles, tuiles, intégration et retrait sur une copie
   des sources, ordre des tuiles, `golemhp()`, catalogues de traduction.
 - Vérifié sur une copie complète des sources : compilation sans
   avertissement avec dix robots, `tilemap` sans erreur, monstre créé en

@@ -29,8 +29,9 @@ direct.
 
 Tout ce que contient une entrée `MON()` de `include/monsters.h` :
 
-- **identité** : nom français (affiché dans le jeu, thème `fr@cyber`) et
-  son genre, nom anglais (nom interne, à taper avec Ctrl-G en mode
+- **identité** : nom français (affiché dans le jeu, thème `fr@cyber`),
+  son genre et son pluriel (calculé comme le jeu, à corriger quand il se
+  trompe : « sentinelles Arasakas »), nom anglais (nom interne, à taper avec Ctrl-G en mode
   wizard), identifiant `PM_`, noms par genre facultatifs ;
 - **apparence** : classe (lettre sur la carte) et couleur ;
 - **caractéristiques** : niveau, vitesse, classe d'armure, résistance à
@@ -109,7 +110,7 @@ sphère, araignée, chenilles), `u` annuler, Échap pour terminer.
    | `include/monsters.h` | l'entrée `MON()`, à la fin de la classe choisie |
    | `src/makemon.c` | les PV fixes dans `golemhp()` (classe golem) |
    | `win/share/monsters.txt` | les tuiles mâle et femelle |
-   | `po/fr.po`, `po/themes/fr@cyber.po`, `po/nethack.pot` | nom français et genre |
+   | `po/fr.po`, `po/themes/fr@cyber.po`, `po/nethack.pot` | nom français, genre et pluriel corrigé |
    | `dat/data.base`, `dat/data-fr.base`, `dat/data-fr@cyber.base` | encyclopédie |
    | `include/patchlevel.h` | `EDITLEVEL` + 1 quand la liste des monstres change |
 

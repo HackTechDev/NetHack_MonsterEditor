@@ -371,6 +371,7 @@ def new_monster():
         "name": "new robot",
         "name_m": "", "name_f": "",          # NAMS(mâle, femelle, neutre)
         "fr_name": "nouveau robot", "fr_gender": "m",
+        "fr_plural": "",               # vide : pluriel calculé par le jeu
         "fr_name_m": "", "fr_name_f": "",
         "sym": "S_GOLEM",
         "level": 5, "move": 9, "ac": 5, "mr": 0, "align": 0,
@@ -769,6 +770,74 @@ def parse_monsters_h(path):
     return out
 
 
+# --- pluriel français ----------------------------------------------------
+
+_PLURAL_STOPS = [" de ", " d'", " des ", " du ", " à ", " en "]
+
+
+def french_plural(tr):
+    """Pluriel que le jeu forme pour un nom français : i18n_mon_plural()
+    de src/do_name.c, octet pour octet (UTF-8). Chaque mot avant le
+    premier complément (« de », « d' »… « en ») prend un « s », ou un
+    « x » après « au » et « eu », sauf s'il finit par s, x ou z ou n'a
+    qu'un octet ; les mots sont séparés par des espaces ou des traits
+    d'union."""
+    b = tr.encode("utf-8")
+    end, rest = len(b), b""
+    for st in _PLURAL_STOPS:
+        i = b.find(st.encode("utf-8"))
+        if i >= 0 and i < end:
+            end, rest = i, b[i:]
+    if not rest:
+        rest = b[end:]
+    out = b""
+    p = 0
+    while p < end:
+        q = p
+        while q < end and b[q:q + 1] not in (b" ", b"-"):
+            q += 1
+        out += b[p:q]
+        if q - p >= 2 and b[q - 1:q] not in (b"s", b"x", b"z"):
+            out += b"x" if b[q - 1:q] == b"u" and b[q - 2:q - 1] in (
+                b"a", b"e") else b"s"
+        if q < end:
+            out += b[q:q + 1]
+            q += 1
+        p = q
+    return (out + rest).decode("utf-8", errors="replace")
+
+
+# exceptions courantes de la règle « + s »
+_PLURAL_IRREGULAR = ("al", "ail")
+_PLURAL_OU_X = ("bijou", "caillou", "chou", "genou", "hibou", "joujou",
+                "pou")
+_PLURAL_INVARIABLE = ("bleu", "pneu", "landau", "sarrau")
+
+
+def plural_doubts(tr):
+    """Raisons de douter du pluriel calculé d'un nom français."""
+    out = []
+    head = tr
+    for st in _PLURAL_STOPS:
+        i = head.find(st)
+        if i >= 0:
+            head = head[:i]
+    words = re.split(r"[ -]", head)
+    for k, w in enumerate(words):
+        lw = w.lower()
+        if len(w) >= 2 and w.isupper():
+            out.append("« %s » est un sigle (invariable)" % w)
+        elif k and w[:1].isupper():
+            out.append("« %s » est un nom propre (pas de « s »)" % w)
+        elif lw.endswith(_PLURAL_IRREGULAR) and len(lw) > 3:
+            out.append("« %s » fait peut-être son pluriel en -aux" % w)
+        elif lw in _PLURAL_OU_X:
+            out.append("« %s » prend un x au pluriel" % w)
+        elif lw in _PLURAL_INVARIABLE:
+            out.append("« %s » prend un s au pluriel, pas un x" % w)
+    return out
+
+
 # --- vérification -------------------------------------------------------
 
 # Dégâts que le code du jeu sait traiter pour chaque type d'attaque
@@ -970,6 +1039,11 @@ def validate(m, game=None, project=None):
              "des phrases (« le Mecha… ») ; M2_PNAME pour un nom propre")
     if not m["fr_name"].strip():
         warn("Pas de nom français : le jeu affichera le nom anglais")
+    elif not m["fr_plural"].strip() and "G_UNIQ" not in m["geno"] \
+            and "M2_PNAME" not in m["flags2"]:
+        for why in plural_doubts(m["fr_name"]):
+            warn("Pluriel calculé « %s » : %s ; corrigez-le dans "
+                 "« Pluriel français »" % (french_plural(m["fr_name"]), why))
     if m["fr_gender"] not in ("m", "f"):
         err("Genre français : m ou f")
     if m["name_m"] and not (m["fr_name_m"] and m["fr_name_f"]):

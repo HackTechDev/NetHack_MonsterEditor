@@ -45,6 +45,9 @@ FIELDS = [
      "(thème fr@cyber)"),
     ("choice", "fr_gender", "Genre (français)", "accord des phrases : "
      "« le », « la », « détruit », « détruite »"),
+    ("plural", "fr_plural", "Pluriel français", "« trois mechas de "
+     "combat » : vide = calculé par le jeu (s ou x à chaque mot avant "
+     "« de », « à »…) ; Entrée pour le corriger"),
     ("text", "name", "Nom anglais", "nom interne du jeu (en minuscules) ; "
      "c'est lui qu'on tape avec ^G en mode wizard"),
     ("ident", "bn", "Identifiant PM_", "nom C : PM_<identifiant>, en "
@@ -399,6 +402,14 @@ class Editor(Popups):
         if kind == "longtext":
             s = " ".join(v.split())
             return (s or "—"), (0 if s else curses.A_DIM)
+        if kind == "plural":
+            if v:
+                return v, 0
+            auto = D.french_plural(m["fr_name"]) if m["fr_name"] else "—"
+            doubt = D.plural_doubts(m["fr_name"])
+            return "auto : %s%s" % (auto, "  (à vérifier)" if doubt else ""), \
+                self.colors.fg(curses.COLOR_YELLOW, True) if doubt \
+                else curses.A_DIM
         if not v:
             return "—", curses.A_DIM
         return v, 0
@@ -571,7 +582,8 @@ class Editor(Popups):
             used = [a for a in m["attacks"] if a != D.NO_ATTK]
             m["attacks"] = used + [list(D.NO_ATTK)
                                    for _ in range(D.NATTK - len(used))]
-        elif f[0] in ("text", "longtext") and f[1] not in ("name",):
+        elif f[0] in ("text", "longtext", "plural") \
+                and f[1] not in ("name",):
             self.checkpoint()
             m[f[1]] = ""
         elif f[0] == "difficulty":
@@ -597,6 +609,16 @@ class Editor(Popups):
                                                  "NEW_ROBOT"):
                     m["bn"] = D.derive_bn(v)
                 m[key] = v
+            elif kind == "plural":
+                auto = D.french_plural(m["fr_name"])
+                v = self.input_line(label, m[key] or auto,
+                                    "vide ou inchangé = pluriel calculé "
+                                    "(%s)" % auto).strip()
+                if v == auto:
+                    v = ""
+                if v != m[key]:
+                    self.checkpoint()
+                    m[key] = v
             elif kind == "int":
                 v = self.input_int(label, m[key], f[4], f[5], f[3])
                 if v != m[key]:
