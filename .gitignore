@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+# copies des sources faites avant chaque intégration
+sauvegardes/
+# fichiers temporaires d'enregistrement
+*.tmp
+*.nhmonedit-tmp
+# notes personnelles, hors du dépôt
+claude_task.md
