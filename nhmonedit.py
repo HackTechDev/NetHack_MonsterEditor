@@ -23,7 +23,8 @@ import time
 import nhmon_data as D
 import nhmon_install as I
 import nhmon_templates as T
-from nhmon_ui import (Cancel, Colors, ESC, Popups, get_key, is_enter, put)
+from nhmon_ui import (Cancel, Colors, ESC, Mouse, Popups, enable_mouse,
+                      get_key, is_enter, put, wheel)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PROJECT = os.path.join(HERE, "monstres.json")
@@ -149,6 +150,11 @@ HELP = [
     "  s            enregistrer le projet",
     "  u            annuler la dernière modification",
     "  Ctrl-R       rétablir ce qui a été annulé (aussi Ctrl-Y)",
+    "",
+    "Souris : un clic choisit un monstre ou un champ, un double clic",
+    "ouvre la fiche ou modifie le champ ; la molette fait défiler. Dans",
+    "les menus, un second clic valide. Pour sélectionner du texte dans",
+    "le terminal, maintenez Maj (NHMONEDIT_MOUSE=0 coupe la souris).",
     "  ?            cette aide       q  quitter",
     "",
     "En jeu (mode wizard) : Ctrl-G puis le nom ANGLAIS du monstre pour",
@@ -189,6 +195,8 @@ class Editor(Popups):
         self.redo_stack = []
         self.msg = ""
         self.form_top = 0
+        self.list_top = 0
+        self.areas = {}         # zone -> (y, x, h, w), pour la souris
         self._game = None
         self._fr = None
         self._inst = (None, {})
@@ -308,6 +316,7 @@ class Editor(Popups):
         lw = 30
         rw = 40 if W >= 120 else 0
         fw = W - lw - rw
+        self.areas = {"list": (1, 0, H - 3, lw), "form": (1, lw, H - 3, fw)}
         self.draw_list(1, 0, H - 3, lw)
         self.draw_form(1, lw, H - 3, fw)
         if rw:
@@ -342,6 +351,7 @@ class Editor(Popups):
             return
         rows = h - 2
         top = max(0, min(self.cur - rows // 2, len(self.monsters) - rows))
+        self.list_top = top
         for r, m in enumerate(self.monsters[top:top + rows]):
             i = top + r
             sel = i == self.cur
@@ -1002,6 +1012,7 @@ class Editor(Popups):
         curses.reset_prog_mode()
         self.stdscr.clear()
         curses.curs_set(0)
+        enable_mouse()
         return rc
 
     def make(self):
@@ -1064,6 +1075,41 @@ class Editor(Popups):
         cmd = "HACKDIR=%s %s -D" % (shlex.quote(d), shlex.quote(exe))
         self.run_external("NetHack (mode wizard)", cmd, d)
 
+    # --- souris -------------------------------------------------------------
+
+    def mouse(self, ev):
+        """Clic : choisir un monstre ou un champ ; double clic : ouvrir
+        la fiche ou modifier le champ ; molette : faire défiler."""
+        for zone, (y, x, h, w) in self.areas.items():
+            if y < ev.y < y + h - 1 and x < ev.x < x + w - 1:
+                break
+        else:
+            return
+        if not self.monsters:
+            return
+        row = ev.y - y - 1
+        if zone == "list":
+            self.focus = "list"
+            if wheel(ev):
+                self.cur = max(0, min(len(self.monsters) - 1,
+                                      self.cur + 3 * wheel(ev)))
+            elif ev.kind in ("click", "double") and \
+                    self.list_top + row < len(self.monsters):
+                self.cur = self.list_top + row
+                if ev.kind == "double":
+                    self.focus = "form"
+        else:
+            self.focus = "form"
+            if wheel(ev):
+                for _ in range(3):
+                    self.move_field(wheel(ev))
+            elif ev.kind in ("click", "double"):
+                i = self.form_top + row
+                if i < len(FIELDS) and FIELDS[i][0] != "section":
+                    self.field = i
+                    if ev.kind == "double":
+                        self.edit_field()
+
     # --- boucle -------------------------------------------------------------
 
     def quit(self):
@@ -1084,6 +1130,7 @@ class Editor(Popups):
     def run(self):
         curses.curs_set(0)
         self.stdscr.keypad(True)
+        enable_mouse()
         while True:
             self.draw()
             k = get_key(self.stdscr)
@@ -1091,7 +1138,9 @@ class Editor(Popups):
                 self.msg = ""
             if k == curses.KEY_RESIZE:
                 continue
-            if k == "q":
+            if isinstance(k, Mouse):
+                self.mouse(k)
+            elif k == "q":
                 if self.quit():
                     return
             elif k == "?":

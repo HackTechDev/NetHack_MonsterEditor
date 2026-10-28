@@ -12,7 +12,7 @@ touchés, le [README](README.md) ou `?` dans l'éditeur.
   ajoute aux sources du jeu ; pensé pour les robots et les mechas de
   Night City, mais tout monstre est possible.
 - Interface en français, saisie des accents (UTF-8).
-- Utilisable entièrement au clavier.
+- Utilisable entièrement au clavier, ou à la souris (voir Saisie).
 - Annulation (`u`) des 100 dernières modifications du projet, et
   rétablissement (Ctrl-R ou Ctrl-Y) de ce qui a été annulé.
 - Lanceur `nhmonedit.sh`, utilisable depuis un lien symbolique ;
@@ -114,6 +114,12 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
   ligne à l'affichage.
 - Changer le nom anglais met à jour l'identifiant C tant qu'il n'a pas
   été choisi à la main.
+- Souris : un clic choisit un monstre ou un champ, un double clic ouvre
+  la fiche ou modifie le champ ; la molette fait défiler la liste, la
+  fiche, les menus, les cases à cocher et les textes ; dans un menu, un
+  second clic valide, dans les cases à cocher, un clic coche.
+  `NHMONEDIT_MOUSE=0` coupe la souris (Maj + clic sélectionne du texte
+  dans la plupart des terminaux).
 
 ## Pluriel
 
@@ -199,7 +205,9 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
 - Éditeur de pixels facultatif (`t`, après un avertissement) : palette
   des 29 couleurs de `monsters.txt`, aperçu en taille réelle, pipette,
   remplissage, remplacement d'une couleur, symétrie, retournement,
-  silhouettes, annulation. Une tuile dessinée ou importée du jeu devient
+  silhouettes, annulation ; à la souris, clic ou glissé pour peindre
+  (un trait s'annule d'un coup), clic droit pipette, molette ou clic
+  sur la palette pour la couleur. Une tuile dessinée ou importée du jeu devient
   « personnalisée ».
 - Couleurs exactes sur les terminaux à 256 couleurs, approchées sinon.
 

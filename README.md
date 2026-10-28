@@ -19,7 +19,8 @@ la liste complète des fonctions est dans [FEATURES.md](FEATURES.md).
 ```
 
 Variables : `NHMONEDIT_SRC` (sources du jeu), `NHMONEDIT_HACKDIR`
-(dossier du jeu installé, par défaut `~/nh/install/games/lib/nethackdir`).
+(dossier du jeu installé, par défaut `~/nh/install/games/lib/nethackdir`),
+`NHMONEDIT_MOUSE=0` (sans souris).
 
 Terminal de 80×24 au minimum ; à partir de 120 colonnes, un panneau
 « Aperçu » montre la difficulté, les PV et les problèmes du monstre en
@@ -93,11 +94,18 @@ grands mechas, `e` aux sphères et drones-caméras, `B` aux drones volants,
 | `m` `U` `j` | compiler, mettre à jour le jeu installé, jouer |
 | `s` `u` Ctrl-R `?` `q` | enregistrer, annuler, rétablir, aide, quitter |
 
+**Souris** : un clic choisit un monstre ou un champ, un double clic
+ouvre la fiche ou modifie le champ, la molette fait défiler ; dans les
+menus, un second clic valide. Pour sélectionner du texte dans le
+terminal, maintenir Maj ; `NHMONEDIT_MOUSE=0` coupe la souris.
+
 Éditeur de tuile (facultatif) : flèches pour se déplacer, Espace pour peindre, une
 lettre de la palette (`A`–`Z`, `.`, `0`, `1`) pour choisir la couleur
 et peindre, `f` remplir, `p` pipette, `r` remplacer une couleur, `m`
 symétrie, `h` retourner, `g` silhouette (humanoïde, mecha, drone,
-sphère, araignée, chenilles), `u` annuler, Échap pour terminer.
+sphère, araignée, chenilles), `u` annuler, Échap pour terminer. À la
+souris : clic ou glissé pour peindre, clic droit pipette, molette ou
+clic sur la palette pour la couleur.
 
 ## Du projet au jeu
 

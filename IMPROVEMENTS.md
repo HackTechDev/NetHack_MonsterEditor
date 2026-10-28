@@ -15,7 +15,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 |---|---|---|
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
-| 3. Saisie et affichage | 1 / 6 | souris, anglais, recherche, fiche comparée, aperçu de l'attaque |
+| 3. Saisie et affichage | 2 / 6 | anglais, recherche, fiche comparée, aperçu de l'attaque |
 | 4. Projets et fichiers | 0 / 5 | tout |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
@@ -102,8 +102,14 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    rétablit ; ajouter Ctrl-R comme dans l'éditeur de cartes.
    *Réalisé : Ctrl-R (ou Ctrl-Y) rétablit, 100 niveaux ; une nouvelle
    modification vide la pile des rétablissements.*
-2. **Souris** **[moyen]** : choisir un monstre ou un champ d'un clic,
-   faire défiler les listes à la molette, peindre la tuile à la souris.
+2. ✅ **Fait** — **Souris** **[moyen]** : choisir un monstre ou un champ
+   d'un clic, faire défiler les listes à la molette, peindre la tuile à
+   la souris. *Réalisé : clic et double clic dans la liste et la fiche,
+   molette partout (liste, fiche, menus, cases à cocher, visionneuse),
+   second clic qui valide un menu ; dans l'éditeur de tuile, clic et
+   glissé pour peindre (un trait = une annulation), clic droit pipette,
+   clic sur la palette, molette pour la couleur. `NHMONEDIT_MOUSE=0`
+   coupe la souris.*
 3. **Interface en anglais** **[moyen]** : textes passés par `_()` et
    catalogue anglais, choisis par la locale, comme l'éditeur de cartes.
 4. **Recherche dans la liste** **[facile]** : `/` pour aller à un

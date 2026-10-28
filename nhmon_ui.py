@@ -3,6 +3,8 @@
 visionneuse, confirmation) et éditeur de tuile 16x16."""
 
 import curses
+import os
+import time
 import unicodedata
 
 import nhmon_data as D
@@ -148,8 +150,78 @@ def box(win, title="", attr=0):
         put(win, 0, 2, " %s " % title, attr | curses.A_BOLD)
 
 
+# --- souris -------------------------------------------------------------
+
+class Mouse:
+    """Événement souris rendu par get_key() à la place d'une touche.
+    kind : click, double, right, drag (bouton gauche enfoncé qui se
+    déplace), up, down (molette). y, x : coordonnées de l'écran."""
+
+    def __init__(self, kind, y, x):
+        self.kind, self.y, self.x = kind, y, x
+
+    def inside(self, win):
+        """(ligne, colonne) relatives à win, ou None hors de la fenêtre."""
+        by, bx = win.getbegyx()
+        h, w = win.getmaxyx()
+        if by <= self.y < by + h and bx <= self.x < bx + w:
+            return self.y - by, self.x - bx
+        return None
+
+    def __repr__(self):
+        return "Mouse(%s, %d, %d)" % (self.kind, self.y, self.x)
+
+
+_mouse = {"on": False, "held": False, "last": (0, -1, -1)}
+_WHEEL_UP = getattr(curses, "BUTTON4_PRESSED", 0x10000)
+_WHEEL_DOWN = getattr(curses, "BUTTON5_PRESSED", 0x200000)
+
+
+def enable_mouse(motion=False):
+    """Active la souris (sauf NHMONEDIT_MOUSE=0). motion : suivre aussi
+    les déplacements bouton enfoncé (pour peindre la tuile)."""
+    if os.environ.get("NHMONEDIT_MOUSE", "1") == "0":
+        return
+    mask = curses.ALL_MOUSE_EVENTS
+    if motion:
+        mask |= curses.REPORT_MOUSE_POSITION
+    try:
+        curses.mousemask(mask)
+        curses.mouseinterval(0)     # appui et relâchement sans attente
+        _mouse["on"] = True
+    except curses.error:
+        pass
+
+
+def _mouse_event():
+    try:
+        _id, x, y, _z, b = curses.getmouse()
+    except curses.error:
+        return None
+    if b & _WHEEL_UP:
+        return Mouse("up", y, x)
+    if b & _WHEEL_DOWN:
+        return Mouse("down", y, x)
+    if b & curses.BUTTON3_PRESSED:
+        return Mouse("right", y, x)
+    if b & (curses.BUTTON1_PRESSED | curses.BUTTON1_CLICKED):
+        _mouse["held"] = bool(b & curses.BUTTON1_PRESSED)
+        t, ly, lx = _mouse["last"]
+        now = time.monotonic()
+        double = now - t < 0.4 and (ly, lx) == (y, x)
+        _mouse["last"] = (0 if double else now, y, x)
+        return Mouse("double" if double else "click", y, x)
+    if b & curses.BUTTON1_RELEASED:
+        _mouse["held"] = False
+        return None
+    if b & curses.REPORT_MOUSE_POSITION and _mouse["held"]:
+        return Mouse("drag", y, x)
+    return None
+
+
 def get_key(win):
-    """Touche lue : caractère (str) ou code curses (int)."""
+    """Touche lue : caractère (str), code curses (int) ou Mouse.
+    Les relâchements et déplacements sans bouton sont ignorés."""
     while True:
         try:
             k = win.get_wch()
@@ -157,9 +229,19 @@ def get_key(win):
             continue
         except KeyboardInterrupt:
             return ESC
-        if k == curses.KEY_RESIZE:
-            return k
+        if k == curses.KEY_MOUSE:
+            ev = _mouse_event()
+            if ev is None:
+                continue
+            return ev
         return k
+
+
+def wheel(k):
+    """-1 / +1 pour la molette, 0 sinon."""
+    if isinstance(k, Mouse):
+        return {"up": -1, "down": 1}.get(k.kind, 0)
+    return 0
 
 
 def centered(stdscr, h, w):
@@ -325,6 +407,18 @@ class Popups:
                 k = get_key(win)
                 if is_enter(k) and sel >= 0:
                     return sel
+                if isinstance(k, Mouse) and shown:
+                    pos = k.inside(win)
+                    r = pos[0] - 2 if pos else -1
+                    if wheel(k):
+                        idx = max(0, min(len(shown) - 1, idx + 3 * wheel(k)))
+                    elif 0 <= r < rows and top + r < len(shown):
+                        # un clic choisit la ligne, un second la valide
+                        if shown[top + r] == sel or k.kind == "double":
+                            return shown[top + r]
+                        idx = top + r
+                    sel = shown[idx]
+                    continue
                 if k == ESC:
                     if flt:
                         flt = ""
@@ -376,8 +470,8 @@ class Popups:
                     top = cur - rows + 1
                 win.erase()
                 box(win, title, self.accent())
-                put(win, 1, 2, "Espace : cocher   Entrée : valider   "
-                    "Échap : annuler", curses.A_DIM)
+                put(win, 1, 2, "Espace ou clic : cocher   Entrée : valider"
+                    "   Échap : annuler", curses.A_DIM)
                 for r, (n, d) in enumerate(items[top:top + rows]):
                     i = top + r
                     mark = "[x]" if n in sel else "[ ]"
@@ -392,7 +486,16 @@ class Popups:
                     return [n for n, _ in items if n in sel]
                 if k == ESC:
                     raise Cancel
-                if k == " ":
+                if isinstance(k, Mouse):
+                    pos = k.inside(win)
+                    r = pos[0] - 2 if pos else -1
+                    if wheel(k):
+                        cur = max(0, min(len(items) - 1, cur + 3 * wheel(k)))
+                    elif k.kind in ("click", "double") and 0 <= r < rows \
+                            and top + r < len(items):
+                        cur = top + r
+                        sel.symmetric_difference_update({items[cur][0]})
+                elif k == " ":
                     n = items[cur][0]
                     sel.symmetric_difference_update({n})
                     cur = min(len(items) - 1, cur + 1)
@@ -428,7 +531,10 @@ class Popups:
                 k = get_key(win)
                 if k in (ESC, "q", "\n", "\r", curses.KEY_ENTER):
                     return
-                if k == curses.KEY_UP:
+                if wheel(k):
+                    top = max(0, min(max(0, len(lines) - rows),
+                                     top + 3 * wheel(k)))
+                elif k == curses.KEY_UP:
                     top = max(0, top - 1)
                 elif k == curses.KEY_DOWN:
                     top = min(max(0, len(lines) - rows), top + 1)
@@ -555,8 +661,10 @@ class Popups:
             "m : symétrie gauche -> droite",
             "h : retourner     g : silhouette",
             "x : tout effacer  u : annuler",
-            "Échap : terminer",
+            "souris : clic peindre, clic droit pipette,",
+            "         molette couleur     Échap : terminer",
         ]
+        enable_mouse(motion=True)
         try:
             while True:
                 self.stdscr.erase()
@@ -608,6 +716,26 @@ class Popups:
                     del undo[:-50]
                 if k == ESC:
                     return ["".join(r) for r in grid]
+                if isinstance(k, Mouse):
+                    j, i = k.y - oy, (k.x - ox) // 2
+                    on_grid = 0 <= j < S and 0 <= k.x - ox < 2 * S
+                    if wheel(k):
+                        color = pal[(pal.index(color) + wheel(k)) % len(pal)]
+                    elif on_grid and k.kind == "right":
+                        y, x = j, i
+                        color = grid[y][x]
+                    elif on_grid and k.kind in ("click", "double", "drag"):
+                        if k.kind != "drag":
+                            save()      # un trait = une annulation
+                        y, x = j, i
+                        grid[y][x] = color
+                    elif k.kind == "click":
+                        for n, c in enumerate(pal):
+                            if k.y == oy + 1 + n % 15 and \
+                                    qx + (n // 15) * 12 <= k.x < \
+                                    qx + (n // 15) * 12 + 7:
+                                color = c
+                    continue
                 if k == curses.KEY_UP:
                     y = (y - 1) % S
                 elif k == curses.KEY_DOWN:
@@ -674,4 +802,5 @@ class Popups:
                         return ["".join(r) for r in grid]
                     return ["".join(r) for r in orig]
         finally:
+            enable_mouse()
             self.redraw()
