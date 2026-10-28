@@ -29,6 +29,8 @@ import nhmon_templates as T
 TAG = "nhmonedit"
 MONSTERS_H = "include/monsters.h"
 MAKEMON_C = "src/makemon.c"
+SOUNDS_C = "src/sounds.c"
+MONFLAG_H = "include/monflag.h"
 TILES = "win/share/monsters.txt"
 PO_FILES = ["po/fr.po", "po/themes/fr@cyber.po", "po/nethack.pot"]
 DATA_FILES = {"dat/data.base": "encyclo_en",
@@ -36,7 +38,7 @@ DATA_FILES = {"dat/data.base": "encyclo_en",
               "dat/data-fr@cyber.base": "encyclo_fr"}
 PATCHLEVEL = "include/patchlevel.h"
 FIXES = "doc/fixes5-0-0.txt"
-ALL_FILES = [MONSTERS_H, MAKEMON_C, TILES, PATCHLEVEL] + PO_FILES \
+ALL_FILES = [MONSTERS_H, MAKEMON_C, SOUNDS_C, TILES, PATCHLEVEL] + PO_FILES \
     + list(DATA_FILES) + [FIXES]
 # l'entrée de doc/fixes, reconnue à son début (pas de marqueur dans la
 # documentation du jeu)
@@ -75,6 +77,8 @@ BEGIN_RE = re.compile(r"^[ \t]*/\* %s:begin (\w+) \*/\n.*?"
 TXT_BEGIN_RE = re.compile(r"^# %s:begin (\S+)\n.*?^# %s:end \1\n"
                           % (TAG, TAG), re.M | re.S)
 LINE_TAG = "/* %s */" % TAG
+# place des répliques dans la table robot_lines[] de sounds.c
+LINES_MARK = "/* %s:lines */" % TAG
 
 
 def strip_monsters_h(text):
@@ -268,6 +272,57 @@ def renumber_tiles(text):
     return TILE_HDR.sub(num, text)
 
 
+# --- répliques des robots (sounds.c) -----------------------------------
+
+def _c_str(s):
+    return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def line_entry(bn, text):
+    """Ligne(s) C de la table robot_lines[] : { PM_X, N_("…") },
+    coupée à 78 colonnes comme le reste du code."""
+    one = '    { PM_%s, N_(%s) },' % (bn, _c_str(text))
+    if len(one) <= 78:
+        return [one]
+    # morceaux concaténés : 9 colonnes de retrait, 5 pour « ") }, »
+    pieces, cur = [], ""
+    for word in text.split(" "):
+        if cur and len(_c_str(cur + " " + word)) > 78 - 9 - 5:
+            pieces.append(cur + " ")
+            cur = word
+        else:
+            cur = cur + " " + word if cur else word
+    pieces.append(cur)
+    out = ["    { PM_%s," % bn]
+    for i, p in enumerate(pieces):
+        lead = "      N_(" if i == 0 else "         "
+        tail = ") }," if i == len(pieces) - 1 else ""
+        out.append(lead + _c_str(p) + tail)
+    return out
+
+
+def insert_lines(text, monsters):
+    """Répliques des monstres avant la marque de robot_lines[]."""
+    blocks = []
+    for m in monsters:
+        lines = D.robot_lines(m)
+        if not lines:
+            continue
+        blk = ["    /* %s:begin %s */" % (TAG, m["bn"])]
+        for en, _fr in lines:
+            blk += line_entry(m["bn"], en)
+        blk.append("    /* %s:end %s */" % (TAG, m["bn"]))
+        blocks.append("\n".join(blk) + "\n")
+    if not blocks:
+        return text
+    pos = text.find(LINES_MARK)
+    if pos < 0:
+        raise InstallError(_("Pas de table des répliques dans %s (sources "
+                             "trop anciennes ?)") % SOUNDS_C)
+    pos = text.rfind("\n", 0, pos) + 1
+    return text[:pos] + "".join(blocks) + text[pos:]
+
+
 # --- traductions ---------------------------------------------------------
 
 def _po_str(s):
@@ -303,13 +358,42 @@ def po_entries(m, kind):
         for ctx, val in ctxs:
             out.append("# %s: %s\nmsgctxt \"%s\"\nmsgid %s\nmsgstr %s"
                        % (TAG, m["bn"], ctx, _po_str(en), _po_str(val)))
+    # répliques, sans contexte (verbalize() les traduit) ; le thème
+    # reprend celles de fr.po
+    if kind != "cyber":
+        for en, fr in D.robot_lines(m):
+            out.append("# %s: %s\nmsgid %s\nmsgstr %s"
+                       % (TAG, m["bn"], _po_str(en),
+                          _po_str(fr if kind == "fr" else "")))
     return out
+
+
+def _has_msgid(text, msgid, ctx=None):
+    """Le catalogue a-t-il déjà cette entrée ? (msgfmt refuse les
+    doublons)"""
+    want = "msgctxt \"%s\"" % ctx if ctx else None
+    for mo in re.finditer(r"^msgid %s$" % re.escape(_po_str(msgid)), text,
+                          re.M):
+        prev = text.rfind("\n", 0, mo.start() - 1)
+        before = text[prev + 1:mo.start() - 1]
+        if (before.startswith("msgctxt ") and before == want) or \
+                (not before.startswith("msgctxt ") and want is None):
+            return True
+    return False
 
 
 def insert_po(text, monsters, kind):
     entries = []
     for m in monsters:
-        entries += po_entries(m, kind)
+        for e in po_entries(m, kind):
+            ctx = re.search(r'^msgctxt "(.*)"$', e, re.M)
+            msgid = D._po_unquote(re.search(r"^msgid (.*)$", e,
+                                            re.M).group(1))
+            # même réplique déjà traduite, ou dite par un autre robot
+            if not ctx and (_has_msgid(text, msgid) or
+                            _has_msgid("\n\n".join(entries), msgid)):
+                continue
+            entries.append(e)
     if not entries:
         return text
     return text.rstrip("\n") + "\n\n" + "\n\n".join(entries) + "\n"
@@ -474,6 +558,15 @@ def plan(src, monsters, fixes=""):
     out[MONSTERS_H] = new_h
     out[MAKEMON_C] = insert_golemhp(strip_lines(_read(src, MAKEMON_C)),
                                     monsters)
+    beep = [m["name"] for m in monsters if m["sound"] == "MS_BEEP"]
+    if beep and os.path.isfile(os.path.join(src, MONFLAG_H)) and \
+            "MS_BEEP" not in _read(src, MONFLAG_H):
+        raise InstallError(_("Son MS_BEEP absent de %s (sources trop "
+                             "anciennes ?) : %s") % (MONFLAG_H,
+                                                     ", ".join(beep)))
+    if os.path.isfile(os.path.join(src, SOUNDS_C)):
+        out[SOUNDS_C] = insert_lines(strip_monsters_h(_read(src, SOUNDS_C)),
+                                     monsters)
     if os.path.isfile(os.path.join(src, TILES)):
         known = {D.parse_mon(a)["name"]
                  for _s, _e, a in D.iter_mon_calls(new_h)

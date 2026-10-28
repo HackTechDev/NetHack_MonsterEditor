@@ -363,6 +363,50 @@ class TestInstall(unittest.TestCase):
         self.assertEqual(cyber[("monster", m["name"])], m["fr_name"])
         self.assertEqual(cyber[("gender", m["name"])], "f")
 
+    def test_robot_lines(self):
+        m = T.from_template(0)
+        m["sound"] = "MS_BEEP"
+        m["lines_en"] = ("Please show your badge.\n\nYou are not authorized "
+                         "to be in this sector, citizen; \"leave\" now.\n")
+        m["lines_fr"] = "Veuillez présenter votre badge.\n"
+        self.assertEqual(len(D.robot_lines(m)), 2)
+        self.assertIn(("attention", "Répliques : 1 sans traduction "
+                       "française (dites en anglais)"), D.validate(m))
+        sounds = os.path.join(self.tmp, I.SOUNDS_C)
+        with open(sounds, "w", encoding="utf-8") as f:
+            f.write("static const struct robot_line {\n} robot_lines[] = {\n"
+                    "    " + I.LINES_MARK + "\n    { NON_PM, 0 }\n};\n")
+        with open(os.path.join(self.tmp, I.MONFLAG_H), "w",
+                  encoding="utf-8") as f:
+            f.write("    MS_BEEP     = 45,\n")
+        I.install(self.tmp, [m])
+        text = open(sounds, encoding="utf-8").read()
+        self.assertIn('    { PM_%s, N_("Please show your badge.") },\n'
+                      % m["bn"], text)
+        self.assertIn('\\"leave\\" now.") },\n    /* nhmonedit:end', text)
+        self.assertLess(text.index("nhmonedit:end"),
+                        text.index(I.LINES_MARK))
+        self.assertTrue(all(len(l) <= 78 for l in text.splitlines()))
+        po = open(os.path.join(self.tmp, "po", "fr.po"),
+                  encoding="utf-8").read()
+        self.assertIn('msgid "Please show your badge."\n'
+                      'msgstr "Veuillez présenter votre badge."', po)
+        # une réplique déjà au catalogue n'est pas répétée
+        m2 = T.from_template(1)
+        m2["lines_en"] = "Please show your badge."
+        I.install(self.tmp, [m, m2])
+        po = open(os.path.join(self.tmp, "po", "fr.po"),
+                  encoding="utf-8").read()
+        self.assertEqual(po.count('msgid "Please show your badge."'), 1)
+        I.uninstall(self.tmp)
+        self.assertNotIn("nhmonedit:begin",
+                         open(sounds, encoding="utf-8").read())
+        # sources sans la table : intégration refusée
+        with open(sounds, "w", encoding="utf-8") as f:
+            f.write("/* rien */\n")
+        with self.assertRaises(I.InstallError):
+            I.plan(self.tmp, [m])
+
 
 def json_copy(m):
     return json.loads(json.dumps(m))

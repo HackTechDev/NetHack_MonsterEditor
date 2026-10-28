@@ -1092,4 +1092,24 @@ EN = {
     "Tuile (t)": "Tile (t)",
     "dessinée à la main (Entrée : modifier)": "hand drawn (Enter: edit)",
     "générée (%s) ; Entrée : dessiner": "generated (%s); Enter: draw",
+    # répliques des robots
+    "bipe ou dit ses répliques (robot)": "beeps or says its lines (robot)",
+    "Répliques : une réplique française sans son texte anglais":
+        "Lines: a French line without its English text",
+    "Répliques inutilisées : le son doit être MS_BEEP":
+        "Unused lines: the sound must be MS_BEEP",
+    "Répliques : %d sans traduction française (dites en anglais)":
+        "Lines: %d without French translation (said in English)",
+    "Pas de table des répliques dans %s (sources trop anciennes ?)":
+        "No table of lines in %s (sources too old?)",
+    "Son MS_BEEP absent de %s (sources trop anciennes ?) : %s":
+        "No MS_BEEP sound in %s (sources too old?): %s",
+    "Répliques (en)": "Lines (en)",
+    "son MS_BEEP : phrases dites par #parler, une par ligne, tirées au "
+    "hasard (sinon : bip)":
+        "MS_BEEP sound: sentences said by #chat, one per line, picked at "
+        "random (otherwise: beep)",
+    "Répliques (fr)": "Lines (fr)",
+    "traduction de chaque réplique anglaise, dans le même ordre":
+        "translation of each English line, in the same order",
 }

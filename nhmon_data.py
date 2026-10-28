@@ -181,6 +181,7 @@ SOUNDS = [
     ("MS_SELL", 39, _("vend")), ("MS_ORACLE", 40, _("oracle")),
     ("MS_PRIEST", 41, _("prêtre")), ("MS_SPELL", 42, _("lanceur de sorts")),
     ("MS_BOAST", 43, _("se vante (géant)")), ("MS_GROAN", 44, _("geint")),
+    ("MS_BEEP", 45, _("bipe ou dit ses répliques (robot)")),
 ]
 SIZES = [
     ("MZ_TINY", 0, _("minuscule (< 60 cm)")),
@@ -392,6 +393,7 @@ def new_monster():
         "tile_shape": "auto",          # silhouette de la tuile
         "tile": blank_tile(),          # tuile dessinée (« personnalisée »)
         "encyclo_en": "", "encyclo_fr": "",
+        "lines_en": "", "lines_fr": "",  # répliques (son MS_BEEP)
         "notes": "",
         "after": "",                   # monstre du jeu qui le précède
     }
@@ -414,6 +416,13 @@ def normalize(m):
     if len(m["tile"]) != TILE_SIZE:
         m["tile"] = blank_tile()
     return m
+
+
+def robot_lines(m):
+    """Répliques du robot : [(anglais, français)], une par ligne."""
+    en = [s.strip() for s in m["lines_en"].splitlines() if s.strip()]
+    fr = [s.strip() for s in m["lines_fr"].splitlines() if s.strip()]
+    return list(zip(en, fr + [""] * (len(en) - len(fr))))
 
 
 def attacks_used(m):
@@ -1130,6 +1139,15 @@ def validate(m, game=None, project=None):
             err(_("Classe golem : niveau au moins 1 (PV par niveau)"))
     if m["sound"] not in [s for s, _, _ in SOUNDS]:
         err(_("Son inconnu : %s") % m["sound"])
+    n_en = len([s for s in m["lines_en"].splitlines() if s.strip()])
+    n_fr = len([s for s in m["lines_fr"].splitlines() if s.strip()])
+    if n_fr > n_en:
+        err(_("Répliques : une réplique française sans son texte anglais"))
+    elif n_fr and n_fr < n_en:
+        warn(_("Répliques : %d sans traduction française (dites en "
+             "anglais)") % (n_en - n_fr))
+    if n_en and m["sound"] != "MS_BEEP":
+        warn(_("Répliques inutilisées : le son doit être MS_BEEP"))
     if m["size"] not in [s for s, _, _ in SIZES]:
         err(_("Taille inconnue : %s") % m["size"])
     if m["color"] not in COLOR_VALUE:

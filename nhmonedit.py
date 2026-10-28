@@ -95,6 +95,10 @@ FIELDS = [
     ("int", "nutrition", _("Nutrition"), _("valeur nutritive du cadavre "
      "(0 pour une épave de robot)"), 0, 65535, 50),
     ("choice", "sound", _("Son"), _("bruit ou phrases du monstre (#parler)")),
+    ("lines", "lines_en", _("Répliques (en)"), _("son MS_BEEP : phrases "
+     "dites par #parler, une par ligne, tirées au hasard (sinon : bip)")),
+    ("lines", "lines_fr", _("Répliques (fr)"), _("traduction de chaque "
+     "réplique anglaise, dans le même ordre")),
     ("choice", "size", _("Taille"), _("taille physique")),
     ("flags", "mr1", _("Résistances"), _("résistances du monstre")),
     ("flags", "mr2", _("Conférées"), _("résistances données en mangeant le "
@@ -472,6 +476,11 @@ class Editor(Popups, Game):
         if kind == "longtext":
             s = " ".join(v.split())
             return (s or "—"), (0 if s else curses.A_DIM)
+        if kind == "lines":
+            ls = [s.strip() for s in v.splitlines() if s.strip()]
+            if not ls:
+                return "—", curses.A_DIM
+            return "%d : %s" % (len(ls), " / ".join(ls)), 0
         if kind == "after":
             if not v:
                 return _("fin de la classe"), curses.A_DIM
@@ -691,7 +700,7 @@ class Editor(Popups, Game):
             used = [a for a in m["attacks"] if a != D.NO_ATTK]
             m["attacks"] = used + [list(D.NO_ATTK)
                                    for _ in range(D.NATTK - len(used))]
-        elif f[0] in ("text", "longtext", "plural") \
+        elif f[0] in ("text", "longtext", "lines", "plural") \
                 and f[1] not in ("name",):
             self.checkpoint()
             m[f[1]] = ""
@@ -776,7 +785,7 @@ class Editor(Popups, Game):
                     m[key] = v
             elif kind == "attack":
                 self.edit_attack(m, key)
-            elif kind == "longtext":
+            elif kind in ("longtext", "lines"):
                 v = self.text_area(label, m[key])
                 if v != m[key]:
                     self.checkpoint()
