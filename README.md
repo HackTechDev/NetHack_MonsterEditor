@@ -132,6 +132,7 @@ clic sur la palette pour la couleur.
    | `win/share/monsters.txt` | les tuiles mâle et femelle |
    | `po/fr.po`, `po/themes/fr@cyber.po`, `po/nethack.pot` | nom français, genre et pluriel corrigé |
    | `dat/data.base`, `dat/data-fr.base`, `dat/data-fr@cyber.base` | encyclopédie |
+   | `doc/fixes5-0-0.txt` | une entrée « new monsters made with nhmonedit: … », proposée et modifiable |
    | `include/patchlevel.h` | `EDITLEVEL` + 1 quand la liste des monstres change |
 
    Chaque ajout est marqué `nhmonedit` : une nouvelle intégration

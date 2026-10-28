@@ -34,8 +34,12 @@ DATA_FILES = {"dat/data.base": "encyclo_en",
               "dat/data-fr.base": "encyclo_fr",
               "dat/data-fr@cyber.base": "encyclo_fr"}
 PATCHLEVEL = "include/patchlevel.h"
+FIXES = "doc/fixes5-0-0.txt"
 ALL_FILES = [MONSTERS_H, MAKEMON_C, TILES, PATCHLEVEL] + PO_FILES \
-    + list(DATA_FILES)
+    + list(DATA_FILES) + [FIXES]
+# l'entrée de doc/fixes, reconnue à son début (pas de marqueur dans la
+# documentation du jeu)
+FIXES_PREFIX = "new monsters made with nhmonedit: "
 
 
 class InstallError(Exception):
@@ -377,9 +381,59 @@ def backup(src, backup_root):
     return dest
 
 
-def plan(src, monsters):
+# --- doc/fixes5-0-0.txt --------------------------------------------------
+
+def default_fixes(monsters):
+    """Texte proposé pour l'entrée de doc/fixes (après FIXES_PREFIX)."""
+    return ", ".join("%s (%s)" % (m["name"], m["fr_name"])
+                     if m["fr_name"] else m["name"] for m in monsters)
+
+
+def fixes_entry(text):
+    """Texte de l'entrée de l'éditeur dans doc/fixes, ou None."""
+    mo = re.search(r"^%s(.*\n(?:\t.*\n)*)" % re.escape(FIXES_PREFIX), text,
+                   re.M)
+    if not mo:
+        return None
+    return " ".join(mo.group(1).split())
+
+
+def strip_fixes(text):
+    return re.sub(r"^%s.*\n(?:\t.*\n)*" % re.escape(FIXES_PREFIX), "",
+                  text, flags=re.M)
+
+
+def wrap_fixes(body):
+    """Entrée coupée comme celles du fichier : 78 colonnes, suite des
+    lignes en retrait d'une tabulation."""
+    lines, cur = [], FIXES_PREFIX.rstrip()
+    for word in body.split():
+        width = 78 if not lines else 70
+        if len(cur) + 1 + len(word) > width:
+            lines.append(cur)
+            cur = "\t" + word
+        else:
+            cur += " " + word
+    return "\n".join(lines + [cur]) + "\n"
+
+
+def insert_fixes(text, body):
+    """Ajoute l'entrée à la fin de « General New Features »."""
+    if not body.strip():
+        return text
+    head = text.find("\nGeneral New Features\n")
+    nxt = text.find("\n\n\n", head) if head >= 0 else -1
+    if nxt < 0:
+        raise InstallError(_("Section « General New Features » introuvable "
+                             "dans %s") % FIXES)
+    pos = nxt + 1
+    return text[:pos] + wrap_fixes(body) + text[pos:]
+
+
+def plan(src, monsters, fixes=""):
     """Nouveaux textes des fichiers : {chemin relatif: texte}. Ne touche
-    à rien sur le disque."""
+    à rien sur le disque. fixes : texte de l'entrée de doc/fixes (vide :
+    pas d'entrée)."""
     out = {}
     old_h = _read(src, MONSTERS_H)
     clean_h = strip_monsters_h(old_h)
@@ -400,6 +454,9 @@ def plan(src, monsters):
         if os.path.isfile(os.path.join(src, rel)):
             out[rel] = insert_data(strip_txt(_read(src, rel)), monsters,
                                    field)
+    if os.path.isfile(os.path.join(src, FIXES)):
+        out[FIXES] = insert_fixes(strip_fixes(_read(src, FIXES)),
+                                  fixes if monsters else "")
     return out
 
 
@@ -427,8 +484,8 @@ def apply(src, files, bump=True, backup_root=None):
     return changed, newlevel, saved
 
 
-def install(src, monsters, bump=True, backup_root=None):
-    return apply(src, plan(src, monsters), bump, backup_root)
+def install(src, monsters, bump=True, backup_root=None, fixes=""):
+    return apply(src, plan(src, monsters, fixes), bump, backup_root)
 
 
 def uninstall(src, bump=True, backup_root=None):

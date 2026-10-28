@@ -1328,8 +1328,18 @@ class Editor(Popups, Game):
             self.viewer(_("Intégration impossible : corrigez d'abord"),
                         errs)
             return
+        fixes = ""
+        if os.path.isfile(os.path.join(self.src, I.FIXES)):
+            old = I.fixes_entry(I._read(self.src, I.FIXES))
+            try:
+                fixes = self.input_line(
+                    _("Entrée de %s") % I.FIXES,
+                    old or I.default_fixes(self.monsters),
+                    _("« %s… » ; vide : pas d'entrée") % I.FIXES_PREFIX)
+            except Cancel:
+                return
         try:
-            files = I.plan(self.src, self.monsters)
+            files = I.plan(self.src, self.monsters, fixes)
         except I.InstallError as e:
             self.message_box(_("Intégration impossible"), [str(e)])
             return

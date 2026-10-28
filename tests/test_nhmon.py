@@ -284,6 +284,26 @@ class TestInstall(unittest.TestCase):
         self.assertTrue(any("Placer après" in msg for _g, msg in
                             D.validate(dict(a, sym="S_DOG"), game, [])))
 
+    def test_fixes_entry(self):
+        if I.FIXES not in self.orig:
+            self.skipTest("pas de " + I.FIXES)
+        ms = [T.from_template(i) for i in range(4)]
+        body = I.default_fixes(ms)
+        files = I.plan(self.tmp, ms, body)
+        text = files[I.FIXES]
+        self.assertEqual(I.fixes_entry(text), body)
+        entry = text[text.index(I.FIXES_PREFIX):]
+        entry = entry[:entry.index("\n\n")]
+        self.assertTrue(all(len(l.expandtabs(8)) <= 78
+                            for l in entry.split("\n")))
+        self.assertLess(text.index("General New Features"),
+                        text.index(I.FIXES_PREFIX))
+        self.assertLess(text.index(I.FIXES_PREFIX),
+                        text.index("Platform- and/or Interface-Specific New"))
+        I.apply(self.tmp, files, bump=False)
+        I.uninstall(self.tmp, bump=False)
+        self.assertEqual(I._read(self.tmp, I.FIXES), self.orig[I.FIXES])
+
     def test_golemhp(self):
         m = T.from_template(0)
         I.install(self.tmp, [m])

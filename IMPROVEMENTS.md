@@ -17,7 +17,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 6 / 6 | — |
 | 4. Projets et fichiers | 5 / 5 | — |
-| 5. Intégration avec le jeu | 2 / 6 | fixes, commit, annulation, sons |
+| 5. Intégration avec le jeu | 3 / 6 | commit, annulation, sons |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
 | 8. Qualité du projet | 0 / 4 | tout |
@@ -196,9 +196,14 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    sont exclues, le champ se vide quand la classe change ; plusieurs
    monstres placés après le même gardent l'ordre du projet, et les
    tuiles suivent.*
-3. **Entrée de `doc/fixes5-0-0.txt`** **[facile]** : les conventions du
-   jeu demandent de noter les changements visibles ; proposer une ligne
-   lors de l'intégration.
+3. ✅ **Fait** — **Entrée de `doc/fixes5-0-0.txt`** **[facile]** : les
+   conventions du jeu demandent de noter les changements visibles ;
+   proposer une ligne lors de l'intégration. *Réalisé : `I` propose
+   « new monsters made with nhmonedit: security bot (robot de
+   sécurité), … » (ou l'entrée déjà écrite), modifiable ou vide ; elle
+   va à la fin de « General New Features », coupée à 78 colonnes comme
+   les autres, et le retrait (`R`) l'enlève (reconnue à son début, sans
+   marqueur dans la documentation).*
 4. **Commit dans les sources** **[facile]** : après une intégration
    réussie, proposer un commit git dans les sources, avec la liste des
    monstres ajoutés.

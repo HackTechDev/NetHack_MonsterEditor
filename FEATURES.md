@@ -266,6 +266,10 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
     sont pas concernés ; plusieurs monstres placés au même endroit
     gardent l'ordre du projet) ;
   - `src/makemon.c` : les PV fixes dans `golemhp()` ;
+  - `doc/fixes5-0-0.txt` : une entrée « new monsters made with
+    nhmonedit: … » à la fin de « General New Features », proposée
+    (noms anglais et français) et modifiable à chaque intégration, vide
+    pour n'en pas mettre ;
   - `win/share/monsters.txt` : tuiles mâle et femelle à la bonne place
     (y compris après les tuiles gardées pour des monstres désactivés,
     comme « beholder »), tuiles renumérotées ;

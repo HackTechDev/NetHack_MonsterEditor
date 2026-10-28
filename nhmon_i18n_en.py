@@ -1052,4 +1052,9 @@ EN = {
         "\"of the same class\")",
     "(fin de la classe)": "(end of the class)",
     "fin de la classe": "end of the class",
+    # --- doc/fixes ------------------------------------------------------
+    "Section « General New Features » introuvable dans %s":
+        "Section \"General New Features\" not found in %s",
+    "Entrée de %s": "Entry of %s",
+    "« %s… » ; vide : pas d'entrée": "\"%s…\"; empty: no entry",
 }
