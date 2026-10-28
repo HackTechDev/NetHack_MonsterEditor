@@ -17,7 +17,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 6 / 6 | — |
 | 4. Projets et fichiers | 5 / 5 | — |
-| 5. Intégration avec le jeu | 3 / 6 | commit, annulation, sons |
+| 5. Intégration avec le jeu | 4 / 6 | annulation, sons |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
 | 8. Qualité du projet | 0 / 4 | tout |
@@ -204,9 +204,13 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    va à la fin de « General New Features », coupée à 78 colonnes comme
    les autres, et le retrait (`R`) l'enlève (reconnue à son début, sans
    marqueur dans la documentation).*
-4. **Commit dans les sources** **[facile]** : après une intégration
-   réussie, proposer un commit git dans les sources, avec la liste des
-   monstres ajoutés.
+4. ✅ **Fait** — **Commit dans les sources** **[facile]** : après une
+   intégration réussie, proposer un commit git dans les sources, avec
+   la liste des monstres ajoutés. *Réalisé : si les sources sont un
+   dépôt git, `I` et `R` proposent un message (« Add monsters made with
+   nhmonedit: security bot, … ») modifiable, Échap pour ne pas
+   committer ; seuls les fichiers touchés partent dans le commit (ce
+   qui était déjà indexé à côté reste indexé).*
 5. **Annuler une intégration** **[facile]** : rétablir les fichiers
    depuis le dernier dossier de `sauvegardes/`.
 6. **Sons et phrases propres aux robots** **[gros]** : un son

@@ -18,6 +18,7 @@ Fichiers touchés (chemins relatifs aux sources) :
 
 import os
 import re
+import subprocess
 import shutil
 import time
 
@@ -482,6 +483,39 @@ def apply(src, files, bump=True, backup_root=None):
     for rel in changed:
         _write(src, rel, files[rel])
     return changed, newlevel, saved
+
+
+# --- git -----------------------------------------------------------------
+
+def _git(src, *args):
+    try:
+        r = subprocess.run(["git", "-C", src] + list(args),
+                           capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.SubprocessError) as e:
+        return False, str(e)
+    return r.returncode == 0, (r.stdout + r.stderr).strip()
+
+
+def is_git_repo(src):
+    return _git(src, "rev-parse", "--is-inside-work-tree")[0]
+
+
+def commit_message(monsters):
+    """Message proposé pour le commit des sources."""
+    if not monsters:
+        return "Remove the monsters added with nhmonedit"
+    names = ", ".join(m["name"] for m in monsters)
+    return ("Add monster%s made with nhmonedit: %s"
+            % ("s" if len(monsters) > 1 else "", names))
+
+
+def git_commit(src, paths, message):
+    """Commit des seuls fichiers donnés (ce qui est déjà indexé à côté
+    n'est pas emporté). Renvoie (réussi, sortie de git)."""
+    ok, out = _git(src, "add", "--", *paths)
+    if not ok:
+        return ok, out
+    return _git(src, "commit", "-m", message, "--only", "--", *paths)
 
 
 def install(src, monsters, bump=True, backup_root=None, fixes=""):

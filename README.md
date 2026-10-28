@@ -135,6 +135,9 @@ clic sur la palette pour la couleur.
    | `doc/fixes5-0-0.txt` | une entrée « new monsters made with nhmonedit: … », proposée et modifiable |
    | `include/patchlevel.h` | `EDITLEVEL` + 1 quand la liste des monstres change |
 
+   Si les sources sont un dépôt git, l'éditeur propose ensuite un commit
+   des fichiers touchés (message modifiable, Échap pour s'en passer).
+
    Chaque ajout est marqué `nhmonedit` : une nouvelle intégration
    remplace la précédente par le contenu **du projet ouvert**, et `R`
    rend les fichiers dans leur état d'origine (seul `EDITLEVEL` reste

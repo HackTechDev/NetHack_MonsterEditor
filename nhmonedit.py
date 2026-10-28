@@ -1372,6 +1372,28 @@ class Editor(Popups, Game):
             self.save()
         self.msg = _("Intégré : %d fichier(s)%s — m pour compiler") % (
             len(ch), _(", EDITLEVEL %d") % lvl if lvl is not None else "")
+        self.offer_commit(ch, I.commit_message(self.monsters))
+
+    def offer_commit(self, changed, message):
+        """Après une intégration ou un retrait : commit git des fichiers
+        touchés, si les sources sont un dépôt git."""
+        if not changed or not I.is_git_repo(self.src):
+            return
+        try:
+            message = self.input_line(
+                _("Commit dans les sources ? (Échap : non)"), message,
+                _("message du commit des %d fichier(s) modifié(s)")
+                % len(changed)).strip()
+        except Cancel:
+            return
+        if not message:
+            return
+        ok, out = I.git_commit(self.src, changed, message)
+        if ok:
+            self.msg = _("Commit créé dans les sources : %s") % \
+                out.split("\n")[0]
+        else:
+            self.message_box(_("Commit impossible"), out.split("\n")[-12:])
 
     def remove(self):
         if not self.check_src():
@@ -1388,6 +1410,7 @@ class Editor(Popups, Game):
         self._game = None
         self._inst = (None, {})
         self.msg = _("Retiré de %d fichier(s)") % len(ch)
+        self.offer_commit(ch, I.commit_message([]))
 
     def run_external(self, title, cmd, cwd):
         """Lance une commande hors de curses, la sortie dans le terminal."""

@@ -1057,4 +1057,11 @@ EN = {
         "Section \"General New Features\" not found in %s",
     "Entrée de %s": "Entry of %s",
     "« %s… » ; vide : pas d'entrée": "\"%s…\"; empty: no entry",
+    # --- commit dans les sources ----------------------------------------
+    "Commit dans les sources ? (Échap : non)":
+        "Commit in the sources? (Esc: no)",
+    "message du commit des %d fichier(s) modifié(s)":
+        "commit message for the %d changed file(s)",
+    "Commit créé dans les sources : %s": "Commit created in the sources: %s",
+    "Commit impossible": "Cannot commit",
 }

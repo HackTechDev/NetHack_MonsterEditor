@@ -287,6 +287,10 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
   fichiers identiques à l'origine (seul `EDITLEVEL` reste augmenté).
 - Écriture atomique (fichier temporaire puis renommage).
 - Projet enregistré automatiquement après l'intégration.
+- Si les sources sont un dépôt git, après une intégration ou un
+  retrait, un commit des seuls fichiers touchés est proposé, avec un
+  message modifiable (« Add monsters made with nhmonedit: … ») ;
+  Échap pour s'en passer.
 
 ## Compiler et jouer
 

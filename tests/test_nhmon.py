@@ -8,9 +8,11 @@ Les sources sont cherchées dans ../NetHack-5.0.0 ou $NHMONEDIT_SRC.
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
@@ -303,6 +305,33 @@ class TestInstall(unittest.TestCase):
         I.apply(self.tmp, files, bump=False)
         I.uninstall(self.tmp, bump=False)
         self.assertEqual(I._read(self.tmp, I.FIXES), self.orig[I.FIXES])
+
+    def test_git_commit(self):
+        def git(*args):
+            return subprocess.run(["git", "-C", self.tmp] + list(args),
+                                  capture_output=True, text=True,
+                                  check=True).stdout
+        git("init", "-q")
+        git("-c", "user.name=t", "-c", "user.email=t@t", "add", ".")
+        git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm",
+            "base")
+        self.assertTrue(I.is_git_repo(self.tmp))
+        # un fichier indexé par ailleurs ne doit pas partir avec le commit
+        with open(os.path.join(self.tmp, "autre.txt"), "w") as f:
+            f.write("x\n")
+        git("add", "autre.txt")
+        ms = [T.from_template(0)]
+        ch, _lvl, _bk = I.install(self.tmp, ms, bump=False)
+        with mock.patch.dict(os.environ, GIT_AUTHOR_NAME="t",
+                             GIT_AUTHOR_EMAIL="t@t", GIT_COMMITTER_NAME="t",
+                             GIT_COMMITTER_EMAIL="t@t"):
+            ok, out = I.git_commit(self.tmp, ch, I.commit_message(ms))
+        self.assertTrue(ok, out)
+        self.assertEqual(git("log", "-1", "--format=%s").strip(),
+                         "Add monster made with nhmonedit: security bot")
+        self.assertEqual(sorted(git("show", "--name-only", "--format=")
+                                .split()), sorted(ch))
+        self.assertIn("A  autre.txt", git("status", "--short"))
 
     def test_golemhp(self):
         m = T.from_template(0)
