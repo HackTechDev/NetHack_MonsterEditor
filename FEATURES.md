@@ -151,6 +151,15 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
   exceptions du thème) ; une saisie identique au calcul revient à
   « auto ».
 
+## Projet (`p`)
+
+- Menu Projet (`p`) : actions sur les fichiers.
+- Fusion d'un autre projet : ses monstres sont ajoutés à la fin de la
+  liste ; ceux qui existent déjà à l'identique sont ignorés, les noms
+  et identifiants déjà pris reçoivent « mk II », « mk III »… ; le
+  fichier se choisit parmi les projets du dossier du projet, de
+  l'éditeur et du dossier courant, ou se saisit.
+
 ## Difficulté et équilibrage
 
 - Difficulté calculée comme dans le jeu (`mstrength()` de

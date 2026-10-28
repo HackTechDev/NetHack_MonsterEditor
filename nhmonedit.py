@@ -23,6 +23,7 @@ import time
 import nhmon_data as D
 from nhmon_i18n import LANG, _
 import nhmon_install as I
+import nhmon_project as P
 import nhmon_templates as T
 from nhmon_ui import (Cancel, Colors, ESC, Mouse, Popups, clip,
                       enable_mouse, get_key, is_enter, put, wheel)
@@ -150,6 +151,9 @@ HELP = [
     _("               sysconf, scores et sauvegardes)"),
     _("  j            lancer le jeu en mode wizard pour essayer"),
     "",
+    _("Projet :"),
+    _("  p            menu du projet : fusionner un autre projet…"),
+    "",
     _("Général :"),
     _("  s            enregistrer le projet"),
     _("  u            annuler la dernière modification"),
@@ -251,13 +255,7 @@ class Editor(Popups):
                        "monstre") % self.project
 
     def save(self):
-        data = {"format": "nhmonedit", "version": 1,
-                "monsters": self.monsters}
-        tmp = self.project + ".tmp"
-        with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=1)
-            f.write("\n")
-        os.replace(tmp, self.project)
+        P.write_project(self.project, self.monsters)
         self.modified = False
         self.msg = _("Enregistré : %s") % self.project
 
@@ -915,6 +913,64 @@ class Editor(Popups):
         ms[self.cur], ms[j] = ms[j], ms[self.cur]
         self.cur = j
 
+    # --- projet -----------------------------------------------------------
+
+    def project_menu(self):
+        """p : actions sur les fichiers du projet."""
+        actions = [
+            (_("Fusionner un autre projet…"),
+             _("ajoute ses monstres à la fin de la liste"), self.merge),
+        ]
+        try:
+            i = self.menu(_("Projet : %s") % os.path.basename(self.project),
+                          [(a, b) for a, b, _f in actions], filterable=False)
+        except Cancel:
+            return
+        actions[i][2]()
+
+    def choose_file(self, title, suffix):
+        """Choix d'un fichier *suffix (dossier du projet, de l'éditeur,
+        dossier courant) ou d'un chemin saisi. Lève Cancel."""
+        dirs = [os.path.dirname(self.project), HERE, os.getcwd()]
+        files = [(n, d) for n, d in P.json_files(dirs, suffix)
+                 if os.path.join(d, n) != self.project]
+        home = os.path.expanduser("~")
+        items = [(n, d.replace(home, "~", 1)) for n, d in files] + \
+            [(_("Autre fichier…"), "")]
+        i = self.menu(title, items)
+        if i < len(files):
+            return os.path.join(files[i][1], files[i][0])
+        path = self.input_line(title, os.path.dirname(self.project) + "/",
+                               _("chemin du fichier"))
+        return os.path.abspath(os.path.expanduser(path.strip()))
+
+    def merge(self):
+        """Ajoute les monstres d'un autre projet ; ceux qui existent déjà
+        à l'identique sont ignorés, les noms déjà pris sont renommés."""
+        try:
+            path = self.choose_file(_("Fusionner un projet"), ".json")
+            new = P.read_monsters(path)
+        except Cancel:
+            return
+        except P.ProjectError as e:
+            self.message_box(_("Fusion impossible"), [str(e)])
+            return
+        added, same = self.add_monsters(new)
+        self.msg = _("Fusion : %d monstre(s) ajouté(s), %d déjà "
+                     "présent(s)") % (added, same)
+
+    def add_monsters(self, new):
+        """Ajoute des monstres à la fin du projet. Renvoie (ajoutés,
+        identiques ignorés)."""
+        fresh = [m for m in new
+                 if not any(P.same_monster(m, o) for o in self.monsters)]
+        if fresh:
+            self.checkpoint()
+            for m in fresh:
+                self.monsters.append(self.unique_names(m))
+            self.cur = len(self.monsters) - 1
+        return len(fresh), len(new) - len(fresh)
+
     # --- vues -------------------------------------------------------------
 
     def show_code(self):
@@ -1307,6 +1363,8 @@ class Editor(Popups):
                 self.edit_tile()
             elif k == "/":
                 self.goto_monster()
+            elif k == "p":
+                self.project_menu()
             elif k == "v":
                 self.show_validation()
             elif k == "c":

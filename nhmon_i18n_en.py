@@ -939,4 +939,20 @@ EN = {
     "Quitter sans enregistrer": "Quit without saving",
     "Annuler": "Cancel",
     "Option inconnue : %s (voir --help)": "Unknown option: %s (see --help)",
+    # --- nhmon_project.py et menu Projet --------------------------------
+    "%s illisible : %s": "%s unreadable: %s",
+    "%s n'est pas un projet nhmonedit": "%s is not an nhmonedit project",
+    "Fusionner un autre projet…": "Merge another project…",
+    "ajoute ses monstres à la fin de la liste":
+        "adds its monsters at the end of the list",
+    "Projet : %s": "Project: %s",
+    "Autre fichier…": "Other file…",
+    "chemin du fichier": "path of the file",
+    "Fusionner un projet": "Merge a project",
+    "Fusion impossible": "Cannot merge",
+    "Fusion : %d monstre(s) ajouté(s), %d déjà présent(s)":
+        "Merge: %d monster(s) added, %d already there",
+    "Projet :": "Project:",
+    "  p            menu du projet : fusionner un autre projet…":
+        "  p            project menu: merge another project…",
 }

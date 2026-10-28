@@ -18,6 +18,7 @@ os.environ["NHMONEDIT_LANG"] = "fr"     # messages vérifiés en français
 
 import nhmon_data as D  # noqa: E402
 import nhmon_install as I  # noqa: E402
+import nhmon_project as P  # noqa: E402
 import nhmon_templates as T  # noqa: E402
 import nhmonedit as E  # noqa: E402
 import nhmon_ui as U  # noqa: E402
@@ -284,6 +285,8 @@ def bare_editor(monsters=()):
     ed.monsters = [D.normalize(m) for m in monsters]
     ed.cur, ed.field, ed.focus, ed.msg = 0, 1, "list", ""
     ed.modified, ed.undo_stack, ed.redo_stack = False, [], []
+    ed._game = []
+    ed.project = os.path.join(tempfile.gettempdir(), "nhmonedit-test.json")
     return ed
 
 
@@ -325,6 +328,23 @@ class TestEditor(unittest.TestCase):
         diff = [l for l in text if l.startswith("≠")]
         self.assertTrue(any("Niveau" in l for l in diff))
         self.assertTrue(all(len(l) <= 100 for l in text))
+
+    def test_merge_projects(self):
+        ed = bare_editor([T.from_template(0), T.from_template(1)])
+        with tempfile.TemporaryDirectory() as d:
+            other = os.path.join(d, "autre.json")
+            mech = T.from_template(7)
+            P.write_project(other, [T.from_template(0), mech,
+                                    dict(json_copy(mech), level=20)])
+            added, same = ed.add_monsters(P.read_monsters(other))
+            self.assertEqual((added, same), (2, 1))
+            names = [m["name"] for m in ed.monsters]
+            self.assertEqual(names[2:], ["combat mech", "combat mech mk II"])
+            self.assertTrue(ed.modified)
+            with open(other, "w") as f:
+                f.write("{}")
+            with self.assertRaises(P.ProjectError):
+                P.read_monsters(other)
 
     def test_filter_ignores_accents(self):
         self.assertIn(U.fold("securite"), U.fold("Robot de Sécurité"))

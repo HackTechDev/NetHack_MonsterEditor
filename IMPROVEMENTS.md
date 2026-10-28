@@ -16,7 +16,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 6 / 6 | — |
-| 4. Projets et fichiers | 0 / 5 | tout |
+| 4. Projets et fichiers | 1 / 5 | export, secours, modèles, configuration |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
@@ -141,8 +141,13 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
 
 ## 4. Projets et fichiers
 
-1. **Fusionner des projets** **[facile]** : importer les monstres d'un
-   autre fichier JSON (ce qui règle en partie la limite 1.4).
+1. ✅ **Fait** — **Fusionner des projets** **[facile]** : importer les
+   monstres d'un autre fichier JSON (ce qui règle en partie la limite
+   1.4). *Réalisé : menu Projet (`p`), « Fusionner un autre projet… » :
+   choix parmi les projets voisins ou chemin saisi ; les monstres
+   identiques sont ignorés, les noms déjà pris deviennent « mk II » ;
+   une seule annulation défait la fusion. Nouveau module
+   `nhmon_project.py`.*
 2. **Exporter un monstre** **[facile]** : un fichier par monstre pour
    l'échanger, et l'import correspondant.
 3. **Sauvegarde de secours** **[facile]** : enregistrement automatique
