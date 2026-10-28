@@ -188,6 +188,20 @@ def hp_text(m):
     return "%dd8 (~%d)" % (m["level"], m["level"] * 9 // 2)
 
 
+def num(v):
+    """4.5 -> « 4,5 », 4.0 -> « 4 »."""
+    return ("%.1f" % v).rstrip("0").rstrip(".").replace(".", ",")
+
+
+def attack_hint(m, attack):
+    """Ligne d'aide d'une attaque : dégâts moyens et message du jeu."""
+    if attack not in D.attacks_used(m):
+        return None
+    avg, msg, note = D.attack_preview(m, attack)
+    return "moy. %s pts — « %s »%s" % (num(avg), msg,
+                                       " (%s)" % note if note else "")
+
+
 def short_flags(names):
     return ", ".join(n.split("_", 1)[1] for n in names) if names else "—"
 
@@ -337,7 +351,9 @@ class Editor(Popups):
         m = self.mon()
         hint = ""
         if self.focus == "form" and m:
-            hint = FIELDS[self.field][3]
+            f = FIELDS[self.field]
+            hint = (f[0] == "attack" and attack_hint(m, m["attacks"][f[1]])) \
+                or f[3]
         put(scr, H - 2, 0, (" " + hint).ljust(W),
             self.colors.fg(curses.COLOR_CYAN))
         keys = " n:nouveau d:dupl. i:importer v:vérif c:code b:comparer " \
@@ -500,6 +516,7 @@ class Editor(Popups):
                                      m["difficulty"] is None else " (forcée)")),
             ("Points de vie", hp),
             ("Dégâts max/tour", str(D.max_damage(m))),
+            ("Dégâts moy/tour", num(D.average_per_turn(m))),
             ("Vitesse", "%d (%s)" % (m["move"], "immobile" if not m["move"]
                                      else "lent" if m["move"] < 9 else
                                      "normal" if m["move"] <= 12 else
@@ -513,7 +530,15 @@ class Editor(Popups):
             yy += 1
         put(scr, yy, x + 2, "Sources".ljust(16), curses.A_DIM)
         put(scr, yy, x + 18, st, sa, cw - 16)
-        yy += 2
+        yy += 1
+        for n, a in enumerate(D.attacks_used(m)):
+            avg, msg, _note = D.attack_preview(m, a)
+            put(scr, yy, x + 2, "Attaque %d" % (n + 1), curses.A_DIM)
+            put(scr, yy, x + 13, "%5s" % num(avg), 0)
+            put(scr, yy, x + 19, msg.replace(D.monnam(m), "…", 1),
+                self.colors.fg(curses.COLOR_CYAN), cw - 17)
+            yy += 1
+        yy += 1
         # vérification
         res = D.validate(m, self.game(), self.others(m))
         if not res:

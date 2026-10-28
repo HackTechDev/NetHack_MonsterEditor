@@ -491,6 +491,78 @@ def max_damage(m):
                if a[0] not in ("AT_NONE", "AT_BOOM"))
 
 
+# --- aperçu des attaques ------------------------------------------------
+
+# verbes de hitmsg() (src/mhitu.c), traduits dans po/fr.po (« monverb »)
+_HIT_VERB = {
+    "AT_BITE": "mord", "AT_KICK": "donne un coup de pied",
+    "AT_STNG": "pique", "AT_BUTT": "donne un coup de corne",
+    "AT_TUCH": "vous touche", "AT_EXPL": "explose", "AT_BOOM": "explose",
+}
+# breathwep[] (src/mthrowu.c), contexte « breath »
+_BREATH_NAME = {
+    "AD_MAGM": "des éclats", "AD_FIRE": "du feu", "AD_COLD": "du givre",
+    "AD_SLEE": "du gaz soporifique",
+    "AD_DISN": "un souffle de désintégration", "AD_ELEC": "des éclairs",
+    "AD_DRST": "du gaz toxique", "AD_ACID": "de l'acide",
+}
+
+
+def monnam(m):
+    """« Le robot de sécurité », « L'androïde », comme Monnam()."""
+    name = m["fr_name"] or m["name"]
+    if "G_UNIQ" in m.get("geno", []) or "M2_PNAME" in m.get("flags2", []):
+        return name[:1].upper() + name[1:]
+    if name[:1].lower() in "aâàeéèêiîoôuûœh":
+        return "L'" + name
+    return ("La " if m.get("fr_gender") == "f" else "Le ") + name
+
+
+def average_damage(attack):
+    """Dégâts moyens des dés NdM : N × (M + 1) / 2."""
+    _at, _ad, n, d = attack
+    return n * (d + 1) / 2 if n and d else 0.0
+
+
+def attack_preview(m, attack):
+    """(dégâts moyens, message affiché par le jeu, remarque)."""
+    at, ad, n, d = attack
+    who = monnam(m)
+    avg = average_damage(attack)
+    note = ""
+    if at == "AT_BREA":
+        msg = "%s crache %s !" % (who, _BREATH_NAME.get(ad, "un souffle étrange"))
+    elif at == "AT_SPIT":
+        msg = "%s crache du venin !" % who
+    elif at == "AT_ENGL":
+        msg = "%s vous engloutit !" % who
+    elif at == "AT_MAGC":
+        msg = "%s lance un sort !" % who
+        note = "sort choisi selon le niveau"
+    elif at == "AT_GAZE":
+        msg = "%s vous fixe du regard (%s)" % (who, AD_DESC.get(ad, "?"))
+    elif at == "AT_TENT":
+        msg = "%s vous suce le cerveau avec ses tentacules !" % who
+    elif at == "AT_NONE":
+        msg = "(riposte quand vous le frappez : %s)" % AD_DESC.get(ad, "?")
+        if not n:
+            note = "dés selon le niveau : (niveau / 2 + 1)d%d" % (d or 4)
+    else:
+        msg = "%s %s !" % (who, _HIT_VERB.get(at, "frappe"))
+        if at == "AT_WEAP":
+            note = "+ dégâts de l'arme tenue"
+        elif at == "AT_HUGS":
+            note = "seulement si les deux attaques précédentes touchent"
+        elif at == "AT_BOOM":
+            note = "à sa mort"
+    return avg, msg, note
+
+
+def average_per_turn(m):
+    return sum(average_damage(a) for a in attacks_used(m)
+               if a[0] not in ("AT_NONE", "AT_BOOM"))
+
+
 # --- génération du code C -----------------------------------------------
 
 def c_string(s):

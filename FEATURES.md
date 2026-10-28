@@ -37,8 +37,15 @@ touchés, le [README](README.md) ou `?` dans l'éditeur.
   valeurs de référence du jeu : « humain : 1450 », « golem de fer :
   120 »…).
 - Panneau Aperçu, mis à jour à chaque touche : difficulté, points de
-  vie (fixes pour un golem, sinon dés et moyenne), dégâts maximaux par
-  tour, vitesse en clair, état dans les sources, problèmes détectés.
+  vie (fixes pour un golem, sinon dés et moyenne), dégâts maximaux et
+  moyens par tour, vitesse en clair, état dans les sources, chaque
+  attaque avec ses dégâts moyens et le message du jeu, problèmes
+  détectés.
+- Sur une attaque, la ligne d'aide donne ses dégâts moyens et le
+  message que le jeu affichera, accordé au nom français (« La
+  sentinelle Arasaka frappe ! », « L'androïde crache du feu ! »), avec
+  les cas particuliers (dégâts de l'arme en plus, étreinte, explosion à
+  la mort, sort selon le niveau).
 - Couleurs néon (magenta et cyan) ; les couleurs des monstres suivent
   celles du jeu en mode terminal (CLR_BLACK en bleu, couleurs vives en
   gras).

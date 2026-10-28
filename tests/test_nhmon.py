@@ -158,6 +158,19 @@ class TestTemplates(unittest.TestCase):
                       'msgstr "robots de sécurité"', cyber)
         self.assertNotIn("monster-plural", "".join(I.po_entries(m, "fr")))
 
+    def test_attack_preview(self):
+        m = T.from_template(0)
+        m["fr_name"], m["fr_gender"] = "sentinelle Arasaka", "f"
+        avg, msg, _n = D.attack_preview(m, ["AT_WEAP", "AD_PHYS", 2, 6])
+        self.assertEqual(avg, 7.0)
+        self.assertEqual(msg, "La sentinelle Arasaka frappe !")
+        m["fr_name"] = "androïde"
+        _a, msg, _n = D.attack_preview(m, ["AT_BREA", "AD_FIRE", 4, 6])
+        self.assertEqual(msg, "L'androïde crache du feu !")
+        self.assertEqual(D.average_per_turn(
+            dict(m, attacks=[["AT_CLAW", "AD_PHYS", 1, 4],
+                             ["AT_BOOM", "AD_FIRE", 4, 6]])), 2.5)
+
     def test_derive_bn(self):
         self.assertEqual(D.derive_bn("araignée-robot"), "ARAIGNEE_ROBOT")
         self.assertEqual(D.derive_bn("2 bots"), "M_2_BOTS")

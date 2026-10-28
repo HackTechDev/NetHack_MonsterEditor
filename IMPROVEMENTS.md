@@ -15,7 +15,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 |---|---|---|
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
-| 3. Saisie et affichage | 4 / 6 | anglais, aperçu de l'attaque |
+| 3. Saisie et affichage | 5 / 6 | interface en anglais |
 | 4. Projets et fichiers | 0 / 5 | tout |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
@@ -123,9 +123,14 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    monstre du projet ou du jeu (le monstre d'origine d'un import est
    proposé d'office), affiche tous les champs plus PV et dégâts, les
    différences marquées ≠ en jaune et comptées dans le titre.*
-6. **Aperçu de l'attaque** **[facile]** : afficher pour chaque attaque
-   ses dégâts moyens et le message que le jeu affiche (« Le mecha de
-   combat vous frappe ! », « … crache des flammes »).
+6. ✅ **Fait** — **Aperçu de l'attaque** **[facile]** : afficher pour
+   chaque attaque ses dégâts moyens et le message que le jeu affiche
+   (« Le mecha de combat vous frappe ! », « … crache des flammes »).
+   *Réalisé : `attack_preview()` reprend les verbes de `hitmsg()` et
+   les souffles de `breathwep[]` tels que traduits dans `po/fr.po`
+   (« La sentinelle Arasaka frappe ! », « L'androïde crache du feu ! ») ;
+   message et moyenne dans la ligne d'aide de l'attaque, résumé et
+   dégâts moyens par tour dans le panneau Aperçu.*
 
 ## 4. Projets et fichiers
 
