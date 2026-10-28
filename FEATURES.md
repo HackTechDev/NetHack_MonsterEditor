@@ -159,6 +159,9 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
   et identifiants déjà pris reçoivent « mk II », « mk III »… ; le
   fichier se choisit parmi les projets du dossier du projet, de
   l'éditeur et du dossier courant, ou se saisit.
+- Export d'un monstre dans un fichier à échanger
+  (`<identifiant>.nhmon.json`, remplacement confirmé), et import de ce
+  fichier dans un autre projet, avec les mêmes règles que la fusion.
 
 ## Difficulté et équilibrage
 

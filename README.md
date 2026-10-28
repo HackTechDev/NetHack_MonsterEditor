@@ -94,7 +94,7 @@ grands mechas, `e` aux sphères et drones-caméras, `B` aux drones volants,
 | `v` `c` `b` `B` | vérifier, voir le code C, comparer, fiche comparée |
 | `I` `R` | intégrer aux sources, retirer des sources |
 | `m` `U` `j` | compiler, mettre à jour le jeu installé, jouer |
-| `p` | menu du projet : fusionner un autre projet |
+| `p` | menu du projet : fusionner un autre projet, exporter ou importer un monstre |
 | `s` `u` Ctrl-R `?` `q` | enregistrer, annuler, rétablir, aide, quitter |
 
 **Souris** : un clic choisit un monstre ou un champ, un double clic
@@ -161,7 +161,7 @@ tuile personnalisée vide… L'intégration est refusée tant qu'il reste une er
 | `nhmon_ui.py` | fenêtres curses, menus, éditeur de texte et de tuile |
 | `nhmon_data.py` | constantes du jeu, lecture de `monsters.h`, difficulté, code C, vérifications |
 | `nhmon_install.py` | intégration et retrait dans les sources |
-| `nhmon_project.py` | fichiers : projets, fusion |
+| `nhmon_project.py` | fichiers : projets, fusion, monstres exportés |
 | `nhmon_templates.py` | modèles de robots, silhouettes et fabrication des tuiles |
 | `nhmon_i18n.py`, `nhmon_i18n_en.py` | choix de la langue, traduction anglaise de l'interface |
 | `tests/` | tests (`python3 -m unittest discover -s tests`) |

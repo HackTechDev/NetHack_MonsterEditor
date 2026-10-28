@@ -16,7 +16,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 6 / 6 | — |
-| 4. Projets et fichiers | 1 / 5 | export, secours, modèles, configuration |
+| 4. Projets et fichiers | 2 / 5 | secours, modèles, configuration |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
@@ -148,8 +148,12 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    identiques sont ignorés, les noms déjà pris deviennent « mk II » ;
    une seule annulation défait la fusion. Nouveau module
    `nhmon_project.py`.*
-2. **Exporter un monstre** **[facile]** : un fichier par monstre pour
-   l'échanger, et l'import correspondant.
+2. ✅ **Fait** — **Exporter un monstre** **[facile]** : un fichier par
+   monstre pour l'échanger, et l'import correspondant. *Réalisé : menu
+   Projet, « Exporter le monstre… » écrit `<identifiant>.nhmon.json`
+   (format `nhmonedit-monstre`), « Importer un monstre exporté… » le
+   relit (noms renommés au besoin, doublon exact ignoré) ; la fusion
+   accepte aussi ces fichiers.*
 3. **Sauvegarde de secours** **[facile]** : enregistrement automatique
    régulier, comme `*.nhme-autosave` dans l'éditeur de cartes.
 4. **Bibliothèque de modèles personnels** **[moyen]** : enregistrer un

@@ -953,6 +953,22 @@ EN = {
     "Fusion : %d monstre(s) ajouté(s), %d déjà présent(s)":
         "Merge: %d monster(s) added, %d already there",
     "Projet :": "Project:",
-    "  p            menu du projet : fusionner un autre projet…":
-        "  p            project menu: merge another project…",
+    "Exporter le monstre…": "Export the monster…",
+    "un fichier .nhmon.json à échanger": "a .nhmon.json file to share",
+    "Importer un monstre exporté…": "Import an exported monster…",
+    "fichier .nhmon.json": ".nhmon.json file",
+    "Exporter « %s »": "Export \"%s\"",
+    "fichier à créer (se relit avec « Importer un monstre exporté »)":
+        "file to create (read back with \"Import an exported monster\")",
+    "%s existe déjà. Le remplacer ?": "%s already exists. Replace it?",
+    "Export impossible": "Cannot export",
+    "Exporté : %s": "Exported: %s",
+    "Importer un monstre exporté": "Import an exported monster",
+    "Import impossible": "Cannot import",
+    "Importé : %s": "Imported: %s",
+    "déjà dans le projet": "already in the project",
+    "  p            menu du projet : fusionner un autre projet,":
+        "  p            project menu: merge another project,",
+    "               exporter ou importer un monstre…":
+        "               export or import a monster…",
 }

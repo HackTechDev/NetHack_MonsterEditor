@@ -1,5 +1,5 @@
-"""Fichiers de l'éditeur : projets (liste de monstres en JSON) et
-fusion de projets."""
+"""Fichiers de l'éditeur : projets (liste de monstres en JSON), fusion
+de projets, monstres exportés un par un (*.nhmon.json)."""
 
 import json
 import os
@@ -8,6 +8,8 @@ import nhmon_data as D
 from nhmon_i18n import _
 
 PROJECT_FORMAT = "nhmonedit"
+MONSTER_FORMAT = "nhmonedit-monstre"
+MONSTER_SUFFIX = ".nhmon.json"
 
 
 class ProjectError(Exception):
@@ -29,14 +31,28 @@ def write_project(path, monsters):
                       "monsters": monsters})
 
 
+def export_path(directory, m):
+    """Fichier d'export d'un monstre : <identifiant>.nhmon.json."""
+    return os.path.join(directory, m["bn"].lower() + MONSTER_SUFFIX)
+
+
+def write_monster(path, m):
+    write_json(path, {"format": MONSTER_FORMAT, "version": 1,
+                      "monster": m})
+
+
 def read_monsters(path):
-    """Monstres d'un fichier projet, complétés par normalize()."""
+    """Monstres d'un projet ou d'un monstre exporté, complétés par
+    normalize()."""
     try:
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
     except (OSError, ValueError) as e:
         raise ProjectError(_("%s illisible : %s") % (path, e))
-    if not isinstance(data, dict) or data.get("format") != PROJECT_FORMAT:
+    fmt = data.get("format") if isinstance(data, dict) else None
+    if fmt == MONSTER_FORMAT and isinstance(data.get("monster"), dict):
+        return [D.normalize(data["monster"])]
+    if fmt != PROJECT_FORMAT:
         raise ProjectError(_("%s n'est pas un projet nhmonedit") % path)
     return [D.normalize(m) for m in data.get("monsters", [])]
 

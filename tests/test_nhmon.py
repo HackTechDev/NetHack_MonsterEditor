@@ -346,6 +346,17 @@ class TestEditor(unittest.TestCase):
             with self.assertRaises(P.ProjectError):
                 P.read_monsters(other)
 
+    def test_export_monster(self):
+        ed = bare_editor([T.from_template(0)])
+        with tempfile.TemporaryDirectory() as d:
+            m = T.from_template(5)
+            path = P.export_path(d, m)
+            self.assertTrue(path.endswith("android.nhmon.json"))
+            P.write_monster(path, m)
+            self.assertEqual(ed.add_monsters(P.read_monsters(path)), (1, 0))
+            self.assertTrue(P.same_monster(ed.mon(), m))
+            self.assertEqual(ed.add_monsters(P.read_monsters(path)), (0, 1))
+
     def test_filter_ignores_accents(self):
         self.assertIn(U.fold("securite"), U.fold("Robot de Sécurité"))
         self.assertEqual(U.fold("araignée-robot"), "araignee-robot")

@@ -152,7 +152,8 @@ HELP = [
     _("  j            lancer le jeu en mode wizard pour essayer"),
     "",
     _("Projet :"),
-    _("  p            menu du projet : fusionner un autre projet…"),
+    _("  p            menu du projet : fusionner un autre projet,"),
+    _("               exporter ou importer un monstre…"),
     "",
     _("Général :"),
     _("  s            enregistrer le projet"),
@@ -920,6 +921,10 @@ class Editor(Popups):
         actions = [
             (_("Fusionner un autre projet…"),
              _("ajoute ses monstres à la fin de la liste"), self.merge),
+            (_("Exporter le monstre…"),
+             _("un fichier .nhmon.json à échanger"), self.export_monster),
+            (_("Importer un monstre exporté…"),
+             _("fichier .nhmon.json"), self.import_monster),
         ]
         try:
             i = self.menu(_("Projet : %s") % os.path.basename(self.project),
@@ -958,6 +963,44 @@ class Editor(Popups):
         added, same = self.add_monsters(new)
         self.msg = _("Fusion : %d monstre(s) ajouté(s), %d déjà "
                      "présent(s)") % (added, same)
+
+    def export_monster(self):
+        m = self.mon()
+        if not m:
+            self.msg = _("Aucun monstre dans le projet")
+            return
+        try:
+            path = self.input_line(
+                _("Exporter « %s »") % (m["fr_name"] or m["name"]),
+                P.export_path(os.path.dirname(self.project), m),
+                _("fichier à créer (se relit avec « Importer un monstre "
+                  "exporté »)")).strip()
+        except Cancel:
+            return
+        path = os.path.abspath(os.path.expanduser(path))
+        if os.path.exists(path) and not self.confirm(
+                _("%s existe déjà. Le remplacer ?") % path):
+            return
+        try:
+            P.write_monster(path, m)
+        except OSError as e:
+            self.message_box(_("Export impossible"), [str(e)])
+            return
+        self.msg = _("Exporté : %s") % path
+
+    def import_monster(self):
+        try:
+            path = self.choose_file(_("Importer un monstre exporté"),
+                                    P.MONSTER_SUFFIX)
+            new = P.read_monsters(path)
+        except Cancel:
+            return
+        except P.ProjectError as e:
+            self.message_box(_("Import impossible"), [str(e)])
+            return
+        added, _same = self.add_monsters(new)
+        self.msg = _("Importé : %s") % (self.mon()["name"] if added else
+                                        _("déjà dans le projet"))
 
     def add_monsters(self, new):
         """Ajoute des monstres à la fin du projet. Renvoie (ajoutés,
