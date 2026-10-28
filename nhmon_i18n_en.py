@@ -722,8 +722,6 @@ EN = {
         "  I            add the monsters to the sources (preview, then",
     "               confirmation ; copie des fichiers dans sauvegardes/)":
         "               confirmation; files copied to sauvegardes/)",
-    "  R            retirer les monstres des sources":
-        "  R            remove the monsters from the sources",
     "  m            compiler (make)": "  m            compile (make)",
     "  U            mettre à jour le jeu installé (make update : garde":
         "  U            update the installed game (make update: keeps",
@@ -1064,4 +1062,30 @@ EN = {
         "commit message for the %d changed file(s)",
     "Commit créé dans les sources : %s": "Commit created in the sources: %s",
     "Commit impossible": "Cannot commit",
+    # --- rétablir une sauvegarde ----------------------------------------
+    "Retirer des sources": "Remove from the sources",
+    "Retirer les monstres de l'éditeur": "Remove the editor's monsters",
+    "rend les fichiers d'origine (EDITLEVEL + 1)":
+        "gives back the original files (EDITLEVEL + 1)",
+    "Rétablir une sauvegarde…": "Restore a backup…",
+    "annule une intégration : fichiers de sauvegardes/":
+        "undoes an integration: files from sauvegardes/",
+    "Aucune sauvegarde dans %s": "No backup in %s",
+    "%d fichier(s), d'avant l'écriture de ce moment-là":
+        "%d file(s), from before that write",
+    "Rétablir une sauvegarde": "Restore a backup",
+    "Les sources sont déjà dans cet état":
+        "The sources are already in that state",
+    "Changements du rétablissement (q pour continuer)":
+        "Changes of the restore (q to continue)",
+    "Rétablir dans les sources (%s) ?\n\n%s\n\nL'état actuel est d'abord "
+    "copié dans sauvegardes/.":
+        "Restore in the sources (%s)?\n\n%s\n\nThe current state is "
+        "first copied to sauvegardes/.",
+    "Sauvegarde du %s rétablie : %d fichier(s)":
+        "Backup of %s restored: %d file(s)",
+    "  R            retirer les monstres des sources, ou rétablir":
+        "  R            remove the monsters from the sources, or restore",
+    "               une sauvegarde (annuler une intégration)":
+        "               a backup (undo an integration)",
 }

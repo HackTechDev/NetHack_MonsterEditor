@@ -382,6 +382,38 @@ def backup(src, backup_root):
     return dest
 
 
+def list_backups(backup_root):
+    """[(dossier, fichiers relatifs)] des sauvegardes, la plus récente
+    d'abord."""
+    out = []
+    try:
+        names = sorted(os.listdir(backup_root), reverse=True)
+    except OSError:
+        return out
+    for n in names:
+        d = os.path.join(backup_root, n)
+        files = [rel for rel in ALL_FILES
+                 if os.path.isfile(os.path.join(d, rel))]
+        if os.path.isdir(d) and files:
+            out.append((d, files))
+    return out
+
+
+def restore_plan(src, backup_dir):
+    """{fichier relatif: texte sauvegardé} des fichiers qui diffèrent des
+    sources."""
+    out = {}
+    for rel in ALL_FILES:
+        p = os.path.join(backup_dir, rel)
+        if os.path.isfile(p):
+            with open(p, encoding="utf-8") as f:
+                text = f.read()
+            if not os.path.isfile(os.path.join(src, rel)) or \
+                    _read(src, rel) != text:
+                out[rel] = text
+    return out
+
+
 # --- doc/fixes5-0-0.txt --------------------------------------------------
 
 def default_fixes(monsters):

@@ -101,7 +101,7 @@ grands mechas, `e` aux sphères et drones-caméras, `B` aux drones volants,
 | `/` | aller à un monstre (tapez une partie de son nom) |
 | `t` | dessiner la tuile à la main (versions graphiques seulement) |
 | `v` `c` `b` `B` | vérifier, voir le code C, comparer, fiche comparée |
-| `I` `R` | intégrer aux sources, retirer des sources |
+| `I` `R` | intégrer aux sources, retirer des sources ou rétablir une sauvegarde |
 | `m` `U` `j` | compiler, mettre à jour le jeu installé, jouer |
 | `p` | menu du projet : fusionner un autre projet, exporter ou importer un monstre, modèles personnels |
 | `s` `u` Ctrl-R `?` `q` | enregistrer, annuler, rétablir, aide, quitter |
@@ -140,7 +140,8 @@ clic sur la palette pour la couleur.
 
    Chaque ajout est marqué `nhmonedit` : une nouvelle intégration
    remplace la précédente par le contenu **du projet ouvert**, et `R`
-   rend les fichiers dans leur état d'origine (seul `EDITLEVEL` reste
+   rend les fichiers dans leur état d'origine (ou, au choix, rétablit
+   une sauvegarde de `sauvegardes/` pour annuler une intégration) (seul `EDITLEVEL` reste
    augmenté). `git diff` dans les sources montre aussi tout ce qui a
    changé.
 

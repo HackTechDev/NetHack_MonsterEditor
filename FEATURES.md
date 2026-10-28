@@ -282,6 +282,10 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
 - Aperçu des différences, en couleur, avant d'écrire ; confirmation avec
   la liste des fichiers.
 - Copie des fichiers d'avant dans `sauvegardes/<date>/`.
+- Rétablissement d'une sauvegarde (`R`, « Rétablir une sauvegarde… ») :
+  annule une intégration ou un retrait en remettant les fichiers d'un
+  dossier de `sauvegardes/` (y compris `EDITLEVEL`), après aperçu des
+  différences ; l'état actuel est copié avant.
 - Ajouts marqués `nhmonedit` : une nouvelle intégration remplace la
   précédente (sans rien écrire si tout est déjà à jour), `R` rend les
   fichiers identiques à l'origine (seul `EDITLEVEL` reste augmenté).

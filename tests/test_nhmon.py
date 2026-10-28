@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -332,6 +333,21 @@ class TestInstall(unittest.TestCase):
         self.assertEqual(sorted(git("show", "--name-only", "--format=")
                                 .split()), sorted(ch))
         self.assertIn("A  autre.txt", git("status", "--short"))
+
+    def test_restore_backup(self):
+        root = os.path.join(self.tmp, "sauvegardes")
+        I.install(self.tmp, [T.from_template(0)], bump=True,
+                  backup_root=root)
+        (d, files), = I.list_backups(root)
+        self.assertIn(I.MONSTERS_H, files)
+        todo = I.restore_plan(self.tmp, d)
+        self.assertIn(I.PATCHLEVEL, todo)       # EDITLEVEL aussi
+        time.sleep(1.1)                         # autre nom de dossier
+        I.apply(self.tmp, todo, False, root)
+        for rel, text in self.orig.items():
+            self.assertEqual(I._read(self.tmp, rel), text, rel)
+        self.assertEqual(I.restore_plan(self.tmp, d), {})
+        self.assertEqual(len(I.list_backups(root)), 2)
 
     def test_golemhp(self):
         m = T.from_template(0)

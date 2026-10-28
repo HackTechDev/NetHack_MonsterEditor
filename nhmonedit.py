@@ -145,7 +145,8 @@ HELP = [
     _("Sources du jeu :"),
     _("  I            intégrer les monstres aux sources (aperçu, puis"),
     _("               confirmation ; copie des fichiers dans sauvegardes/)"),
-    _("  R            retirer les monstres des sources"),
+    _("  R            retirer les monstres des sources, ou rétablir"),
+    _("               une sauvegarde (annuler une intégration)"),
     _("  m            compiler (make)"),
     _("  U            mettre à jour le jeu installé (make update : garde"),
     _("               sysconf, scores et sauvegardes)"),
@@ -1395,6 +1396,70 @@ class Editor(Popups, Game):
         else:
             self.message_box(_("Commit impossible"), out.split("\n")[-12:])
 
+    def sources_menu(self):
+        """R : retirer les monstres, ou rétablir une sauvegarde."""
+        try:
+            i = self.menu(_("Retirer des sources"), [
+                (_("Retirer les monstres de l'éditeur"),
+                 _("rend les fichiers d'origine (EDITLEVEL + 1)")),
+                (_("Rétablir une sauvegarde…"),
+                 _("annule une intégration : fichiers de sauvegardes/"))],
+                filterable=False)
+        except Cancel:
+            return
+        if i == 0:
+            self.remove()
+        else:
+            self.restore_backup()
+
+    def restore_backup(self):
+        """Remet dans les sources les fichiers d'un dossier de
+        sauvegardes/ (l'état d'avant une intégration ou un retrait)."""
+        if not self.check_src():
+            return
+        backups = I.list_backups(BACKUP_DIR)
+        if not backups:
+            self.msg = _("Aucune sauvegarde dans %s") % BACKUP_DIR
+            return
+        items = []
+        for d, files in backups:
+            n = os.path.basename(d)
+            when = "%s/%s/%s %s:%s:%s" % (n[6:8], n[4:6], n[:4], n[9:11],
+                                          n[11:13], n[13:15]) \
+                if re.match(r"\d{8}-\d{6}$", n) else n
+            items.append((when, _("%d fichier(s), d'avant l'écriture de "
+                                  "ce moment-là") % len(files)))
+        try:
+            i = self.menu(_("Rétablir une sauvegarde"), items,
+                          filterable=False)
+        except Cancel:
+            return
+        files = I.restore_plan(self.src, backups[i][0])
+        if not files:
+            self.msg = _("Les sources sont déjà dans cet état")
+            return
+        lines = []
+        for l in I.diff(self.src, files).split("\n"):
+            a = self.colors.fg(curses.COLOR_GREEN) if l.startswith("+") \
+                else self.colors.fg(curses.COLOR_RED) if l.startswith("-") \
+                else self.cyan() if l.startswith("@@") else 0
+            lines.append((l, a))
+        self.viewer(_("Changements du rétablissement (q pour continuer)"),
+                    lines)
+        if not self.confirm(_("Rétablir dans les sources (%s) ?\n\n%s\n\n"
+                              "L'état actuel est d'abord copié dans "
+                              "sauvegardes/.") % (
+                                  self.src, "\n".join("  " + r
+                                                      for r in files))):
+            return
+        ch, _lvl, _bk = I.apply(self.src, files, False, BACKUP_DIR)
+        self._game = None
+        self._inst = (None, {})
+        self.msg = _("Sauvegarde du %s rétablie : %d fichier(s)") % (
+            items[i][0], len(ch))
+        self.offer_commit(ch, "Restore the sources from the nhmonedit "
+                          "backup of %s" % items[i][0])
+
     def remove(self):
         if not self.check_src():
             return
@@ -1568,7 +1633,7 @@ class Editor(Popups, Game):
             elif k == "I":
                 self.integrate()
             elif k == "R":
-                self.remove()
+                self.sources_menu()
             elif k == "m":
                 self.make()
             elif k == "U":
