@@ -357,6 +357,25 @@ class TestEditor(unittest.TestCase):
             self.assertTrue(P.same_monster(ed.mon(), m))
             self.assertEqual(ed.add_monsters(P.read_monsters(path)), (0, 1))
 
+    def test_autosave(self):
+        ed = bare_editor([T.from_template(0)])
+        with tempfile.TemporaryDirectory() as d:
+            ed.project = os.path.join(d, "p.json")
+            ed.autosave_delay, ed.autosave_time = 60, 0
+            P.write_project(ed.project, ed.monsters)
+            ed.autosave()                   # rien à sauver
+            self.assertIsNone(P.pending_autosave(ed.project))
+            ed.checkpoint()
+            ed.mon()["level"] = 30
+            ed.autosave()
+            auto = P.pending_autosave(ed.project)
+            self.assertTrue(auto)
+            self.assertEqual(P.read_monsters(auto)[0]["level"], 30)
+            # le projet enregistré après : la sauvegarde est périmée
+            os.utime(auto, (1, 1))
+            self.assertIsNone(P.pending_autosave(ed.project))
+            self.assertFalse(os.path.exists(auto))
+
     def test_filter_ignores_accents(self):
         self.assertIn(U.fold("securite"), U.fold("Robot de Sécurité"))
         self.assertEqual(U.fold("araignée-robot"), "araignee-robot")

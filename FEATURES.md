@@ -153,6 +153,11 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
 
 ## Projet (`p`)
 
+- Sauvegarde de secours : tant que le projet est modifié et non
+  enregistré, une copie est écrite au plus une fois par minute dans
+  `projet.json.nhmonedit-autosave` ; au lancement suivant, si elle est
+  plus récente que le projet (session interrompue), l'éditeur propose
+  de la récupérer. Elle est effacée à l'enregistrement et à la sortie.
 - Menu Projet (`p`) : actions sur les fichiers.
 - Fusion d'un autre projet : ses monstres sont ajoutés à la fin de la
   liste ; ceux qui existent déjà à l'identique sont ignorés, les noms

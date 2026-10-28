@@ -16,7 +16,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 6 / 6 | — |
-| 4. Projets et fichiers | 2 / 5 | secours, modèles, configuration |
+| 4. Projets et fichiers | 3 / 5 | modèles, configuration |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
@@ -154,8 +154,12 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    (format `nhmonedit-monstre`), « Importer un monstre exporté… » le
    relit (noms renommés au besoin, doublon exact ignoré) ; la fusion
    accepte aussi ces fichiers.*
-3. **Sauvegarde de secours** **[facile]** : enregistrement automatique
-   régulier, comme `*.nhme-autosave` dans l'éditeur de cartes.
+3. ✅ **Fait** — **Sauvegarde de secours** **[facile]** : enregistrement
+   automatique régulier, comme `*.nhme-autosave` dans l'éditeur de
+   cartes. *Réalisé : `projet.json.nhmonedit-autosave` écrit au plus
+   une fois par minute tant que le projet est modifié (même sans
+   toucher au clavier), proposé au lancement s'il est plus récent que
+   le projet, effacé à l'enregistrement et à la sortie.*
 4. **Bibliothèque de modèles personnels** **[moyen]** : enregistrer un
    monstre comme modèle, proposé ensuite par `n` à côté des modèles
    fournis.

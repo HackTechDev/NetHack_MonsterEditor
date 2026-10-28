@@ -153,6 +153,10 @@ fixes, arme sans mains, hostile et pacifique à la fois, plusieurs sexes,
 fréquence nulle sans `G_NOGEN`, nom français manquant ou avec majuscule,
 tuile personnalisée vide… L'intégration est refusée tant qu'il reste une erreur.
 
+Tant que le projet n'est pas enregistré, une **sauvegarde de secours**
+(`projet.json.nhmonedit-autosave`) est écrite chaque minute et proposée
+au lancement suivant si l'éditeur a été interrompu.
+
 ## Fichiers
 
 | Fichier | Rôle |

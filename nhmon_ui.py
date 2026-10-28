@@ -226,13 +226,16 @@ def _mouse_event():
     return None
 
 
-def get_key(win):
+def get_key(win, idle=False):
     """Touche lue : caractère (str), code curses (int) ou Mouse.
-    Les relâchements et déplacements sans bouton sont ignorés."""
+    Les relâchements et déplacements sans bouton sont ignorés. idle :
+    renvoie None quand le délai de win.timeout() passe sans touche."""
     while True:
         try:
             k = win.get_wch()
         except curses.error:
+            if idle:
+                return None
             continue
         except KeyboardInterrupt:
             return ESC

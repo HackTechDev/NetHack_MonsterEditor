@@ -1,5 +1,6 @@
 """Fichiers de l'éditeur : projets (liste de monstres en JSON), fusion
-de projets, monstres exportés un par un (*.nhmon.json)."""
+de projets, monstres exportés un par un (*.nhmon.json), sauvegarde de
+secours (projet.json.nhmonedit-autosave)."""
 
 import json
 import os
@@ -10,6 +11,8 @@ from nhmon_i18n import _
 PROJECT_FORMAT = "nhmonedit"
 MONSTER_FORMAT = "nhmonedit-monstre"
 MONSTER_SUFFIX = ".nhmon.json"
+AUTOSAVE_SUFFIX = ".nhmonedit-autosave"
+AUTOSAVE_DELAY = 60         # secondes
 
 
 class ProjectError(Exception):
@@ -55,6 +58,30 @@ def read_monsters(path):
     if fmt != PROJECT_FORMAT:
         raise ProjectError(_("%s n'est pas un projet nhmonedit") % path)
     return [D.normalize(m) for m in data.get("monsters", [])]
+
+
+def autosave_path(project):
+    return project + AUTOSAVE_SUFFIX
+
+
+def pending_autosave(project):
+    """Sauvegarde de secours plus récente que le projet (session
+    interrompue), ou None ; une sauvegarde périmée est effacée."""
+    auto = autosave_path(project)
+    if not os.path.isfile(auto):
+        return None
+    if os.path.isfile(project) and \
+            os.path.getmtime(auto) <= os.path.getmtime(project):
+        drop_autosave(project)
+        return None
+    return auto
+
+
+def drop_autosave(project):
+    try:
+        os.remove(autosave_path(project))
+    except OSError:
+        pass
 
 
 def same_monster(a, b):

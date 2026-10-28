@@ -971,4 +971,11 @@ EN = {
         "  p            project menu: merge another project,",
     "               exporter ou importer un monstre…":
         "               export or import a monster…",
+    "Sauvegarde de secours du %s trouvée\n(session interrompue). La "
+    "récupérer ?":
+        "Backup from %s found\n(interrupted session). Recover it?",
+    "Sauvegarde de secours": "Backup",
+    "Sauvegarde de secours illisible : %s": "Unreadable backup: %s",
+    "Sauvegarde de secours récupérée (%d monstres) — s pour enregistrer":
+        "Backup recovered (%d monsters) — s to save",
 }

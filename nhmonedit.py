@@ -232,6 +232,8 @@ class Editor(Popups):
         self.modified = False
         self.undo_stack = []
         self.redo_stack = []
+        self.autosave_delay = P.AUTOSAVE_DELAY
+        self.autosave_time = time.time()
         self.msg = ""
         self.form_top = 0
         self.list_top = 0
@@ -257,6 +259,7 @@ class Editor(Popups):
 
     def save(self):
         P.write_project(self.project, self.monsters)
+        P.drop_autosave(self.project)
         self.modified = False
         self.msg = _("Enregistré : %s") % self.project
 
@@ -914,6 +917,47 @@ class Editor(Popups):
         ms[self.cur], ms[j] = ms[j], ms[self.cur]
         self.cur = j
 
+    # --- sauvegarde de secours -------------------------------------------
+
+    def autosave(self, force=False):
+        """Écrit projet.json.nhmonedit-autosave si le projet est modifié
+        et que la dernière sauvegarde de secours date de plus de
+        autosave_delay secondes."""
+        now = time.time()
+        if not self.modified or self.autosave_delay <= 0:
+            return
+        if not force and now - self.autosave_time < self.autosave_delay:
+            return
+        self.autosave_time = now
+        try:
+            P.write_project(P.autosave_path(self.project), self.monsters)
+        except OSError:
+            pass        # une sauvegarde de secours ratée ne doit pas
+            #             gêner l'édition
+
+    def offer_autosave(self):
+        """Au lancement : propose de récupérer une sauvegarde de secours
+        plus récente que le projet."""
+        auto = P.pending_autosave(self.project)
+        if not auto:
+            return
+        when = time.strftime("%d/%m/%Y %H:%M",
+                             time.localtime(os.path.getmtime(auto)))
+        if not self.confirm(_("Sauvegarde de secours du %s trouvée\n"
+                              "(session interrompue). La récupérer ?") % when,
+                            _("Sauvegarde de secours")):
+            P.drop_autosave(self.project)
+            return
+        try:
+            monsters = P.read_monsters(auto)
+        except P.ProjectError as e:
+            self.msg = _("Sauvegarde de secours illisible : %s") % e
+            return
+        self.checkpoint()
+        self.monsters, self.cur = monsters, 0
+        self.msg = _("Sauvegarde de secours récupérée (%d monstres) — s pour "
+                     "enregistrer") % len(monsters)
+
     # --- projet -----------------------------------------------------------
 
     def project_menu(self):
@@ -1375,10 +1419,16 @@ class Editor(Popups):
     def run(self):
         curses.curs_set(0)
         self.stdscr.keypad(True)
+        self.stdscr.timeout(5000)   # réveil pour la sauvegarde de secours
         enable_mouse()
+        self.draw()
+        self.offer_autosave()
         while True:
+            self.autosave()
             self.draw()
-            k = get_key(self.stdscr)
+            k = get_key(self.stdscr, idle=True)
+            if k is None:
+                continue
             if k != curses.KEY_RESIZE:
                 self.msg = ""
             if k == curses.KEY_RESIZE:
@@ -1387,6 +1437,7 @@ class Editor(Popups):
                 self.mouse(k)
             elif k == "q":
                 if self.quit():
+                    P.drop_autosave(self.project)
                     return
             elif k == "?":
                 self.help()
