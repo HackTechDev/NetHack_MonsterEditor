@@ -14,7 +14,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | Thème | Fait | Reste |
 |---|---|---|
 | 1. Limites connues | 0 / 5 | tout |
-| 2. Vérification | 0 / 5 | tout |
+| 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 0 / 6 | tout |
 | 4. Projets et fichiers | 0 / 5 | tout |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
@@ -22,11 +22,10 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
 | 8. Qualité du projet | 0 / 4 | tout |
 
-Prochaines étapes conseillées : les **combinaisons d'attaques que le
-jeu ne gère pas** (2.1), parce qu'une erreur de ce genre ne se voit
-qu'en jouant, puis le **pluriel français** (1.3) et le **lien avec
-l'éditeur de cartes** (7.1), qui permettra de placer les robots dans
-les niveaux.
+Prochaines étapes conseillées : le **pluriel français** (1.3), les
+**sons réservés** (2.2), qui comme les attaques ne se voient qu'en
+jouant, et le **lien avec l'éditeur de cartes** (7.1), qui permettra de
+placer les robots dans les niveaux.
 
 ## 1. Limites connues
 
@@ -60,7 +59,8 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
 
 ## 2. Vérification
 
-1. **Combinaisons d'attaques que le jeu ne gère pas** **[moyen]**. Le
+1. ✅ **Fait** — **Combinaisons d'attaques que le jeu ne gère pas**
+   **[moyen]**. Le
    code du jeu n'accepte qu'une partie des dégâts pour chaque type
    d'attaque : un souffle doit avoir des dégâts entre `AD_MAGM` et
    `AD_SPC2` (`BZ_VALID_ADTYP`, `include/hack.h`), un regard n'a d'effet
@@ -68,7 +68,10 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    confusion, étourdissement, aveuglement, feu, sommeil, lenteur…), un
    sort (`AT_MAGC`) a ses propres règles (`mcastu.c`). Signaler en
    erreur les combinaisons sans effet, par exemple un souffle
-   paralysant.
+   paralysant. *Réalisé : `ATTACK_RULES` et `check_attacks()` dans
+   `nhmon_data.py` (erreurs et avertissements, étreinte mal placée,
+   seconde riposte passive), dégâts marqués ✖ dans le menu ; aucun
+   monstre du jeu n'est signalé.*
 2. **Sons réservés** **[facile]**. Certains sons supposent un rôle
    précis dans le jeu (`MS_LEADER`, `MS_NEMESIS`, `MS_GUARDIAN`,
    `MS_PRIEST`, `MS_SELL`, `MS_ORACLE`, `MS_NURSE`, `MS_GUARD`…) :

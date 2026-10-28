@@ -63,6 +63,11 @@ class TestGameData(unittest.TestCase):
             for k in keys:
                 self.assertEqual(p[k], m[k], (m["name"], k))
 
+    def test_game_attacks_accepted(self):
+        """Aucune combinaison d'attaque du jeu n'est signalée."""
+        for m in self.game:
+            self.assertEqual(D.check_attacks(m), [], m["name"])
+
     def test_french_names(self):
         fr = D.french_names(SRC)
         self.assertIn("iron golem", fr)
@@ -101,6 +106,28 @@ class TestTemplates(unittest.TestCase):
         del m["tile_shape"]
         m["tile"][3] = "B" * D.TILE_SIZE
         self.assertEqual(D.normalize(m)["tile_shape"], T.SHAPE_CUSTOM)
+
+    def test_attack_combinations(self):
+        def grav(*attacks):
+            m = D.new_monster()
+            m["attacks"] = [list(a) for a in attacks] + [
+                list(D.NO_ATTK) for _ in range(D.NATTK - len(attacks))]
+            return [g for g, _ in D.check_attacks(m)]
+        self.assertEqual(grav(("AT_BREA", "AD_PLYS", 2, 6)), ["erreur"])
+        self.assertEqual(grav(("AT_BREA", "AD_FIRE", 2, 6)), [])
+        self.assertEqual(grav(("AT_SPIT", "AD_FIRE", 1, 6)), ["erreur"])
+        self.assertEqual(grav(("AT_GAZE", "AD_SLEE", 1, 6)), ["erreur"])
+        self.assertEqual(grav(("AT_EXPL", "AD_ACID", 4, 6)), ["erreur"])
+        self.assertEqual(grav(("AT_MAGC", "AD_ELEC", 0, 0)), ["erreur"])
+        self.assertEqual(grav(("AT_ENGL", "AD_PLYS", 1, 4)), ["attention"])
+        self.assertEqual(grav(("AT_NONE", "AD_SLEE", 1, 4)), ["attention"])
+        self.assertEqual(grav(("AT_CLAW", "AD_SPEL", 1, 4)), ["attention"])
+        self.assertEqual(grav(("AT_HUGS", "AD_PHYS", 2, 6)), ["attention"])
+        self.assertEqual(grav(("AT_CLAW", "AD_PHYS", 1, 4),
+                              ("AT_CLAW", "AD_PHYS", 1, 4),
+                              ("AT_HUGS", "AD_PHYS", 2, 6)), [])
+        self.assertTrue(D.attack_allows("AT_CLAW", "AD_ELEC"))
+        self.assertFalse(D.attack_allows("AT_BREA", "AD_PLYS"))
 
     def test_derive_bn(self):
         self.assertEqual(D.derive_bn("araignée-robot"), "ARAIGNEE_ROBOT")

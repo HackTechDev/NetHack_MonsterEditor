@@ -771,6 +771,100 @@ def parse_monsters_h(path):
 
 # --- vérification -------------------------------------------------------
 
+# Dégâts que le code du jeu sait traiter pour chaque type d'attaque
+# (relevés dans les sources de NetHack 5.0). Hors de ces listes, le jeu
+# signale une erreur interne (« impossible ») ou l'attaque est sans effet.
+_BREATH = ("AD_MAGM", "AD_FIRE", "AD_COLD", "AD_SLEE", "AD_DISN",
+           "AD_ELEC", "AD_DRST", "AD_ACID")
+ATTACK_RULES = {
+    # type : (dégâts acceptés, gravité hors liste, explication)
+    "AT_BREA": (_BREATH + ("AD_RBRE", "AD_SPC1", "AD_SPC2"), "erreur",
+                "un souffle n'existe qu'en projectiles magiques, feu, "
+                "froid, sommeil, désintégration, électricité, poison, "
+                "acide ou au hasard (breamu(), BZ_VALID_ADTYP)"),
+    "AT_SPIT": (("AD_ACID", "AD_BLND", "AD_DRST"), "erreur",
+                "on ne crache que de l'acide ou du venin aveuglant "
+                "(spitmm())"),
+    "AT_GAZE": (("AD_STON", "AD_CONF", "AD_STUN", "AD_BLND", "AD_FIRE"),
+                "erreur",
+                "un regard ne pétrifie, confond, étourdit, aveugle ou "
+                "brûle (gazemu())"),
+    "AT_EXPL": (("AD_COLD", "AD_FIRE", "AD_ELEC", "AD_BLND", "AD_HALU"),
+                "erreur",
+                "une explosion au contact est de froid, de feu, "
+                "électrique, aveuglante ou hallucinogène (explmu())"),
+    "AT_BOOM": (("AD_PHYS",) + _BREATH, "erreur",
+                "une explosion à la destruction est physique ou du type "
+                "d'un souffle (mon_explodes())"),
+    "AT_MAGC": (("AD_SPEL", "AD_CLRC", "AD_FIRE", "AD_COLD", "AD_MAGM"),
+                "erreur",
+                "un sort est de mage (AD_SPEL), de prêtre (AD_CLRC), de "
+                "feu, de froid ou de projectiles magiques (castmu())"),
+    "AT_ENGL": (("AD_DGST", "AD_PHYS", "AD_ACID", "AD_BLND", "AD_ELEC",
+                 "AD_COLD", "AD_FIRE", "AD_DISE", "AD_DREN", "AD_WRAP"),
+                "attention",
+                "l'engloutissement n'a pas d'effet avec ces dégâts "
+                "(gulpmu())"),
+    "AT_NONE": (("AD_FIRE", "AD_ACID", "AD_STON", "AD_RUST", "AD_CORR",
+                 "AD_MAGM", "AD_ENCH", "AD_PLYS", "AD_COLD", "AD_STUN",
+                 "AD_ELEC", "AD_SLIM"), "attention",
+                "la riposte passive n'a pas d'effet avec ces dégâts "
+                "(passive())"),
+}
+# dégâts qui n'ont de sens qu'avec un type d'attaque précis
+_ONLY_WITH = {
+    "AD_RBRE": ("AT_BREA",), "AD_SPEL": ("AT_MAGC",),
+    "AD_CLRC": ("AT_MAGC",), "AD_SPC1": (), "AD_SPC2": (),
+}
+
+
+def attack_allows(at, ad):
+    """Vrai si le jeu sait traiter ce dégât pour ce type d'attaque."""
+    if at in ATTACK_RULES:
+        ok = ad in ATTACK_RULES[at][0]
+    else:
+        ok = True
+    return ok and (ad not in _ONLY_WITH or at in _ONLY_WITH[ad])
+
+
+def check_attacks(m):
+    """Combinaisons d'attaques que le jeu ne gère pas : liste de
+    (gravité, message)."""
+    out = []
+    passive_seen = False
+    for i, (at, ad, dn, dd) in enumerate(m["attacks"]):
+        if at == "AT_NONE" and ad == "AD_PHYS" and not dn and not dd:
+            continue                    # emplacement vide
+        n = i + 1
+        if at in ATTACK_RULES and ad not in ATTACK_RULES[at][0]:
+            grav, why = ATTACK_RULES[at][1], ATTACK_RULES[at][2]
+            out.append((grav, "Attaque %d (%s %s) : %s"
+                        % (n, at[3:], ad[3:], why)))
+        elif ad in _ONLY_WITH and at not in _ONLY_WITH[ad]:
+            if _ONLY_WITH[ad]:
+                out.append(("attention", "Attaque %d : %s ne sert qu'avec "
+                            "%s" % (n, ad, " ou ".join(_ONLY_WITH[ad]))))
+            else:
+                out.append(("attention", "Attaque %d : %s n'est pas "
+                            "utilisé par le jeu" % (n, ad)))
+        elif at == "AT_BREA" and ad in ("AD_SPC1", "AD_SPC2"):
+            out.append(("attention", "Attaque %d : souffle %s sans nom "
+                        "(« strange breath »)" % (n, ad)))
+        if at == "AT_NONE":
+            if passive_seen:
+                out.append(("attention", "Attaque %d : seule la première "
+                            "riposte passive (AT_NONE) compte" % n))
+            passive_seen = True
+        if at == "AT_HUGS":
+            prev = m["attacks"][i - 2:i] if i >= 2 else []
+            if len(prev) < 2 or any(a[0] == "AT_NONE" for a in prev):
+                out.append(("attention", "Attaque %d : une étreinte ne "
+                            "réussit que si les deux attaques précédentes "
+                            "ont touché ; placez-la après deux attaques "
+                            "au corps à corps" % n))
+    return out
+
+
 BN_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 
@@ -835,6 +929,7 @@ def validate(m, game=None, project=None):
         if at == "AT_ENGL" and m["size"] in ("MZ_TINY", "MZ_SMALL"):
             warn("Attaque %d : engloutir demande une grande taille"
                  % (i + 1))
+    out += check_attacks(m)
     used = attacks_used(m)
     if m["attacks"][:len(used)] != used:
         warn("Attaques : un emplacement vide avant une attaque "

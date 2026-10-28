@@ -103,7 +103,9 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
   invalide, menu filtrable, cases à cocher.
 - Menus filtrables : quelques lettres tapées réduisent la liste (sur le
   nom C et sur la description française).
-- Attaque en trois temps : type, dégâts, dés.
+- Attaque en trois temps : type, dégâts, dés ; dans le menu des
+  dégâts, ceux que le jeu ne gère pas avec le type choisi sont marqués
+  ✖ et le curseur se place sur un choix valide.
 - `Suppr` vide un champ : texte, difficulté forcée (retour au calcul),
   attaque (les suivantes remontent).
 - Éditeur de texte multiligne pour l'encyclopédie, avec retour à la
@@ -128,6 +130,17 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
 En direct dans l'Aperçu et la liste, et pour tout le projet avec `v`.
 Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
 
+- **Combinaisons d'attaques** : chaque type d'attaque n'accepte que
+  les dégâts que le code du jeu sait traiter (relevés dans `breamu()`,
+  `spitmm()`, `gazemu()`, `explmu()`, `mon_explodes()`, `castmu()`,
+  `gulpmu()`, `passive()`). Erreur pour un souffle, un crachat, un
+  regard, une explosion ou un sort impossibles (le jeu afficherait une
+  erreur interne, par exemple un « souffle paralysant ») ;
+  avertissement pour un engloutissement ou une riposte passive sans
+  effet, une deuxième riposte passive (seule la première compte), des
+  dégâts de souffle ou de sort sur une attaque ordinaire, une étreinte
+  qui n'est pas précédée de deux attaques au corps à corps (elle ne
+  réussit qu'après elles). Aucun des 382 monstres du jeu n'est signalé.
 - Erreurs : identifiant C invalide ou déjà pris, nom anglais vide, déjà
   pris ou contenant un caractère qui casserait les fichiers du jeu
   (guillemet, parenthèse, virgule, barre oblique inverse), noms par
@@ -214,9 +227,9 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
 
 ## Qualité
 
-- 14 tests (`python3 -m unittest discover -s tests`) : lecture de
+- 16 tests (`python3 -m unittest discover -s tests`) : lecture de
   `monsters.h`, constantes connues, difficulté, aller-retour du code C,
-  noms français, modèles, tuiles, intégration et retrait sur une copie
+  noms français, combinaisons d'attaques, modèles, tuiles, intégration et retrait sur une copie
   des sources, ordre des tuiles, `golemhp()`, catalogues de traduction.
 - Vérifié sur une copie complète des sources : compilation sans
   avertissement avec dix robots, `tilemap` sans erreur, monstre créé en

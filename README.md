@@ -134,8 +134,9 @@ plus (c'est le rôle de `EDITLEVEL`).
 
 ## Vérifications
 
-L'éditeur signale (panneau « Aperçu », touche `v`) : identifiant ou nom
-déjà pris par le jeu, valeurs hors limites des champs C, golem sans PV
+L'éditeur signale (panneau « Aperçu », touche `v`) : combinaisons
+d'attaques que le jeu ne gère pas (souffle paralysant, regard
+endormant…), identifiant ou nom déjà pris par le jeu, valeurs hors limites des champs C, golem sans PV
 fixes, arme sans mains, hostile et pacifique à la fois, plusieurs sexes,
 fréquence nulle sans `G_NOGEN`, nom français manquant ou avec majuscule,
 tuile personnalisée vide… L'intégration est refusée tant qu'il reste une erreur.

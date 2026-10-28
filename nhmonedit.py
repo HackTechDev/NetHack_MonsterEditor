@@ -647,8 +647,14 @@ class Editor(Popups):
         cur = [n for n, _ in ats].index(a[0]) if a[0] in D.AT_VALUE else 0
         k = self.menu("Attaque %d : type" % (i + 1), ats, cur)
         at = ats[k][0]
-        ads = [(n, d) for n, _v, d in D.DAMAGE_TYPES]
-        cur = [n for n, _ in ads].index(a[1]) if a[1] in D.AD_VALUE else 0
+        # les dégâts que le jeu ne gère pas avec ce type sont signalés
+        ads = [(n, d if D.attack_allows(at, n) else "✖ " + d +
+                " (sans effet avec ce type)")
+               for n, _v, d in D.DAMAGE_TYPES]
+        names = [n for n, _ in ads]
+        cur = names.index(a[1]) if a[1] in D.AD_VALUE and \
+            D.attack_allows(at, a[1]) else \
+            next(i for i, n in enumerate(names) if D.attack_allows(at, n))
         k = self.menu("Attaque %d : dégâts (%s)" % (i + 1, D.AT_DESC[at]),
                       ads, cur)
         ad = ads[k][0]
