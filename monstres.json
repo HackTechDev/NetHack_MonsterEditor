@@ -1,0 +1,113 @@
+{
+ "format": "nhmonedit",
+ "version": 1,
+ "monsters": [
+  {
+   "bn": "SECURITY_BOT",
+   "name": "security bot",
+   "name_m": "",
+   "name_f": "",
+   "fr_name": "robot de sécurité",
+   "fr_gender": "m",
+   "fr_name_m": "",
+   "fr_name_f": "",
+   "sym": "S_GOLEM",
+   "level": 6,
+   "move": 10,
+   "ac": 4,
+   "mr": 10,
+   "align": 0,
+   "geno": [
+    "G_GENO",
+    "G_NOCORPSE"
+   ],
+   "freq": 2,
+   "attacks": [
+    [
+     "AT_WEAP",
+     "AD_PHYS",
+     1,
+     8
+    ],
+    [
+     "AT_TUCH",
+     "AD_ELEC",
+     1,
+     6
+    ],
+    [
+     "AT_NONE",
+     "AD_PHYS",
+     0,
+     0
+    ],
+    [
+     "AT_NONE",
+     "AD_PHYS",
+     0,
+     0
+    ],
+    [
+     "AT_NONE",
+     "AD_PHYS",
+     0,
+     0
+    ],
+    [
+     "AT_NONE",
+     "AD_PHYS",
+     0,
+     0
+    ]
+   ],
+   "weight": 900,
+   "nutrition": 0,
+   "sound": "MS_SOLDIER",
+   "size": "MZ_MEDIUM",
+   "mr1": [
+    "MR_ELEC",
+    "MR_SLEEP",
+    "MR_POISON"
+   ],
+   "mr2": [],
+   "flags1": [
+    "M1_BREATHLESS",
+    "M1_MINDLESS",
+    "M1_HUMANOID",
+    "M1_THICK_HIDE"
+   ],
+   "flags2": [
+    "M2_HOSTILE",
+    "M2_NEUTER",
+    "M2_COLLECT"
+   ],
+   "flags3": [
+    "M3_INFRAVISION"
+   ],
+   "difficulty": null,
+   "color": "CLR_BRIGHT_BLUE",
+   "golem_hp": 55,
+   "tile": [
+    "................",
+    "......PPPP......",
+    ".....PEEEEP.....",
+    ".....PPPPPP.....",
+    "......OPPO......",
+    "...PPPPPPPPPP...",
+    "..POPPEEEEPPOP..",
+    "..PO.PEEEEP.OP..",
+    "..PO.PPPPPP.OP..",
+    "..AA.PPPPPP.AA..",
+    ".....PP..PP.....",
+    ".....PO..OP.....",
+    ".....PO..OP.....",
+    ".....PO..OP.....",
+    "....APP..PPA....",
+    "................"
+   ],
+   "encyclo_en": "Standard corporate patrol unit. Programmed to de-escalate, which it does with a 50,000-volt baton.",
+   "encyclo_fr": "Unité de patrouille standard des corporations. Programmée pour « désescalader », elle le fait à coups de matraque à 50 000 volts. Ses mises à jour de sécurité ont trois ans de retard.",
+   "notes": ""
+  }
+ ]
+}

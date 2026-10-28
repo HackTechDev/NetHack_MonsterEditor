@@ -81,6 +81,27 @@ class TestTemplates(unittest.TestCase):
             errs = [x for g, x in D.validate(m, [], []) if g == "erreur"]
             self.assertEqual(errs, [], m["name"])
 
+    def test_tile_for(self):
+        for i in range(len(T.TEMPLATES)):
+            m = T.from_template(i)
+            tile = T.tile_for(m)
+            self.assertEqual(len(tile), D.TILE_SIZE)
+            self.assertTrue(any(c != "." for r in tile for c in r))
+            self.assertTrue(all(c in dict(D.TILE_PALETTE)
+                                for r in tile for c in r))
+        m = D.new_monster()
+        m["sym"] = "S_GIANT"
+        self.assertEqual(T.shape_of(m), "mecha")
+        m["tile_shape"] = T.SHAPE_CUSTOM
+        m["tile"][0] = "A" * D.TILE_SIZE
+        self.assertEqual(T.tile_for(m)[0], "A" * D.TILE_SIZE)
+
+    def test_old_project_keeps_drawn_tile(self):
+        m = D.new_monster()
+        del m["tile_shape"]
+        m["tile"][3] = "B" * D.TILE_SIZE
+        self.assertEqual(D.normalize(m)["tile_shape"], T.SHAPE_CUSTOM)
+
     def test_derive_bn(self):
         self.assertEqual(D.derive_bn("araignée-robot"), "ARAIGNEE_ROBOT")
         self.assertEqual(D.derive_bn("2 bots"), "M_2_BOTS")

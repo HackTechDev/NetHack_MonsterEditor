@@ -386,7 +386,8 @@ def new_monster():
         "difficulty": None,            # None : calculée
         "color": "HI_METAL",
         "golem_hp": 50,                # PV fixes des golems (S_GOLEM)
-        "tile": blank_tile(),
+        "tile_shape": "auto",          # silhouette de la tuile
+        "tile": blank_tile(),          # tuile dessinée (« personnalisée »)
         "encyclo_en": "", "encyclo_fr": "",
         "notes": "",
     }
@@ -394,6 +395,10 @@ def new_monster():
 
 def normalize(m):
     """Complète un monstre lu d'un fichier (anciens champs absents)."""
+    if "tile_shape" not in m:
+        # projet d'avant les silhouettes : on garde la tuile dessinée
+        drawn = any(c != "." for row in m.get("tile", []) for c in row)
+        m["tile_shape"] = "personnalisée" if drawn else "auto"
     base = new_monster()
     for k, v in base.items():
         if k not in m:
@@ -874,8 +879,9 @@ def validate(m, game=None, project=None):
         err("Genre français : m ou f")
     if m["name_m"] and not (m["fr_name_m"] and m["fr_name_f"]):
         warn("Noms par genre sans leur traduction française")
-    if not any(c != "." for row in m["tile"] for c in row):
-        warn("Tuile vide (seulement pour les interfaces graphiques)")
+    if m["tile_shape"] == "personnalisée" and \
+            not any(c != "." for row in m["tile"] for c in row):
+        warn("Tuile personnalisée vide (interfaces graphiques seulement)")
     return out
 
 

@@ -22,6 +22,7 @@ import shutil
 import time
 
 import nhmon_data as D
+import nhmon_templates as T
 
 TAG = "nhmonedit"
 MONSTERS_H = "include/monsters.h"
@@ -179,7 +180,7 @@ TILE_HDR = re.compile(r"^# (tile|placeholder) (\d+) \((.*)\)$", re.M)
 
 
 def tile_block(m):
-    rows = "".join("  %s\n" % r for r in m["tile"])
+    rows = "".join("  %s\n" % r for r in T.tile_for(m))
     out = "# %s:begin %s\n" % (TAG, m["bn"])
     for g in ("male", "female"):
         out += "# tile 0 (%s,%s)\n{\n%s}\n" % (m["name"], g, rows)

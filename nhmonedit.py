@@ -97,8 +97,9 @@ FIELDS = [
     ("flags", "flags2", "Drapeaux M2", "nature et comportement"),
     ("flags", "flags3", "Drapeaux M3", "divers (infravision, attente…)"),
     ("section", None, "Apparence et textes", ""),
-    ("tile", "tile", "Tuile 16×16", "image pour les interfaces "
-     "graphiques (X11, Qt, curses avec tuiles)"),
+    ("choice", "tile_shape", "Silhouette (tuile)", "image des versions "
+     "graphiques (Qt, X11) seulement, invisible dans le terminal ; "
+     "colorée d'après la couleur du monstre"),
     ("longtext", "encyclo_fr", "Encyclopédie (fr)", "texte de « ; » et "
      "« / » dans le jeu, en français"),
     ("longtext", "encyclo_en", "Encyclopédie (en)", "même texte en "
@@ -124,7 +125,8 @@ HELP = [
     "  i            importer un monstre du jeu comme base",
     "  Suppr / X    supprimer le monstre (dans la liste)",
     "  < >          déplacer le monstre dans la liste",
-    "  t            dessiner la tuile",
+    "  t            dessiner la tuile à la main (versions graphiques",
+    "               seulement ; sinon la silhouette suffit)",
     "",
     "Contrôle :",
     "  v            vérifier tous les monstres",
@@ -307,7 +309,7 @@ class Editor(Popups):
             hint = FIELDS[self.field][3]
         put(scr, H - 2, 0, (" " + hint).ljust(W),
             self.colors.fg(curses.COLOR_CYAN))
-        keys = " n:nouveau d:dupl. i:importer t:tuile v:vérif c:code " \
+        keys = " n:nouveau d:dupl. i:importer v:vérif c:code b:comparer " \
                "I:intégrer m:make U:update j:jouer s:enreg. ?:aide q:quitter"
         put(scr, H - 1, 0, (" " + self.msg).ljust(W) if self.msg else
             keys.ljust(W), self.colors.pair(curses.COLOR_BLACK,
@@ -364,6 +366,12 @@ class Editor(Popups):
         if kind == "choice":
             if key == "fr_gender":
                 return {"m": "masculin", "f": "féminin"}.get(v, v), 0
+            if key == "tile_shape":
+                if v == T.SHAPE_AUTO:
+                    return "auto (%s, d'après la classe)" % T.shape_of(m), 0
+                if v == T.SHAPE_CUSTOM:
+                    return "personnalisée (dessinée avec t)", 0
+                return v, 0
             if key == "sym":
                 return "%s  %s" % (D.CLASS_CHAR.get(v, "?"), dict(
                     (s, d) for s, _c, d in D.CLASSES).get(v, v)), \
@@ -388,9 +396,6 @@ class Editor(Popups):
                 return "%d (calculée)" % calc, 0
             return "%d (forcée ; calculée : %d)" % (v, calc), \
                 self.colors.fg(curses.COLOR_YELLOW)
-        if kind == "tile":
-            n = sum(c != "." for r in v for c in r)
-            return "%d pixels dessinés — Entrée pour dessiner" % n, 0
         if kind == "longtext":
             s = " ".join(v.split())
             return (s or "—"), (0 if s else curses.A_DIM)
@@ -471,14 +476,6 @@ class Editor(Popups):
         put(scr, yy, x + 2, "Sources".ljust(16), curses.A_DIM)
         put(scr, yy, x + 18, st, sa, cw - 16)
         yy += 2
-        # tuile en demi-blocs
-        if yy + 8 < y + h - 6:
-            for j in range(0, D.TILE_SIZE, 2):
-                for i in range(D.TILE_SIZE):
-                    put(scr, yy + j // 2, x + 2 + i, "▀",
-                        self.colors.halfblock(m["tile"][j][i],
-                                              m["tile"][j + 1][i]))
-            yy += 9
         # vérification
         res = D.validate(m, self.game(), self.others(m))
         if not res:
@@ -510,6 +507,10 @@ class Editor(Popups):
     def choices(self, key):
         if key == "fr_gender":
             return [("m", "masculin"), ("f", "féminin")]
+        if key == "tile_shape":
+            return [(c, "selon la classe" if c == T.SHAPE_AUTO else
+                     "tuile dessinée à la main (t)" if c == T.SHAPE_CUSTOM
+                     else "") for c in T.shape_choices()]
         if key == "sym":
             return [(s, "%s  %s" % (c, d)) for s, c, d in D.CLASSES
                     if s != "S_WORM_TAIL"]
@@ -632,8 +633,6 @@ class Editor(Popups):
                     m[key] = v
             elif kind == "attack":
                 self.edit_attack(m, key)
-            elif kind == "tile":
-                self.edit_tile()
             elif kind == "longtext":
                 v = self.text_area(label, m[key])
                 if v != m[key]:
@@ -668,10 +667,17 @@ class Editor(Popups):
         m = self.mon()
         if not m:
             return
-        new = self.tile_editor(m["tile"], m["fr_name"] or m["name"])
-        if new != m["tile"]:
+        if not self.confirm(
+                "La tuile n'apparaît que dans les versions graphiques\n"
+                "(Qt, X11), pas dans le terminal. La dessiner quand même ?",
+                "Tuile"):
+            return
+        old = T.tile_for(m)
+        new = self.tile_editor(old, m["fr_name"] or m["name"])
+        if new != old:
             self.checkpoint()
             m["tile"] = new
+            m["tile_shape"] = T.SHAPE_CUSTOM
 
     # --- monstres -----------------------------------------------------------
 
@@ -749,7 +755,9 @@ class Editor(Popups):
         m["golem_hp"] = hp.get(m["bn"], m["golem_hp"])
         if m["difficulty"] == D.mstrength(m):
             m["difficulty"] = None
-        m["tile"] = self.game_tile(m["name"]) or T.make_tile("humanoïde")
+        tile = self.game_tile(m["name"])
+        if tile:
+            m["tile"], m["tile_shape"] = tile, T.SHAPE_CUSTOM
         self.add_monster(self.unique_names(m))
         self.msg = "Importé : %s — renommez-le à votre goût" % m["name"]
 

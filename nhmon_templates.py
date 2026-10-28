@@ -1,9 +1,12 @@
-"""Modèles de robots et de mechas pour Night City, avec leurs tuiles.
+"""Modèles de robots et de mechas pour Night City, et tuiles.
 
-Chaque modèle part de new_monster() et change ce qui le distingue. Les
-tuiles 16x16 utilisent la palette de win/share/monsters.txt ; la lettre
-« P » (acier) et la lettre « B » (voyants) y sont remplacées par les
-couleurs du modèle.
+Chaque modèle part de new_monster() et change ce qui le distingue.
+
+La tuile 16x16 ne sert qu'aux interfaces graphiques (Qt, X11), mais
+win/share/monsters.txt en demande une par monstre : elle est tirée d'une
+silhouette, colorée d'après la couleur du monstre (tile_for()). La
+silhouette « auto » dépend de la classe ; « personnalisée » garde la
+tuile dessinée à la main (ou importée du jeu).
 """
 
 import copy
@@ -123,6 +126,45 @@ SHAPES = {
 }
 
 
+SHAPE_AUTO = "auto"
+SHAPE_CUSTOM = "personnalisée"
+# silhouette automatique selon la classe
+CLASS_SHAPE = {
+    "S_GIANT": "mecha", "S_EYE": "sphère", "S_LIGHT": "sphère",
+    "S_VORTEX": "sphère", "S_BAT": "drone", "S_ANT": "drone",
+    "S_XAN": "drone", "S_SPIDER": "araignée", "S_RUSTMONST": "chenilles",
+    "S_BLOB": "chenilles", "S_PUDDING": "chenilles", "S_JELLY": "chenilles",
+    "S_TRAPPER": "chenilles", "S_PIERCER": "chenilles",
+}
+# couleur CLR_* -> lettre de la palette des tuiles (carrosserie)
+COLOR_LETTER = {
+    0: "S", 1: "D", 2: "F", 3: "J", 4: "E", 5: "I", 6: "P", 7: "W", 8: "W",
+    9: "C", 10: "G", 11: "H", 12: "B", 13: "I", 14: "B", 15: "N",
+}
+
+
+def shape_choices():
+    return [SHAPE_AUTO] + list(SHAPES) + [SHAPE_CUSTOM]
+
+
+def shape_of(m):
+    """Silhouette effective (jamais « auto »)."""
+    s = m.get("tile_shape", SHAPE_AUTO)
+    if s == SHAPE_AUTO:
+        return CLASS_SHAPE.get(m["sym"], "humanoïde")
+    return s
+
+
+def tile_for(m):
+    """Tuile écrite dans monsters.txt pour ce monstre."""
+    shape = shape_of(m)
+    if shape not in SHAPES:
+        return list(m["tile"])
+    body = COLOR_LETTER.get(D.COLOR_VALUE.get(m["color"], 6), "P")
+    light = "H" if body == "D" else "D"
+    return make_tile(shape, body, light)
+
+
 def make_tile(shape, body="P", light="B"):
     """Tuile d'une silhouette, recolorée : P -> body, B -> light."""
     tr = str.maketrans({"P": body, "B": light})
@@ -134,10 +176,8 @@ def _m(**kw):
     atk = kw.pop("attacks", [])
     m["attacks"] = [list(a) for a in atk] + \
         [list(D.NO_ATTK) for _ in range(D.NATTK - len(atk))]
-    shape = kw.pop("shape")
-    colors = kw.pop("tile_colors", ("P", "B"))
+    m["tile_shape"] = kw.pop("shape")
     m.update(kw)
-    m["tile"] = make_tile(shape, *colors)
     return m
 
 
@@ -155,7 +195,7 @@ TEMPLATES = [
         flags1=ROBOT + ["M1_HUMANOID", "M1_THICK_HIDE"],
         flags2=["M2_HOSTILE", "M2_NEUTER", "M2_COLLECT"],
         flags3=["M3_INFRAVISION"], color="CLR_BRIGHT_BLUE", golem_hp=55,
-        shape="humanoïde", tile_colors=("P", "E"),
+        shape="humanoïde",
         encyclo_fr="Unité de patrouille standard des corporations. "
         "Programmée pour « désescalader », elle le fait à coups de "
         "matraque à 50 000 volts. Ses mises à jour de sécurité ont "
@@ -173,7 +213,7 @@ TEMPLATES = [
         flags1=ROBOT + ["M1_FLY", "M1_NOLIMBS", "M1_NOHEAD", "M1_NOTAKE"],
         flags2=["M2_HOSTILE", "M2_NEUTER", "M2_WANDER"], flags3=[],
         color="CLR_BRIGHT_CYAN",
-        shape="sphère", tile_colors=("P", "B"),
+        shape="sphère",
         encyclo_fr="Petite caméra à rotors qui suit les passants en "
         "bourdonnant. Son projecteur, prévu pour la reconnaissance "
         "faciale, aveugle surtout les visages qu'il reconnaît.",
@@ -190,7 +230,7 @@ TEMPLATES = [
         flags1=ROBOT + ["M1_FLY", "M1_NOHANDS", "M1_NOTAKE"],
         flags2=["M2_HOSTILE", "M2_NEUTER"], flags3=["M3_INFRAVISION"],
         color="CLR_RED",
-        shape="drone", tile_colors=("P", "D"),
+        shape="drone",
         encyclo_fr="Quadrirotor militaire armé d'un arc électrique. "
         "Les gangs les volent, les reprogramment et les revendent aux "
         "corporations qui les avaient perdus.",
@@ -207,7 +247,7 @@ TEMPLATES = [
                         "M1_NOEYES"],
         flags2=["M2_HOSTILE", "M2_NEUTER"], flags3=["M3_INFRAVISIBLE"],
         color="CLR_ORANGE",
-        shape="sphère", tile_colors=("W", "C"),
+        shape="sphère",
         encyclo_fr="Une charge thermobarique, quatre hélices et un "
         "logiciel de poursuite. Il ne fait qu'une chose, et une seule "
         "fois.",
@@ -225,7 +265,7 @@ TEMPLATES = [
                         "M1_ANIMAL"],
         flags2=["M2_HOSTILE", "M2_NEUTER"], flags3=["M3_INFRAVISION"],
         color="CLR_GRAY",
-        shape="araignée", tile_colors=("P", "D"),
+        shape="araignée",
         encyclo_fr="Robot de maintenance à huit pattes, détourné en "
         "piège par les fixers : il se cache dans les gaines et pique "
         "au sédatif tout ce qui passe dessous.",
@@ -242,7 +282,7 @@ TEMPLATES = [
         flags1=["M1_BREATHLESS", "M1_HUMANOID", "M1_SEE_INVIS"],
         flags2=["M2_HOSTILE", "M2_STRONG", "M2_COLLECT", "M2_MAGIC"],
         flags3=["M3_INFRAVISION"], color="CLR_WHITE",
-        shape="humanoïde", tile_colors=("L", "B"),
+        shape="humanoïde",
         encyclo_fr="Indiscernable d'un humain, sauf pour un test de "
         "Voight-Kampff ou un détecteur de métaux. Il collectionne les "
         "objets des autres, par curiosité, dit-il.",
@@ -260,7 +300,7 @@ TEMPLATES = [
         flags1=ROBOT + ["M1_ANIMAL", "M1_NOHANDS", "M1_METALLIVORE"],
         flags2=["M2_HOSTILE", "M2_NEUTER"], flags3=[],
         color="CLR_BROWN",
-        shape="chenilles", tile_colors=("J", "H"),
+        shape="chenilles",
         encyclo_fr="Benne autonome chargée de récupérer la ferraille "
         "des bas-fonds. Elle ne fait pas la différence entre une "
         "épave et une armure portée.",
@@ -279,7 +319,7 @@ TEMPLATES = [
                 "M2_COLLECT"],
         flags3=["M3_INFRAVISION", "M3_INFRAVISIBLE"],
         color="HI_METAL",
-        shape="mecha", tile_colors=("P", "D"),
+        shape="mecha",
         encyclo_fr="Exosquelette de quatre mètres piloté à distance "
         "par un opérateur payé à la mission. Le lance-flammes du bras "
         "gauche était vendu comme « outil de désherbage urbain ».",
@@ -300,7 +340,7 @@ TEMPLATES = [
                 "M2_ROCKTHROW", "M2_STALK"],
         flags3=["M3_INFRAVISION", "M3_INFRAVISIBLE"],
         color="CLR_BRIGHT_MAGENTA",
-        shape="mecha", tile_colors=("I", "H"),
+        shape="mecha",
         encyclo_fr="Prototype militaire d'Arasaka perdu lors d'un "
         "transfert de données : son pilote automatique protège "
         "toujours un convoi qui n'existe plus.",
@@ -318,14 +358,14 @@ TEMPLATES = [
         flags2=["M2_HOSTILE", "M2_NEUTER"],
         flags3=["M3_WAITFORU", "M3_INFRAVISION"], color="CLR_YELLOW",
         golem_hp=70,
-        shape="chenilles", tile_colors=("W", "H"),
+        shape="chenilles",
         encyclo_fr="Tourelle laser fixée au plafond des halls "
         "d'entrée. Une sirène, puis un faisceau : la politique "
         "d'accueil de la maison.",
         encyclo_en="A ceiling-mounted laser turret. A siren, then a "
         "beam: the lobby's welcome policy.")),
     ("Robot vierge", "valeurs de départ d'un robot (classe golem)",
-     _m(shape="humanoïde")),
+     _m(shape=SHAPE_AUTO)),
 ]
 
 

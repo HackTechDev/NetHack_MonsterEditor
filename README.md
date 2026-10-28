@@ -19,8 +19,8 @@ Variables : `NHMONEDIT_SRC` (sources du jeu), `NHMONEDIT_HACKDIR`
 (dossier du jeu installé, par défaut `~/nh/install/games/lib/nethackdir`).
 
 Terminal de 80×24 au minimum ; à partir de 120 colonnes, un panneau
-« Aperçu » montre la difficulté, les PV, la tuile et les problèmes du
-monstre en direct.
+« Aperçu » montre la difficulté, les PV et les problèmes du monstre en
+direct.
 
 ## Ce que l'on peut régler
 
@@ -29,8 +29,7 @@ Tout ce que contient une entrée `MON()` de `include/monsters.h` :
 - **identité** : nom français (affiché dans le jeu, thème `fr@cyber`) et
   son genre, nom anglais (nom interne, à taper avec Ctrl-G en mode
   wizard), identifiant `PM_`, noms par genre facultatifs ;
-- **apparence** : classe (lettre sur la carte), couleur, tuile 16×16 pour
-  les interfaces graphiques (éditeur de pixels intégré) ;
+- **apparence** : classe (lettre sur la carte) et couleur ;
 - **caractéristiques** : niveau, vitesse, classe d'armure, résistance à
   la magie, alignement, PV fixes pour la classe golem ;
 - **génération** : fréquence, unique, groupes, génocide, cadavre ;
@@ -40,6 +39,19 @@ Tout ce que contient une entrée `MON()` de `include/monsters.h` :
   conférées, drapeaux M1/M2/M3 ;
 - **encyclopédie** en français et en anglais (commandes `;` et `/`).
 
+### La tuile
+
+Dans le terminal, un monstre n'est qu'une lettre colorée : la tuile
+16×16 ne se voit que dans les versions graphiques (Qt, X11). Le jeu en
+exige pourtant une par monstre dans `win/share/monsters.txt` (sinon les
+images de tous les monstres suivants seraient décalées). L'éditeur la
+fabrique donc tout seul à partir d'une **silhouette** (humanoïde,
+mecha, drone, sphère, araignée, chenilles), colorée d'après la couleur
+du monstre. Par défaut (« auto »), la silhouette dépend de la classe.
+
+Pour qui joue en graphique, `t` ouvre un éditeur de pixels ; la tuile
+dessinée (ou importée du jeu avec `i`) est alors « personnalisée ».
+
 La **difficulté** est calculée comme dans le jeu (`mstrength()` de
 `src/mondata.c` ; le calcul retrouve celle de 380 des 382 monstres du
 jeu) ; on peut la forcer. La touche `b` compare le monstre aux monstres
@@ -47,8 +59,8 @@ du jeu de difficulté proche, pour l'équilibrage.
 
 ## Modèles
 
-`n` propose des modèles prêts à adapter, avec leur tuile et leur texte
-d'encyclopédie : robot de sécurité, drone de surveillance, drone
+`n` propose des modèles prêts à adapter, avec leur silhouette et leur
+texte d'encyclopédie : robot de sécurité, drone de surveillance, drone
 d'assaut, drone kamikaze, araignée-robot, androïde, robot recycleur,
 mecha de combat, mecha titan, tourelle de sécurité, robot vierge.
 
@@ -71,13 +83,13 @@ grands mechas, `e` aux sphères et drones-caméras, `B` aux drones volants,
 | Suppr | vider le champ (attaque, texte) ; dans la liste : supprimer |
 | `n` `d` `i` | nouveau, dupliquer, importer du jeu |
 | `<` `>` | déplacer le monstre dans la liste |
-| `t` | dessiner la tuile |
+| `t` | dessiner la tuile à la main (versions graphiques seulement) |
 | `v` `c` `b` | vérifier, voir le code C, comparer |
 | `I` `R` | intégrer aux sources, retirer des sources |
 | `m` `U` `j` | compiler, mettre à jour le jeu installé, jouer |
 | `s` `u` `?` `q` | enregistrer, annuler, aide, quitter |
 
-Éditeur de tuile : flèches pour se déplacer, Espace pour peindre, une
+Éditeur de tuile (facultatif) : flèches pour se déplacer, Espace pour peindre, une
 lettre de la palette (`A`–`Z`, `.`, `0`, `1`) pour choisir la couleur
 et peindre, `f` remplir, `p` pipette, `r` remplacer une couleur, `m`
 symétrie, `h` retourner, `g` silhouette (humanoïde, mecha, drone,
@@ -123,7 +135,7 @@ L'éditeur signale (panneau « Aperçu », touche `v`) : identifiant ou nom
 déjà pris par le jeu, valeurs hors limites des champs C, golem sans PV
 fixes, arme sans mains, hostile et pacifique à la fois, plusieurs sexes,
 fréquence nulle sans `G_NOGEN`, nom français manquant ou avec majuscule,
-tuile vide… L'intégration est refusée tant qu'il reste une erreur.
+tuile personnalisée vide… L'intégration est refusée tant qu'il reste une erreur.
 
 ## Fichiers
 
@@ -133,7 +145,7 @@ tuile vide… L'intégration est refusée tant qu'il reste une erreur.
 | `nhmon_ui.py` | fenêtres curses, menus, éditeur de texte et de tuile |
 | `nhmon_data.py` | constantes du jeu, lecture de `monsters.h`, difficulté, code C, vérifications |
 | `nhmon_install.py` | intégration et retrait dans les sources |
-| `nhmon_templates.py` | modèles de robots et silhouettes de tuiles |
+| `nhmon_templates.py` | modèles de robots, silhouettes et fabrication des tuiles |
 | `tests/test_nhmon.py` | tests (`python3 -m unittest discover -s tests`) |
 | `monstres.json` | le projet par défaut (créé au premier enregistrement) |
 
