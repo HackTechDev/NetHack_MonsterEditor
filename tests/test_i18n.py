@@ -48,6 +48,30 @@ class Catalog(unittest.TestCase):
         used = set(keys())
         self.assertEqual(sorted(k for k in EN if k not in used), [])
 
+    def test_underscore_never_assigned(self):
+        """Une fonction qui assigne « _ » (for _ in…) ne peut plus
+        appeler _() : UnboundLocalError à l'exécution."""
+        bad = []
+        for path in sorted(glob.glob(os.path.join(ROOT, "*.py"))):
+            with open(path, encoding="utf-8") as f:
+                tree = ast.parse(f.read())
+            for fn in ast.walk(tree):
+                if not isinstance(fn, ast.FunctionDef):
+                    continue
+                todo = list(ast.iter_child_nodes(fn))
+                while todo:
+                    n = todo.pop()
+                    if isinstance(n, (ast.FunctionDef, ast.Lambda,
+                                      ast.ListComp, ast.GeneratorExp,
+                                      ast.SetComp, ast.DictComp)):
+                        continue
+                    if isinstance(n, ast.Name) and n.id == "_" and \
+                            isinstance(n.ctx, ast.Store):
+                        bad.append("%s:%d" % (os.path.basename(path),
+                                              n.lineno))
+                    todo.extend(ast.iter_child_nodes(n))
+        self.assertEqual(bad, [])
+
     def test_same_placeholders(self):
         bad = [k for k, v in EN.items()
                if FORMAT.findall(k) != FORMAT.findall(v)]

@@ -285,9 +285,15 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
 - `U` : `make update` (et non `make install`) : `sysconf`, scores et
   sauvegardes sont conservés, le jeu précédent est gardé en
   `nethack.old`.
-- `j` : lance le jeu installé en mode wizard, après un rappel (Ctrl-G
-  puis le nom anglais) et un avertissement si le jeu est plus ancien
-  que `monsters.h`.
+- `j` : essai en jeu. Avec tmux, NetHack s'ouvre en mode wizard (sans
+  introduction ni tutoriel, personnage au hasard) dans un panneau à
+  droite de l'éditeur, ou une fenêtre « nethack » si l'écran fait moins
+  de 170 colonnes, ou une session à part hors de tmux ; l'éditeur
+  attend que le jeu soit prêt et y crée le monstre choisi (Ctrl-G et
+  son nom anglais). Tant que la partie tourne, `j` crée le monstre
+  choisi sans relancer le jeu. Sans tmux, le jeu se lance en plein
+  écran avec un rappel de Ctrl-G. Avertissement si le jeu installé est
+  plus ancien que `monsters.h`.
 
 ## Fichiers
 

@@ -17,7 +17,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 6 / 6 | — |
 | 4. Projets et fichiers | 5 / 5 | — |
-| 5. Intégration avec le jeu | 0 / 6 | tout |
+| 5. Intégration avec le jeu | 1 / 6 | place dans la classe, fixes, commit, annulation, sons |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
 | 8. Qualité du projet | 0 / 4 | tout |
@@ -177,9 +177,15 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
 
 ## 5. Intégration avec le jeu
 
-1. **Lancer le jeu dans tmux** **[moyen]** : comme l'éditeur de cartes,
-   ouvrir NetHack dans un panneau à côté de l'éditeur et y créer le
-   monstre automatiquement (Ctrl-G et son nom).
+1. ✅ **Fait** — **Lancer le jeu dans tmux** **[moyen]** : comme
+   l'éditeur de cartes, ouvrir NetHack dans un panneau à côté de
+   l'éditeur et y créer le monstre automatiquement (Ctrl-G et son nom).
+   *Réalisé : `nhmon_game.py` ; `j` lance le jeu en mode wizard dans un
+   panneau tmux (fenêtre « nethack » si l'écran est étroit, session à
+   part hors de tmux), attend qu'il soit prêt et y crée le monstre ;
+   tant que la partie tourne, `j` crée le monstre choisi sans relancer.
+   Sans tmux, le jeu se lance en plein écran comme avant. Essayé :
+   « Un drone de combat apparaît à côté de vous. »*
 2. **Place dans la classe** **[facile]** : choisir après quel monstre de
    la classe insérer le nouveau, au lieu de la fin de la classe (l'ordre
    compte pour les monstres créés « de la même classe », par exemple

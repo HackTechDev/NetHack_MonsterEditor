@@ -24,6 +24,7 @@ import nhmon_config as C
 import nhmon_data as D
 from nhmon_i18n import LANG, _
 import nhmon_install as I
+from nhmon_game import Game
 import nhmon_project as P
 import nhmon_templates as T
 from nhmon_ui import (Cancel, Colors, ESC, Mouse, Popups, clip,
@@ -33,7 +34,6 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PROJECT = os.path.join(HERE, "monstres.json")
 DEFAULT_SRC = os.path.normpath(os.path.join(HERE, "..", "NetHack-5.0.0"))
 BACKUP_DIR = os.path.join(HERE, "sauvegardes")
-DEFAULT_HACKDIR = os.path.expanduser("~/nh/install/games/lib/nethackdir")
 
 ALIGN_HINT = _("négatif : chaotique, 0 : neutre, positif : loyal ; " \
              "-128 : sans alignement (A_NONE)")
@@ -146,7 +146,9 @@ HELP = [
     _("  m            compiler (make)"),
     _("  U            mettre à jour le jeu installé (make update : garde"),
     _("               sysconf, scores et sauvegardes)"),
-    _("  j            lancer le jeu en mode wizard pour essayer"),
+    _("  j            essayer en jeu : NetHack en mode wizard à côté de"),
+    _("               l'éditeur (tmux), le monstre y est créé ; dans"),
+    _("               une partie en cours, j en crée un autre"),
     "",
     _("Projet :"),
     _("  p            menu du projet : fusionner un autre projet,"),
@@ -217,7 +219,7 @@ def short_flags(names):
     return ", ".join(n.split("_", 1)[1] for n in names) if names else "—"
 
 
-class Editor(Popups):
+class Editor(Popups, Game):
     def __init__(self, stdscr, project, src, config=None, config_errs=()):
         self.stdscr = stdscr
         self.config = config or {}
@@ -1402,44 +1404,6 @@ class Editor(Popups):
         self.msg = _("Jeu mis à jour — j pour l'essayer") if rc == 0 \
             else _("make update a échoué (code %d)") % rc
 
-    def hackdir(self):
-        """Dossier du jeu installé : NHMONEDIT_HACKDIR, configuration,
-        ~/nh/install/…, puis playground des sources."""
-        for d in (os.environ.get("NHMONEDIT_HACKDIR", ""),
-                  self.config.get("hackdir", ""), DEFAULT_HACKDIR,
-                  os.path.join(self.src, "playground")):
-            if d and os.access(os.path.join(d, "nethack"), os.X_OK):
-                return d
-        return None
-
-    def play(self):
-        d = self.hackdir()
-        if not d:
-            self.message_box(_("Jeu introuvable"), [
-                _("Pas d'exécutable nethack installé. Compilez (m) puis"),
-                _("mettez à jour le jeu (U), ou indiquez son dossier avec"),
-                "NHMONEDIT_HACKDIR."])
-            return
-        exe = os.path.join(d, "nethack")
-        newer = [p for p in (I.MONSTERS_H,)
-                 if os.path.isfile(os.path.join(self.src, p)) and
-                 os.path.getmtime(os.path.join(self.src, p)) >
-                 os.path.getmtime(exe)]
-        names = [m["name"] for m in self.monsters]
-        lines = [_("Mode wizard : Ctrl-G (créer un monstre), puis tapez le"),
-                 _("nom ANGLAIS du monstre. « ; » pour le regarder."), ""]
-        if names:
-            lines += [_("Vos monstres : ") + ", ".join(names[:6]) +
-                      ("…" if len(names) > 6 else ""), ""]
-        if newer:
-            lines += [_("⚠ Le jeu installé est plus ancien que monsters.h :"),
-                      _("  compilez (m) et mettez à jour (U) d'abord."), ""]
-        lines += [_("Lancer le jeu maintenant ?")]
-        if not self.confirm("\n".join(lines), _("Essayer en jeu")):
-            return
-        cmd = "HACKDIR=%s %s -D" % (shlex.quote(d), shlex.quote(exe))
-        self.run_external(_("NetHack (mode wizard)"), cmd, d)
-
     # --- souris -------------------------------------------------------------
 
     def mouse(self, ev):
@@ -1466,7 +1430,7 @@ class Editor(Popups):
         else:
             self.focus = "form"
             if wheel(ev):
-                for _ in range(3):
+                for _i in range(3):
                     self.move_field(wheel(ev))
             elif ev.kind in ("click", "double"):
                 i = self.form_top + row
@@ -1594,10 +1558,10 @@ class Editor(Popups):
         elif k == curses.KEY_DOWN:
             self.move_field(1)
         elif k == curses.KEY_PPAGE:
-            for _ in range(10):
+            for _i in range(10):
                 self.move_field(-1)
         elif k == curses.KEY_NPAGE:
-            for _ in range(10):
+            for _i in range(10):
                 self.move_field(1)
         elif k == curses.KEY_HOME:
             self.field = 1

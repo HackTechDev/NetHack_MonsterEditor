@@ -729,8 +729,6 @@ EN = {
         "  U            update the installed game (make update: keeps",
     "               sysconf, scores et sauvegardes)":
         "               sysconf, scores and saved games)",
-    "  j            lancer le jeu en mode wizard pour essayer":
-        "  j            start the game in wizard mode to try them",
     "Général :": "General:",
     "  s            enregistrer le projet": "  s            save the project",
     "  u            annuler la dernière modification":
@@ -1006,4 +1004,36 @@ EN = {
         "number of seconds expected (0: disabled)",
     "[%s] : section inconnue": "[%s]: unknown section",
     "Configuration : %s": "Configuration: %s",
+
+    # --- nhmon_game.py --------------------------------------------------
+    "NetHack va s'ouvrir en mode wizard à côté de":
+        "NetHack will open in wizard mode next to",
+    "l'éditeur, et « %s » sera créé près de vous.":
+        "the editor, and \"%s\" will be created near you.",
+    "Ensuite, j crée le monstre choisi dans la partie en cours.":
+        "Then j creates the chosen monster in the running game.",
+    "(installez tmux pour que l'éditeur crée le monstre lui-même)":
+        "(install tmux to let the editor create the monster itself)",
+    "Une partie de NetHack est déjà en cours.":
+        "A NetHack game is already running.",
+    "panneau tmux à droite": "tmux pane on the right",
+    "fenêtre tmux « nethack »": "tmux window \"nethack\"",
+    "session tmux « %s »": "tmux session \"%s\"",
+    "Impossible de lancer le jeu dans tmux.":
+        "Cannot start the game in tmux.",
+    "Lancement de NetHack…": "Starting NetHack…",
+    "Le jeu s'est arrêté au démarrage.": "The game stopped at startup.",
+    "NetHack lancé": "NetHack started",
+    "Le jeu tourne dans la session tmux « %s ».":
+        "The game runs in the tmux session \"%s\".",
+    "Pour le voir, dans un autre terminal :":
+        "To see it, in another terminal:",
+    "« %s » créé dans la partie (%s) ; j en crée un autre.":
+        "\"%s\" created in the game (%s); j creates another one.",
+    "  j            essayer en jeu : NetHack en mode wizard à côté de":
+        "  j            try in the game: NetHack in wizard mode next to",
+    "               l'éditeur (tmux), le monstre y est créé ; dans":
+        "               the editor (tmux), the monster is created there;",
+    "               une partie en cours, j en crée un autre":
+        "               in a running game, j creates another one",
 }

@@ -1169,7 +1169,7 @@ def read_po(path, contexts=("monster", "gender")):
         elif s.startswith('"') and field:
             cur[field] += _po_unquote(s)
         else:
-            key, _, rest = s.partition(" ")
+            key, _sep, rest = s.partition(" ")
             if key in ("msgctxt", "msgid", "msgstr"):
                 if key == "msgctxt" and "msgid" in cur:
                     flush()

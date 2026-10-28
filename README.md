@@ -146,7 +146,9 @@ clic sur la palette pour la couleur.
    à `make install`, `sysconf`, les scores et les sauvegardes sont
    conservés.
 
-4. **`j` — jouer** en mode wizard : Ctrl-G puis le nom **anglais** du
+4. **`j` — jouer** en mode wizard. Avec tmux, le jeu s'ouvre à côté de
+   l'éditeur et le monstre choisi y est créé tout seul ; `j` en crée
+   d'autres tant que la partie tourne. Sinon : Ctrl-G puis le nom **anglais** du
    monstre pour le faire apparaître, `;` pour le regarder.
 
 **Attention :** ajouter un monstre change la liste `mons[]` : les
@@ -176,6 +178,7 @@ au lancement suivant si l'éditeur a été interrompu.
 | `nhmon_install.py` | intégration et retrait dans les sources |
 | `nhmon_project.py` | fichiers : projets, fusion, monstres exportés, modèles personnels |
 | `nhmon_config.py` | fichier de configuration (`config.exemple`) |
+| `nhmon_game.py` | essai en jeu (tmux, Ctrl-G) |
 | `nhmon_templates.py` | modèles de robots, silhouettes et fabrication des tuiles |
 | `nhmon_i18n.py`, `nhmon_i18n_en.py` | choix de la langue, traduction anglaise de l'interface |
 | `tests/` | tests (`python3 -m unittest discover -s tests`) |
