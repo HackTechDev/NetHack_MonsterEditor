@@ -9,7 +9,7 @@ Il complète l'éditeur de cartes `../NetHack_MapEditor`.
 **Premiers pas :** le [tutoriel](TUTORIAL.md) crée un robot de A à Z ;
 la liste complète des fonctions est dans [FEATURES.md](FEATURES.md).
 
-![L'éditeur en 120 colonnes : liste des monstres, fiche et aperçu](docs/capture.svg)
+![L'éditeur en 120 colonnes : liste des monstres, fiche et aperçu](docs/capture.png)
 
 ## Lancement
 
