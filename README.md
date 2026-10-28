@@ -90,7 +90,7 @@ grands mechas, `e` aux sphères et drones-caméras, `B` aux drones volants,
 | `<` `>` | déplacer le monstre dans la liste |
 | `/` | aller à un monstre (tapez une partie de son nom) |
 | `t` | dessiner la tuile à la main (versions graphiques seulement) |
-| `v` `c` `b` | vérifier, voir le code C, comparer |
+| `v` `c` `b` `B` | vérifier, voir le code C, comparer, fiche comparée |
 | `I` `R` | intégrer aux sources, retirer des sources |
 | `m` `U` `j` | compiler, mettre à jour le jeu installé, jouer |
 | `s` `u` Ctrl-R `?` `q` | enregistrer, annuler, rétablir, aide, quitter |

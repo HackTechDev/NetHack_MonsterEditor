@@ -23,8 +23,8 @@ import time
 import nhmon_data as D
 import nhmon_install as I
 import nhmon_templates as T
-from nhmon_ui import (Cancel, Colors, ESC, Mouse, Popups, enable_mouse,
-                      get_key, is_enter, put, wheel)
+from nhmon_ui import (Cancel, Colors, ESC, Mouse, Popups, clip,
+                      enable_mouse, get_key, is_enter, put, wheel)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PROJECT = os.path.join(HERE, "monstres.json")
@@ -137,6 +137,8 @@ HELP = [
     "  v            vérifier tous les monstres",
     "  c            voir le code C (entrée MON() de monsters.h)",
     "  b            comparer aux monstres du jeu (difficulté proche)",
+    "  B            fiche comparée : deux monstres côte à côte (un",
+    "               autre du projet ou du jeu), différences en jaune",
     "",
     "Sources du jeu :",
     "  I            intégrer les monstres aux sources (aperçu, puis",
@@ -175,6 +177,15 @@ def align_label(v):
     if v > 0:
         return "%d (loyal)" % v
     return "0 (neutre)"
+
+
+def hp_text(m):
+    """Points de vie à la création (makemon.c)."""
+    if m["sym"] == "S_GOLEM":
+        return "%d fixes" % m["golem_hp"]
+    if m["level"] == 0:
+        return "1d4"
+    return "%dd8 (~%d)" % (m["level"], m["level"] * 9 // 2)
 
 
 def short_flags(names):
@@ -483,9 +494,7 @@ class Editor(Popups):
         yy += 1
         put(scr, yy, x + 4, "(%s)" % m["name"], curses.A_DIM, cw - 2)
         yy += 2
-        hp = ("%d fixes" % m["golem_hp"]) if m["sym"] == "S_GOLEM" else \
-            ("1d4" if m["level"] == 0 else "%dd8 (~%d)" % (
-                m["level"], m["level"] * 9 // 2))
+        hp = hp_text(m)
         lines = [
             ("Difficulté", "%d%s" % (D.difficulty(m), "" if
                                      m["difficulty"] is None else " (forcée)")),
@@ -792,7 +801,15 @@ class Editor(Popups):
                           items)
         except Cancel:
             return
-        m = D.normalize(copy.deepcopy(game[i]))
+        m = self.from_game(game[i])
+        self.add_monster(self.unique_names(m))
+        self.msg = "Importé : %s — renommez-le à votre goût" % m["name"]
+
+    def from_game(self, g):
+        """Copie d'un monstre du jeu avec son nom français, ses PV de
+        golem et sa tuile, comme un monstre du projet."""
+        fr = self.fr_names()
+        m = D.normalize(copy.deepcopy(g))
         m["fr_name"], m["fr_gender"] = fr.get(m["name"], ("", "m"))
         for k in ("name_m", "name_f"):
             if m[k]:
@@ -804,8 +821,7 @@ class Editor(Popups):
         tile = self.game_tile(m["name"])
         if tile:
             m["tile"], m["tile_shape"] = tile, T.SHAPE_CUSTOM
-        self.add_monster(self.unique_names(m))
-        self.msg = "Importé : %s — renommez-le à votre goût" % m["name"]
+        return m
 
     def game_tile(self, name):
         path = os.path.join(self.src, I.TILES)
@@ -928,6 +944,75 @@ class Editor(Popups):
             (m["fr_name"] or m["name"])[:28], m["level"], m["move"],
             m["ac"], d, D.max_damage(m)), curses.A_BOLD)]
         self.viewer("Comparaison", lines)
+
+    def show_side_by_side(self):
+        """B : fiche comparée avec un autre monstre du projet ou du jeu."""
+        m = self.mon()
+        if not m:
+            return
+        fr = self.fr_names()
+        others = [(o, "projet") for o in self.others(m)] + \
+            [(g, "jeu") for g in self.game()]
+        items = [("%s %s" % (D.CLASS_CHAR.get(o["sym"], "?"),
+                             (o.get("fr_name") or
+                              fr.get(o["name"], (o["name"],))[0])),
+                  "%s, %s, niv %d" % (where, o["name"], o["level"]))
+                 for o, where in others]
+        # monstre d'origine d'un import (« soldier ant mk II »)
+        base = re.sub(r" mk [IVX\d]+$", "", m["name"])
+        cur = next((i for i, (o, w) in enumerate(others)
+                    if w == "jeu" and o["name"] == base), 0)
+        try:
+            i = self.menu("Comparer « %s » à…" % (m["fr_name"] or m["name"]),
+                          items, cur)
+        except Cancel:
+            return
+        o, where = others[i]
+        if where == "jeu":
+            o = self.from_game(o)
+        W = self.stdscr.getmaxyx()[1]
+        lines, ndiff = self.compare_lines(m, o, min(W - 2, 110) - 4)
+        self.viewer("Fiche comparée : %d différence(s)" % ndiff, lines)
+
+    def compare_lines(self, a, b, width):
+        """Lignes de la fiche comparée (valeurs différentes en jaune) et
+        nombre de différences."""
+        cw = (width - 26) // 2
+        diff_attr = self.colors.fg(curses.COLOR_YELLOW, True)
+
+        def row(label, va, vb, differ):
+            return ("%s %-20s %s │ %s" % ("≠" if differ else " ", label[:20],
+                                          clip(va, cw).ljust(cw),
+                                          clip(vb, cw)),
+                    diff_attr if differ else 0)
+        lines = [("  %-20s %s │ %s" % ("", clip(a["fr_name"] or a["name"],
+                                                  cw).ljust(cw),
+                                        clip(b["fr_name"] or b["name"], cw)),
+                  curses.A_BOLD)]
+        ndiff = 0
+        for f in FIELDS:
+            if f[0] == "section":
+                lines += ["", ("▸ " + f[2], self.accent())]
+                continue
+            key = f[1]
+            if f[0] == "attack":
+                differ = a["attacks"][key] != b["attacks"][key]
+            elif f[0] == "difficulty":
+                differ = D.difficulty(a) != D.difficulty(b)
+            elif f[0] == "plural":
+                differ = self.field_value(a, f)[0] != \
+                    self.field_value(b, f)[0]
+            else:
+                differ = a[key] != b[key]
+            ndiff += differ
+            lines.append(row(f[2].strip(), self.field_value(a, f)[0],
+                             self.field_value(b, f)[0], differ))
+        lines += ["", ("▸ Calculs", self.accent())]
+        for label, fn in (("Points de vie", hp_text),
+                          ("Dégâts max/tour", lambda m: str(D.max_damage(m)))):
+            va, vb = fn(a), fn(b)
+            lines.append(row(label, va, vb, va != vb))
+        return lines, ndiff
 
     def help(self):
         self.viewer("Aide", HELP)
@@ -1185,6 +1270,8 @@ class Editor(Popups):
                 self.show_code()
             elif k == "b":
                 self.show_compare()
+            elif k == "B":
+                self.show_side_by_side()
             elif k == "I":
                 self.integrate()
             elif k == "R":

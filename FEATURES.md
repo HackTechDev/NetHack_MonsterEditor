@@ -154,6 +154,10 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
 - Comparaison (`b`) avec les 30 monstres du jeu de difficulté la plus
   proche : nom français, niveau, vitesse, CA, difficulté, dégâts
   maximaux, dans leur couleur.
+- `B` : fiche comparée, le monstre et un autre (du projet ou du jeu)
+  côte à côte, champ par champ, avec PV et dégâts maximaux ; les
+  différences sont marquées ≠ en jaune et comptées. Pour un monstre
+  importé, le monstre du jeu d'origine est proposé d'office.
 
 ## Vérification
 

@@ -5,6 +5,7 @@ python3 -m unittest discover -s tests   (depuis le dossier de l'éditeur)
 Les sources sont cherchées dans ../NetHack-5.0.0 ou $NHMONEDIT_SRC.
 """
 
+import json
 import os
 import shutil
 import sys
@@ -253,9 +254,19 @@ class TestInstall(unittest.TestCase):
         self.assertEqual(cyber[("gender", m["name"])], "f")
 
 
+def json_copy(m):
+    return json.loads(json.dumps(m))
+
+
+class NoColors:
+    def __getattr__(self, name):
+        return lambda *a, **k: 0
+
+
 def bare_editor(monsters=()):
     """Éditeur sans écran, pour essayer sa logique hors de curses."""
     ed = E.Editor.__new__(E.Editor)
+    ed.colors = NoColors()
     ed.monsters = [D.normalize(m) for m in monsters]
     ed.cur, ed.field, ed.focus, ed.msg = 0, 1, "list", ""
     ed.modified, ed.undo_stack, ed.redo_stack = False, [], []
@@ -284,6 +295,22 @@ class TestEditor(unittest.TestCase):
         ed.mon()["level"] = 3
         ed.undo(redo=True)
         self.assertEqual(ed.mon()["level"], 3)
+
+    def test_compare_lines(self):
+        ed = bare_editor()
+        a = T.from_template(0)
+        b = D.normalize(dict(a))
+        lines, ndiff = ed.compare_lines(a, b, 100)
+        self.assertEqual(ndiff, 0)
+        b = D.normalize(json_copy(a))
+        b["level"] += 1
+        b["attacks"][0][2] += 1
+        lines, ndiff = ed.compare_lines(a, b, 100)
+        self.assertEqual(ndiff, 3)          # niveau, attaque, difficulté
+        text = [l[0] if isinstance(l, tuple) else l for l in lines]
+        diff = [l for l in text if l.startswith("≠")]
+        self.assertTrue(any("Niveau" in l for l in diff))
+        self.assertTrue(all(len(l) <= 100 for l in text))
 
     def test_filter_ignores_accents(self):
         self.assertIn(U.fold("securite"), U.fold("Robot de Sécurité"))

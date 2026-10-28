@@ -15,7 +15,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 |---|---|---|
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
-| 3. Saisie et affichage | 3 / 6 | anglais, fiche comparée, aperçu de l'attaque |
+| 3. Saisie et affichage | 4 / 6 | anglais, aperçu de l'attaque |
 | 4. Projets et fichiers | 0 / 5 | tout |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
@@ -117,9 +117,12 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    *Réalisé : `/` ouvre la liste des monstres, que quelques lettres
    filtrent (nom français, nom anglais, identifiant) ; le filtre de tous
    les menus ignore désormais les accents.*
-5. **Fiche comparée** **[moyen]** : deux monstres côte à côte (par
-   exemple un robot et le monstre du jeu dont il s'inspire), valeurs
-   différentes en couleur.
+5. ✅ **Fait** — **Fiche comparée** **[moyen]** : deux monstres côte à
+   côte (par exemple un robot et le monstre du jeu dont il s'inspire),
+   valeurs différentes en couleur. *Réalisé : `B` choisit un autre
+   monstre du projet ou du jeu (le monstre d'origine d'un import est
+   proposé d'office), affiche tous les champs plus PV et dégâts, les
+   différences marquées ≠ en jaune et comptées dans le titre.*
 6. **Aperçu de l'attaque** **[facile]** : afficher pour chaque attaque
    ses dégâts moyens et le message que le jeu affiche (« Le mecha de
    combat vous frappe ! », « … crache des flammes »).
