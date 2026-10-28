@@ -23,6 +23,11 @@ Variables : `NHMONEDIT_SRC` (sources du jeu), `NHMONEDIT_HACKDIR`
 `NHMONEDIT_MOUSE=0` (sans souris), `NHMONEDIT_LANG=en` ou `fr` (langue de
 l'interface ; par défaut celle de la locale).
 
+Ces réglages peuvent aussi aller dans `~/.config/nhmonedit/config`
+(sources, jeu installé, options de `make` comme `WANT_WIN_ALL=1`,
+projet par défaut, langue, souris, sauvegarde de secours) : voir
+[`config.exemple`](config.exemple).
+
 Terminal de 80×24 au minimum ; à partir de 120 colonnes, un panneau
 « Aperçu » montre la difficulté, les PV et les problèmes du monstre en
 direct.
@@ -169,7 +174,8 @@ au lancement suivant si l'éditeur a été interrompu.
 | `nhmon_ui.py` | fenêtres curses, menus, éditeur de texte et de tuile |
 | `nhmon_data.py` | constantes du jeu, lecture de `monsters.h`, difficulté, code C, vérifications |
 | `nhmon_install.py` | intégration et retrait dans les sources |
-| `nhmon_project.py` | fichiers : projets, fusion, monstres exportés |
+| `nhmon_project.py` | fichiers : projets, fusion, monstres exportés, modèles personnels |
+| `nhmon_config.py` | fichier de configuration (`config.exemple`) |
 | `nhmon_templates.py` | modèles de robots, silhouettes et fabrication des tuiles |
 | `nhmon_i18n.py`, `nhmon_i18n_en.py` | choix de la langue, traduction anglaise de l'interface |
 | `tests/` | tests (`python3 -m unittest discover -s tests`) |

@@ -998,4 +998,12 @@ EN = {
         "               export or import a monster, save the monster",
     "               monstre comme modèle personnel…":
         "               as a personal template…",
+    # --- nhmon_config.py ------------------------------------------------
+    "clé inconnue": "unknown key",
+    "fr, en ou auto attendu": "fr, en or auto expected",
+    "oui ou non attendu": "yes or no expected",
+    "nombre de secondes attendu (0 : désactivée)":
+        "number of seconds expected (0: disabled)",
+    "[%s] : section inconnue": "[%s]: unknown section",
+    "Configuration : %s": "Configuration: %s",
 }

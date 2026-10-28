@@ -6,6 +6,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -60,6 +61,7 @@ class Detect(unittest.TestCase):
             for var in ("NHMONEDIT_LANG", "LANGUAGE", "LC_ALL",
                         "LC_MESSAGES", "LANG"):
                 os.environ.pop(var, None)
+            os.environ["NHMONEDIT_CONFIG"] = os.devnull
             os.environ.update(env)
             return nhmon_i18n.detect()
         finally:
@@ -72,6 +74,16 @@ class Detect(unittest.TestCase):
         self.assertEqual(self.detect(LANG="de_DE.UTF-8"), "en")
         self.assertEqual(self.detect(LANG="en_US.UTF-8",
                                      LC_ALL="fr_CA.UTF-8"), "fr")
+
+    def test_config(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".ini") as f:
+            f.write("[editeur]\nlangue = en\n")
+            f.flush()
+            self.assertEqual(self.detect(LANG="fr_FR.UTF-8",
+                                         NHMONEDIT_CONFIG=f.name), "en")
+            self.assertEqual(self.detect(LANG="en_US.UTF-8",
+                                         NHMONEDIT_LANG="fr",
+                                         NHMONEDIT_CONFIG=f.name), "fr")
 
     def test_override(self):
         self.assertEqual(self.detect(LANG="fr_FR.UTF-8",

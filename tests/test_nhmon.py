@@ -16,6 +16,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 os.environ["NHMONEDIT_LANG"] = "fr"     # messages vérifiés en français
 
+import nhmon_config as C  # noqa: E402
 import nhmon_data as D  # noqa: E402
 import nhmon_install as I  # noqa: E402
 import nhmon_project as P  # noqa: E402
@@ -385,6 +386,30 @@ class TestEditor(unittest.TestCase):
             (name, desc, back), = P.read_templates(path)
             self.assertEqual((name, desc), ("Tourelle Militech", "plafond"))
             self.assertTrue(P.same_monster(back, m))
+
+    def test_config(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "config")
+            with open(path, "w") as f:
+                f.write("[jeu]\nsources = ~/nh-src\nmake = -j2 "
+                        "WANT_WIN_ALL=1\ncouleur = rouge\n"
+                        "[editeur]\nprojet = /tmp/robots.json\n"
+                        "souris = non\nsauvegarde = 30\nlangue = de\n"
+                        "[autre]\n")
+            cfg, errs = C.load(path)
+            self.assertEqual(cfg["src"], os.path.expanduser("~/nh-src"))
+            self.assertEqual(cfg["make"], "-j2 WANT_WIN_ALL=1")
+            self.assertEqual((cfg["mouse"], cfg["autosave"]), (False, 30))
+            self.assertEqual(len(errs), 3)      # couleur, langue, [autre]
+            old = os.environ.pop("NHMONEDIT_SRC", None)
+            try:
+                self.assertEqual(E.parse_args([], cfg), (
+                    "/tmp/robots.json", os.path.expanduser("~/nh-src")))
+                self.assertEqual(E.parse_args(["a.json", "--src", "/s"],
+                                              cfg)[1], "/s")
+            finally:
+                if old is not None:
+                    os.environ["NHMONEDIT_SRC"] = old
 
     def test_filter_ignores_accents(self):
         self.assertIn(U.fold("securite"), U.fold("Robot de Sécurité"))

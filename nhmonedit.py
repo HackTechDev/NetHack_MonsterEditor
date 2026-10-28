@@ -20,6 +20,7 @@ import subprocess
 import sys
 import time
 
+import nhmon_config as C
 import nhmon_data as D
 from nhmon_i18n import LANG, _
 import nhmon_install as I
@@ -32,11 +33,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PROJECT = os.path.join(HERE, "monstres.json")
 DEFAULT_SRC = os.path.normpath(os.path.join(HERE, "..", "NetHack-5.0.0"))
 BACKUP_DIR = os.path.join(HERE, "sauvegardes")
-HACKDIRS = [
-    os.environ.get("NHMONEDIT_HACKDIR", ""),
-    os.path.expanduser("~/nh/install/games/lib/nethackdir"),
-    os.path.join(DEFAULT_SRC, "playground"),
-]
+DEFAULT_HACKDIR = os.path.expanduser("~/nh/install/games/lib/nethackdir")
 
 ALIGN_HINT = _("négatif : chaotique, 0 : neutre, positif : loyal ; " \
              "-128 : sans alignement (A_NONE)")
@@ -221,8 +218,9 @@ def short_flags(names):
 
 
 class Editor(Popups):
-    def __init__(self, stdscr, project, src):
+    def __init__(self, stdscr, project, src, config=None, config_errs=()):
         self.stdscr = stdscr
+        self.config = config or {}
         self.colors = Colors()
         self.project = project
         self.src = src
@@ -233,7 +231,7 @@ class Editor(Popups):
         self.modified = False
         self.undo_stack = []
         self.redo_stack = []
-        self.autosave_delay = P.AUTOSAVE_DELAY
+        self.autosave_delay = self.config.get("autosave", P.AUTOSAVE_DELAY)
         self.autosave_time = time.time()
         self.msg = ""
         self.form_top = 0
@@ -243,6 +241,8 @@ class Editor(Popups):
         self._fr = None
         self._inst = (None, {})
         self.load()
+        if config_errs:
+            self.msg = _("Configuration : %s") % "; ".join(config_errs)
 
     # --- données ----------------------------------------------------------
 
@@ -1384,8 +1384,8 @@ class Editor(Popups):
                 _("Pas de Makefile : configurez d'abord les sources :"),
                 "  cd sys/unix && sh setup.sh hints/linux.500"])
             return
-        jobs = os.cpu_count() or 2
-        rc = self.run_external(_("compilation"), "make -j%d" % jobs, self.src)
+        opts = self.config.get("make") or "-j%d" % (os.cpu_count() or 2)
+        rc = self.run_external(_("compilation"), "make " + opts, self.src)
         self.msg = _("Compilation réussie — U pour mettre à jour le jeu") \
             if rc == 0 else _("La compilation a échoué (code %d)") % rc
 
@@ -1403,7 +1403,11 @@ class Editor(Popups):
             else _("make update a échoué (code %d)") % rc
 
     def hackdir(self):
-        for d in HACKDIRS:
+        """Dossier du jeu installé : NHMONEDIT_HACKDIR, configuration,
+        ~/nh/install/…, puis playground des sources."""
+        for d in (os.environ.get("NHMONEDIT_HACKDIR", ""),
+                  self.config.get("hackdir", ""), DEFAULT_HACKDIR,
+                  os.path.join(self.src, "playground")):
             if d and os.access(os.path.join(d, "nethack"), os.X_OK):
                 return d
         return None
@@ -1615,9 +1619,12 @@ class Editor(Popups):
             self.focus = "list"
 
 
-def parse_args(argv):
-    project, src = DEFAULT_PROJECT, os.environ.get("NHMONEDIT_SRC",
-                                                    DEFAULT_SRC)
+def parse_args(argv, config=None):
+    """(projet, sources) : ligne de commande, puis NHMONEDIT_SRC, puis
+    la configuration, puis les valeurs par défaut."""
+    config = config or {}
+    project = config.get("project", DEFAULT_PROJECT)
+    src = os.environ.get("NHMONEDIT_SRC") or config.get("src", DEFAULT_SRC)
     args = list(argv)
     while args:
         a = args.pop(0)
@@ -1636,11 +1643,17 @@ def parse_args(argv):
 
 
 def main(argv=None):
-    project, src = parse_args(sys.argv[1:] if argv is None else argv)
+    config, errs = C.load(C.default_path())
+    project, src = parse_args(sys.argv[1:] if argv is None else argv,
+                              config)
     os.environ.setdefault("ESCDELAY", "25")
+    if "mouse" in config:
+        os.environ.setdefault("NHMONEDIT_MOUSE", "1" if config["mouse"]
+                              else "0")
     import locale
     locale.setlocale(locale.LC_ALL, "")
-    curses.wrapper(lambda scr: Editor(scr, project, src).run())
+    curses.wrapper(lambda scr: Editor(scr, project, src, config,
+                                      errs).run())
 
 
 if __name__ == "__main__":

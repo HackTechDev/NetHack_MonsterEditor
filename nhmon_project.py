@@ -7,7 +7,7 @@ import json
 import os
 
 import nhmon_data as D
-from nhmon_i18n import _
+from nhmon_i18n import CONFIG_DIR, _
 
 PROJECT_FORMAT = "nhmonedit"
 MONSTER_FORMAT = "nhmonedit-monstre"
@@ -15,8 +15,6 @@ MONSTER_SUFFIX = ".nhmon.json"
 AUTOSAVE_SUFFIX = ".nhmonedit-autosave"
 AUTOSAVE_DELAY = 60         # secondes
 TEMPLATES_FORMAT = "nhmonedit-modeles"
-CONFIG_DIR = os.path.join(os.environ.get("XDG_CONFIG_HOME") or
-                          os.path.expanduser("~/.config"), "nhmonedit")
 
 
 def templates_path():

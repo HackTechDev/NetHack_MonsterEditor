@@ -21,6 +21,11 @@ touchés, le [README](README.md) ou `?` dans l'éditeur.
 - Sources du jeu choisies par `--src` ou `NHMONEDIT_SRC` (par défaut
   `../NetHack-5.0.0`) ; jeu installé cherché dans `NHMONEDIT_HACKDIR`,
   `~/nh/install/games/lib/nethackdir` ou `playground` des sources.
+- Fichier de configuration `~/.config/nhmonedit/config` (ou
+  `NHMONEDIT_CONFIG`) : sources, jeu installé, options de `make`,
+  projet par défaut, langue, souris, délai de la sauvegarde de secours
+  (voir `config.exemple`) ; la ligne de commande et les variables
+  d'environnement passent avant, les erreurs s'affichent au lancement.
 
 ## Affichage
 

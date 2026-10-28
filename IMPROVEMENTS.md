@@ -16,7 +16,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 6 / 6 | — |
-| 4. Projets et fichiers | 4 / 5 | configuration |
+| 4. Projets et fichiers | 5 / 5 | — |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
@@ -167,9 +167,13 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    « Supprimer un modèle personnel… » ; modèles rangés dans
    `~/.config/nhmonedit/modeles.json` (ou `NHMONEDIT_TEMPLATES`),
    communs à tous les projets, marqués « (perso) » dans `n`.*
-5. **Fichier de configuration** **[facile]** : dossier des sources, du
-   jeu, options de compilation, projet par défaut, au lieu des seules
-   variables d'environnement.
+5. ✅ **Fait** — **Fichier de configuration** **[facile]** : dossier des
+   sources, du jeu, options de compilation, projet par défaut, au lieu
+   des seules variables d'environnement. *Réalisé : `nhmon_config.py`
+   lit `~/.config/nhmonedit/config` (ou `NHMONEDIT_CONFIG`), format INI
+   comme l'éditeur de cartes : `[jeu]` sources, répertoire, make ;
+   `[editeur]` projet, langue, souris, sauvegarde. Les erreurs
+   s'affichent au lancement ; exemple commenté dans `config.exemple`.*
 
 ## 5. Intégration avec le jeu
 
