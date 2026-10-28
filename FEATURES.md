@@ -87,6 +87,10 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
   `e` et `B` pour les drones…).
 - **Couleur** : 31 couleurs et alias du jeu (`CLR_*`, `HI_METAL`,
   `HI_LORD`…), affichées dans leur teinte.
+- **Placer après** : rang dans `monsters.h`, après un monstre du jeu de
+  la même classe (avec son nom français), ou à la fin de la classe ;
+  les plages que le code du jeu parcourt dans l'ordre (dragons, bébés
+  dragons) ne sont pas proposées.
 - **Caractéristiques** : niveau, vitesse, classe d'armure, résistance à
   la magie, alignement (dont « sans alignement », `A_NONE`), PV fixes
   des golems.
@@ -257,8 +261,10 @@ Les erreurs (✖) bloquent l'intégration ; les avertissements (⚠) non.
 
 - Écrit le projet dans les sources du jeu, après vérification :
   - `include/monsters.h` : l'entrée à la fin du premier bloc de sa
-    classe (les classes restent contiguës, les monstres spéciaux de fin
-    de liste ne sont pas concernés) ;
+    classe, ou après le monstre choisi dans « Placer après » (les
+    classes restent contiguës, les monstres spéciaux de fin de liste ne
+    sont pas concernés ; plusieurs monstres placés au même endroit
+    gardent l'ordre du projet) ;
   - `src/makemon.c` : les PV fixes dans `golemhp()` ;
   - `win/share/monsters.txt` : tuiles mâle et femelle à la bonne place
     (y compris après les tuiles gardées pour des monstres désactivés,

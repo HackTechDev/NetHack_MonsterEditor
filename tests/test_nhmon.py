@@ -255,6 +255,35 @@ class TestInstall(unittest.TestCase):
             else:
                 self.fail("tuile de %s absente ou mal placée" % n)
 
+    def test_insert_after(self):
+        game = I.game_monsters(SRC)
+        golems = D.insert_choices(game, "S_GOLEM")
+        self.assertIn("iron golem", golems)
+        dragons = D.insert_choices(game, "S_DRAGON")
+        self.assertNotIn("gray dragon", dragons)
+        self.assertIn("yellow dragon", dragons)
+        self.assertNotIn("archeologist", D.insert_choices(game, "S_HUMAN"))
+        a, b = T.from_template(0), T.from_template(10)
+        a["after"] = b["after"] = "iron golem"
+        b["name"], b["bn"] = "blank bot", "BLANK_BOT"
+        files = I.plan(self.tmp, [a, b])
+        order = [g["name"] for g in I.game_monsters(self.tmp)]
+        text = files[I.MONSTERS_H]
+        names = [D.parse_mon(args)["name"] for _s, _e, args in
+                 D.iter_mon_calls(text) if len(args) == 14]
+        i = names.index("iron golem")
+        self.assertEqual(names[i:i + 4], ["iron golem", "security bot",
+                                          "blank bot",
+                                          order[order.index("iron golem")
+                                                + 1]])
+        tiles = files[I.TILES]
+        self.assertLess(tiles.index("(iron golem,female)"),
+                        tiles.index("(security bot,male)"))
+        self.assertLess(tiles.index("(blank bot,female)"),
+                        tiles.index("(%s,male)" % names[i + 3]))
+        self.assertTrue(any("Placer après" in msg for _g, msg in
+                            D.validate(dict(a, sym="S_DOG"), game, [])))
+
     def test_golemhp(self):
         m = T.from_template(0)
         I.install(self.tmp, [m])

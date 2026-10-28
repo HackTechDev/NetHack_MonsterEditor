@@ -17,7 +17,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 6 / 6 | — |
 | 4. Projets et fichiers | 5 / 5 | — |
-| 5. Intégration avec le jeu | 1 / 6 | place dans la classe, fixes, commit, annulation, sons |
+| 5. Intégration avec le jeu | 2 / 6 | fixes, commit, annulation, sons |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
 | 8. Qualité du projet | 0 / 4 | tout |
@@ -186,10 +186,16 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    tant que la partie tourne, `j` crée le monstre choisi sans relancer.
    Sans tmux, le jeu se lance en plein écran comme avant. Essayé :
    « Un drone de combat apparaît à côté de vous. »*
-2. **Place dans la classe** **[facile]** : choisir après quel monstre de
-   la classe insérer le nouveau, au lieu de la fin de la classe (l'ordre
-   compte pour les monstres créés « de la même classe », par exemple
-   par certains pièges et sorts).
+2. ✅ **Fait** — **Place dans la classe** **[facile]** : choisir après
+   quel monstre de la classe insérer le nouveau, au lieu de la fin de la
+   classe (l'ordre compte pour les monstres créés « de la même
+   classe », par exemple par certains pièges et sorts). *Réalisé :
+   champ « Placer après » (menu des monstres du premier bloc de la
+   classe avec leur nom français, vide = fin de la classe) ; les
+   plages que le code parcourt dans l'ordre (dragons et bébés dragons)
+   sont exclues, le champ se vide quand la classe change ; plusieurs
+   monstres placés après le même gardent l'ordre du projet, et les
+   tuiles suivent.*
 3. **Entrée de `doc/fixes5-0-0.txt`** **[facile]** : les conventions du
    jeu demandent de noter les changements visibles ; proposer une ligne
    lors de l'intégration.

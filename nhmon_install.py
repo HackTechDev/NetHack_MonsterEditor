@@ -136,9 +136,30 @@ def _class_end_positions(text):
     return out
 
 
+def _entry_end(text, name):
+    """Position après l'entrée MON() du monstre name, ou None."""
+    for _s, e, args in D.iter_mon_calls(text):
+        if len(args) == 14 and args[0].startswith("NAM") and \
+                D.parse_mon(args)["name"] == name:
+            return text.index("\n", e) + 1
+    return None
+
+
+def _name_before(text, pos):
+    """Nom du dernier monstre dont l'entrée finit avant pos."""
+    prev = None
+    for _s, e, args in D.iter_mon_calls(text):
+        if e >= pos:
+            break
+        if len(args) == 14 and args[0].startswith("NAM"):
+            prev = D.parse_mon(args)["name"]
+    return prev
+
+
 def insert_monsters_h(text, monsters):
     """Texte de monsters.h avec les monstres (déjà nettoyé), et l'ordre
-    final : liste de (nom du monstre précédent, monstre)."""
+    final : liste de (nom du monstre précédent, monstre). Un monstre va
+    à la fin de sa classe, ou après le monstre de son champ « after »."""
     anchors = []
     for m in monsters:
         ends = _class_end_positions(text)
@@ -147,10 +168,27 @@ def insert_monsters_h(text, monsters):
                                "monstre ne peut pas ouvrir une nouvelle "
                                "classe ici") % m["sym"])
         pos, prev = ends[m["sym"]]
-        # après un bloc de l'éditeur : on reste après sa ligne de fin
-        tail = re.match(r"[ \t]*/\* %s:end \w+ \*/\n" % TAG, text[pos:])
-        if tail:
-            pos += tail.end()
+        if m.get("after"):
+            pos = _entry_end(text, m["after"])
+            if pos is None:
+                raise InstallError(_("« %s » introuvable dans monsters.h "
+                                     "(placer « %s » après)") % (
+                                         m["after"], m["name"]))
+        # après des blocs de l'éditeur : on les garde devant (ordre du
+        # projet)
+        while True:
+            tail = re.match(r"[ \t]*/\* %s:end \w+ \*/\n" % TAG,
+                            text[pos:])
+            if tail:
+                pos += tail.end()
+                continue
+            blk = re.match(r"[ \t]*/\* %s:begin (\w+) \*/\n.*?"
+                           r"^[ \t]*/\* %s:end \1 \*/\n" % (TAG, TAG),
+                           text[pos:], re.S | re.M)
+            if not blk:
+                break
+            pos += blk.end()
+        prev = _name_before(text, pos)
         block =("    /* %s:begin %s */\n" % (TAG, m["bn"])
                  + D.c_entry(m, marker=False) + "\n"
                  + "    /* %s:end %s */\n" % (TAG, m["bn"]))

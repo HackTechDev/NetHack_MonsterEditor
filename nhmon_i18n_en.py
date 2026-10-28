@@ -1036,4 +1036,20 @@ EN = {
         "               the editor (tmux), the monster is created there;",
     "               une partie en cours, j en crée un autre":
         "               in a running game, j creates another one",
+    # --- place dans la classe -------------------------------------------
+    "Placer après « %s » : pas un monstre de la classe %s où l'on peut "
+    "insérer":
+        "Place after \"%s\": not a monster of class %s where one can "
+        "insert",
+    "« %s » introuvable dans monsters.h (placer « %s » après)":
+        "\"%s\" not found in monsters.h (to place \"%s\" after it)",
+    "Placer après": "Place after",
+    "rang dans monsters.h : après quel monstre du jeu de la même classe ; "
+    "vide = fin de la classe (l'ordre compte pour les monstres créés « de "
+    "la même classe »)":
+        "rank in monsters.h: after which game monster of the same class; "
+        "empty = end of the class (the order matters for monsters created "
+        "\"of the same class\")",
+    "(fin de la classe)": "(end of the class)",
+    "fin de la classe": "end of the class",
 }

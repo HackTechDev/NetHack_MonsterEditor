@@ -63,6 +63,9 @@ FIELDS = [
     ("choice", "sym", _("Classe"), _("lettre affichée sur la carte ; la "
      "classe golem (') donne des PV fixes, comme il sied à un robot")),
     ("choice", "color", _("Couleur"), _("couleur de la lettre sur la carte")),
+    ("after", "after", _("Placer après"), _("rang dans monsters.h : après "
+     "quel monstre du jeu de la même classe ; vide = fin de la classe "
+     "(l'ordre compte pour les monstres créés « de la même classe »)")),
     ("section", None, _("Caractéristiques"), ""),
     ("int", "level", _("Niveau"), _("niveau de base (0 à 49) : PV, toucher, "
      "profondeur d'apparition"), 0, 49, 1),
@@ -462,6 +465,11 @@ class Editor(Popups, Game):
         if kind == "longtext":
             s = " ".join(v.split())
             return (s or "—"), (0 if s else curses.A_DIM)
+        if kind == "after":
+            if not v:
+                return _("fin de la classe"), curses.A_DIM
+            fr = self.fr_names().get(v, ("",))[0]
+            return "%s%s" % (v, " (%s)" % fr if fr else ""), 0
         if kind == "plural":
             if v:
                 return v, 0
@@ -584,7 +592,19 @@ class Editor(Popups, Game):
 
     # --- édition des champs ------------------------------------------------
 
-    def choices(self, key):
+    def fix_after(self, m):
+        """Après un changement de classe, « Placer après » ne peut plus
+        désigner un monstre de l'ancienne classe."""
+        if m["after"] and self.game() and \
+                m["after"] not in D.insert_choices(self.game(), m["sym"]):
+            m["after"] = ""
+
+    def choices(self, key, m=None):
+        if key == "after":
+            fr = self.fr_names()
+            return [("", _("(fin de la classe)"))] + [
+                (n, fr.get(n, ("",))[0])
+                for n in D.insert_choices(self.game(), m["sym"])]
         if key == "fr_gender":
             return [("m", _("masculin")), ("f", _("féminin"))]
         if key == "tile_shape":
@@ -623,11 +643,12 @@ class Editor(Popups, Game):
             if v != m[key]:
                 self.checkpoint()
                 m[key] = v
-        elif kind == "choice":
-            ch = [c for c, _ in self.choices(key)]
+        elif kind in ("choice", "after"):
+            ch = [c for c, _ in self.choices(key, m)]
             i = ch.index(m[key]) if m[key] in ch else 0
             self.checkpoint()
             m[key] = ch[(i + delta) % len(ch)]
+            self.fix_after(m)
         elif kind == "difficulty":
             v = D.mstrength(m) if m[key] is None else m[key]
             self.checkpoint()
@@ -658,6 +679,9 @@ class Editor(Popups, Game):
         elif f[0] == "difficulty":
             self.checkpoint()
             m["difficulty"] = None
+        elif f[0] == "after" and m["after"]:
+            self.checkpoint()
+            m["after"] = ""
 
     def edit_field(self):
         m = self.mon()
@@ -693,8 +717,8 @@ class Editor(Popups, Game):
                 if v != m[key]:
                     self.checkpoint()
                     m[key] = v
-            elif kind == "choice":
-                ch = self.choices(key)
+            elif kind in ("choice", "after"):
+                ch = self.choices(key, m)
                 cur = [c for c, _ in ch].index(m[key]) \
                     if m[key] in [c for c, _ in ch] else 0
                 shown = [(T.shape_label(c), d) for c, d in ch] \
@@ -703,6 +727,7 @@ class Editor(Popups, Game):
                 if ch[i][0] != m[key]:
                     self.checkpoint()
                     m[key] = ch[i][0]
+                    self.fix_after(m)
             elif kind == "flags":
                 tab = D.FLAG_TABLES[key]
                 items = [(n, d) for n, _v, d in tab]

@@ -393,6 +393,7 @@ def new_monster():
         "tile": blank_tile(),          # tuile dessinée (« personnalisée »)
         "encyclo_en": "", "encyclo_fr": "",
         "notes": "",
+        "after": "",                   # monstre du jeu qui le précède
     }
 
 
@@ -1017,6 +1018,37 @@ def check_attacks(m):
 BN_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 
+# Plages de monstres que le code du jeu parcourt dans l'ordre de mons[]
+# (Dragon_to_scales(), polyself.c…) : rien ne doit s'y glisser.
+LOCKED_RANGES = [("baby gray dragon", "baby yellow dragon"),
+                 ("gray dragon", "yellow dragon")]
+
+
+def first_blocks(game):
+    """{S_classe: [noms]} du premier bloc de chaque classe, dans l'ordre
+    de monsters.h (les rôles, némésis… des blocs suivants sont exclus :
+    les nouveaux monstres ne vont que dans le premier bloc)."""
+    out, closed, prev = {}, set(), None
+    for g in game:
+        if g["sym"] != prev:
+            if prev is not None:
+                closed.add(prev)
+            prev = g["sym"]
+        if g["sym"] not in closed:
+            out.setdefault(g["sym"], []).append(g["name"])
+    return out
+
+
+def insert_choices(game, sym):
+    """Monstres de la classe après lesquels on peut insérer."""
+    names = first_blocks(game).get(sym, [])
+    locked = set()
+    for a, b in LOCKED_RANGES:
+        if a in names and b in names:
+            locked.update(names[names.index(a):names.index(b)])
+    return [n for n in names if n not in locked]
+
+
 def validate(m, game=None, project=None):
     """Liste de (gravité, message) ; gravité « erreur » ou « attention ».
     game : monstres du jeu (hors ceux de l'éditeur), project : les autres
@@ -1047,6 +1079,11 @@ def validate(m, game=None, project=None):
         onames = {o["name"], o["name_m"], o["name_f"]} - {""}
         for n in names & onames:
             err(_("Nom « %s » déjà utilisé") % n)
+    if m["after"] and game and m["after"] not in insert_choices(
+            game, m["sym"]):
+        err(_("Placer après « %s » : pas un monstre de la classe %s où "
+              "l'on peut insérer") % (m["after"], CLASS_CHAR.get(m["sym"],
+                                                                 "?")))
     if m["sym"] not in CLASS_CHAR:
         err(_("Classe inconnue : %s") % m["sym"])
     for key, lo, hi, label in (

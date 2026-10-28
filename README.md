@@ -127,7 +127,7 @@ clic sur la palette pour la couleur.
 
    | Fichier | Ajout |
    |---|---|
-   | `include/monsters.h` | l'entrée `MON()`, à la fin de la classe choisie |
+   | `include/monsters.h` | l'entrée `MON()`, à la fin de la classe choisie ou après le monstre de « Placer après » |
    | `src/makemon.c` | les PV fixes dans `golemhp()` (classe golem) |
    | `win/share/monsters.txt` | les tuiles mâle et femelle |
    | `po/fr.po`, `po/themes/fr@cyber.po`, `po/nethack.pot` | nom français, genre et pluriel corrigé |
