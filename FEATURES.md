@@ -13,7 +13,8 @@ touchés, le [README](README.md) ou `?` dans l'éditeur.
   Night City, mais tout monstre est possible.
 - Interface en français, saisie des accents (UTF-8).
 - Utilisable entièrement au clavier.
-- Annulation (`u`) des 100 dernières modifications du projet.
+- Annulation (`u`) des 100 dernières modifications du projet, et
+  rétablissement (Ctrl-R ou Ctrl-Y) de ce qui a été annulé.
 - Lanceur `nhmonedit.sh`, utilisable depuis un lien symbolique ;
   `--install` crée la commande `nhmonedit` dans `~/.local/bin`.
 - Sources du jeu choisies par `--src` ou `NHMONEDIT_SRC` (par défaut

@@ -148,6 +148,7 @@ HELP = [
     "Général :",
     "  s            enregistrer le projet",
     "  u            annuler la dernière modification",
+    "  Ctrl-R       rétablir ce qui a été annulé (aussi Ctrl-Y)",
     "  ?            cette aide       q  quitter",
     "",
     "En jeu (mode wizard) : Ctrl-G puis le nom ANGLAIS du monstre pour",
@@ -185,6 +186,7 @@ class Editor(Popups):
         self.focus = "list"
         self.modified = False
         self.undo_stack = []
+        self.redo_stack = []
         self.msg = ""
         self.form_top = 0
         self._game = None
@@ -267,16 +269,21 @@ class Editor(Popups):
     def checkpoint(self):
         self.undo_stack.append((copy.deepcopy(self.monsters), self.cur))
         del self.undo_stack[:-100]
+        self.redo_stack = []
         self.modified = True
 
-    def undo(self):
-        if not self.undo_stack:
-            self.msg = "Rien à annuler"
+    def undo(self, redo=False):
+        """u annule, Ctrl-R rétablit ce qui vient d'être annulé."""
+        src, dst = (self.redo_stack, self.undo_stack) if redo else \
+            (self.undo_stack, self.redo_stack)
+        if not src:
+            self.msg = "Rien à rétablir" if redo else "Rien à annuler"
             return
-        self.monsters, self.cur = self.undo_stack.pop()
+        dst.append((self.monsters, self.cur))
+        self.monsters, self.cur = src.pop()
         self.cur = min(self.cur, max(0, len(self.monsters) - 1))
         self.modified = True
-        self.msg = "Annulé"
+        self.msg = "Rétabli" if redo else "Annulé"
 
     # --- dessin -----------------------------------------------------------
 
@@ -1093,6 +1100,8 @@ class Editor(Popups):
                 self.save()
             elif k == "u":
                 self.undo()
+            elif k in ("\x12", "\x19"):
+                self.undo(redo=True)
             elif k == "n":
                 self.new_monster()
             elif k == "d":

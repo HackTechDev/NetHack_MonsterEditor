@@ -15,7 +15,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 |---|---|---|
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
-| 3. Saisie et affichage | 0 / 6 | tout |
+| 3. Saisie et affichage | 1 / 6 | souris, anglais, recherche, fiche comparée, aperçu de l'attaque |
 | 4. Projets et fichiers | 0 / 5 | tout |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
@@ -98,8 +98,10 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
 
 ## 3. Saisie et affichage
 
-1. **Rétablir** **[facile]** : `u` annule, mais rien ne rétablit ; ajouter
-   Ctrl-R comme dans l'éditeur de cartes.
+1. ✅ **Fait** — **Rétablir** **[facile]** : `u` annule, mais rien ne
+   rétablit ; ajouter Ctrl-R comme dans l'éditeur de cartes.
+   *Réalisé : Ctrl-R (ou Ctrl-Y) rétablit, 100 niveaux ; une nouvelle
+   modification vide la pile des rétablissements.*
 2. **Souris** **[moyen]** : choisir un monstre ou un champ d'un clic,
    faire défiler les listes à la molette, peindre la tuile à la souris.
 3. **Interface en anglais** **[moyen]** : textes passés par `_()` et

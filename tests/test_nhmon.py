@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.dirname(HERE))
 import nhmon_data as D  # noqa: E402
 import nhmon_install as I  # noqa: E402
 import nhmon_templates as T  # noqa: E402
+import nhmonedit as E  # noqa: E402
 
 SRC = os.environ.get("NHMONEDIT_SRC") or os.path.normpath(
     os.path.join(HERE, "..", "..", "NetHack-5.0.0"))
@@ -249,6 +250,39 @@ class TestInstall(unittest.TestCase):
                                        "fr@cyber.po"))
         self.assertEqual(cyber[("monster", m["name"])], m["fr_name"])
         self.assertEqual(cyber[("gender", m["name"])], "f")
+
+
+def bare_editor(monsters=()):
+    """Éditeur sans écran, pour essayer sa logique hors de curses."""
+    ed = E.Editor.__new__(E.Editor)
+    ed.monsters = [D.normalize(m) for m in monsters]
+    ed.cur, ed.field, ed.focus, ed.msg = 0, 1, "list", ""
+    ed.modified, ed.undo_stack, ed.redo_stack = False, [], []
+    return ed
+
+
+class TestEditor(unittest.TestCase):
+    def test_undo_redo(self):
+        ed = bare_editor([T.from_template(0)])
+        ed.checkpoint()
+        ed.mon()["level"] = 9
+        ed.checkpoint()
+        ed.mon()["level"] = 12
+        ed.undo()
+        ed.undo()
+        self.assertEqual(ed.mon()["level"], T.from_template(0)["level"])
+        ed.undo(redo=True)
+        self.assertEqual(ed.mon()["level"], 9)
+        ed.undo(redo=True)
+        self.assertEqual(ed.mon()["level"], 12)
+        ed.undo(redo=True)
+        self.assertEqual(ed.msg, "Rien à rétablir")
+        # une nouvelle modification efface ce qui pouvait être rétabli
+        ed.undo()
+        ed.checkpoint()
+        ed.mon()["level"] = 3
+        ed.undo(redo=True)
+        self.assertEqual(ed.mon()["level"], 3)
 
 
 if __name__ == "__main__":

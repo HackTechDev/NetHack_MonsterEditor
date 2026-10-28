@@ -91,7 +91,7 @@ grands mechas, `e` aux sphères et drones-caméras, `B` aux drones volants,
 | `v` `c` `b` | vérifier, voir le code C, comparer |
 | `I` `R` | intégrer aux sources, retirer des sources |
 | `m` `U` `j` | compiler, mettre à jour le jeu installé, jouer |
-| `s` `u` `?` `q` | enregistrer, annuler, aide, quitter |
+| `s` `u` Ctrl-R `?` `q` | enregistrer, annuler, rétablir, aide, quitter |
 
 Éditeur de tuile (facultatif) : flèches pour se déplacer, Espace pour peindre, une
 lettre de la palette (`A`–`Z`, `.`, `0`, `1`) pour choisir la couleur
