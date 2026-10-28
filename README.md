@@ -20,7 +20,8 @@ la liste complète des fonctions est dans [FEATURES.md](FEATURES.md).
 
 Variables : `NHMONEDIT_SRC` (sources du jeu), `NHMONEDIT_HACKDIR`
 (dossier du jeu installé, par défaut `~/nh/install/games/lib/nethackdir`),
-`NHMONEDIT_MOUSE=0` (sans souris).
+`NHMONEDIT_MOUSE=0` (sans souris), `NHMONEDIT_LANG=en` ou `fr` (langue de
+l'interface ; par défaut celle de la locale).
 
 Terminal de 80×24 au minimum ; à partir de 120 colonnes, un panneau
 « Aperçu » montre la difficulté, les PV et les problèmes du monstre en
@@ -160,7 +161,8 @@ tuile personnalisée vide… L'intégration est refusée tant qu'il reste une er
 | `nhmon_data.py` | constantes du jeu, lecture de `monsters.h`, difficulté, code C, vérifications |
 | `nhmon_install.py` | intégration et retrait dans les sources |
 | `nhmon_templates.py` | modèles de robots, silhouettes et fabrication des tuiles |
-| `tests/test_nhmon.py` | tests (`python3 -m unittest discover -s tests`) |
+| `nhmon_i18n.py`, `nhmon_i18n_en.py` | choix de la langue, traduction anglaise de l'interface |
+| `tests/` | tests (`python3 -m unittest discover -s tests`) |
 | `monstres.json` | le projet par défaut (créé au premier enregistrement) |
 
 ## Environnement de test

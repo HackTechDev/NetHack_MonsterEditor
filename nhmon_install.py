@@ -22,6 +22,7 @@ import shutil
 import time
 
 import nhmon_data as D
+from nhmon_i18n import _
 import nhmon_templates as T
 
 TAG = "nhmonedit"
@@ -57,7 +58,7 @@ def _write(src, rel, text):
 def check_tree(src):
     """Message d'erreur si src n'est pas un arbre de sources NetHack."""
     if not os.path.isfile(os.path.join(src, MONSTERS_H)):
-        return "Pas de %s dans %s" % (MONSTERS_H, src)
+        return _("Pas de %s dans %s") % (MONSTERS_H, src)
     return None
 
 
@@ -142,9 +143,9 @@ def insert_monsters_h(text, monsters):
     for m in monsters:
         ends = _class_end_positions(text)
         if m["sym"] not in ends:
-            raise InstallError("Classe %s absente de monsters.h : un "
+            raise InstallError(_("Classe %s absente de monsters.h : un "
                                "monstre ne peut pas ouvrir une nouvelle "
-                               "classe ici" % m["sym"])
+                               "classe ici") % m["sym"])
         pos, prev = ends[m["sym"]]
         # après un bloc de l'éditeur : on reste après sa ligne de fin
         tail = re.match(r"[ \t]*/\* %s:end \w+ \*/\n" % TAG, text[pos:])
@@ -167,7 +168,7 @@ def insert_golemhp(text, monsters):
     mo = re.search(r"^golemhp\(int type\)\n\{.*?^(    default:\n)", text,
                    re.M | re.S)
     if not mo:
-        raise InstallError("golemhp() introuvable dans %s" % MAKEMON_C)
+        raise InstallError(_("golemhp() introuvable dans %s") % MAKEMON_C)
     add = "".join("    case PM_%s: %s\n        return %d; %s\n"
                   % (m["bn"], LINE_TAG, m["golem_hp"], LINE_TAG)
                   for m in golems)
@@ -198,7 +199,7 @@ def insert_tiles(text, anchors, known):
         mo = re.search(r"^# tile \d+ \(%s,female\)\n\{\n.*?^\}\n"
                        % re.escape(prev), text, re.M | re.S)
         if not mo:
-            raise InstallError("Tuile de « %s » introuvable dans %s"
+            raise InstallError(_("Tuile de « %s » introuvable dans %s")
                                % (prev, TILES))
         end = mo.end()
         # après un bloc de l'éditeur, on reste après sa ligne de fin
@@ -318,7 +319,7 @@ def insert_data(text, monsters, field):
 def bump_editlevel(text):
     mo = re.search(r"^#define EDITLEVEL (\d+)", text, re.M)
     if not mo:
-        raise InstallError("EDITLEVEL introuvable dans %s" % PATCHLEVEL)
+        raise InstallError(_("EDITLEVEL introuvable dans %s") % PATCHLEVEL)
     n = int(mo.group(1)) + 1
     return text[:mo.start(1)] + str(n) + text[mo.end(1):], n
 

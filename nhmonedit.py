@@ -21,6 +21,7 @@ import sys
 import time
 
 import nhmon_data as D
+from nhmon_i18n import LANG, _
 import nhmon_install as I
 import nhmon_templates as T
 from nhmon_ui import (Cancel, Colors, ESC, Mouse, Popups, clip,
@@ -36,161 +37,168 @@ HACKDIRS = [
     os.path.join(DEFAULT_SRC, "playground"),
 ]
 
-ALIGN_HINT = "négatif : chaotique, 0 : neutre, positif : loyal ; " \
-             "-128 : sans alignement (A_NONE)"
+ALIGN_HINT = _("négatif : chaotique, 0 : neutre, positif : loyal ; " \
+             "-128 : sans alignement (A_NONE)")
 
 # (type, clé, libellé, aide[, min, max, pas])
 FIELDS = [
-    ("section", None, "Identité", ""),
-    ("text", "fr_name", "Nom français", "nom affiché dans le jeu "
-     "(thème fr@cyber)"),
-    ("choice", "fr_gender", "Genre (français)", "accord des phrases : "
-     "« le », « la », « détruit », « détruite »"),
-    ("plural", "fr_plural", "Pluriel français", "« trois mechas de "
+    ("section", None, _("Identité"), ""),
+    ("text", "fr_name", _("Nom français"), _("nom affiché dans le jeu "
+     "(thème fr@cyber)")),
+    ("choice", "fr_gender", _("Genre (français)"), _("accord des phrases : "
+     "« le », « la », « détruit », « détruite »")),
+    ("plural", "fr_plural", _("Pluriel français"), _("« trois mechas de "
      "combat » : vide = calculé par le jeu (s ou x à chaque mot avant "
-     "« de », « à »…) ; Entrée pour le corriger"),
-    ("text", "name", "Nom anglais", "nom interne du jeu (en minuscules) ; "
-     "c'est lui qu'on tape avec ^G en mode wizard"),
-    ("ident", "bn", "Identifiant PM_", "nom C : PM_<identifiant>, en "
-     "majuscules"),
-    ("text", "name_m", "  nom anglais masc.", "facultatif : nom propre au "
-     "masculin (sinon le nom anglais sert pour tous)"),
-    ("text", "name_f", "  nom anglais fém.", "facultatif : nom propre au "
-     "féminin"),
-    ("text", "fr_name_m", "  nom français masc.", "traduction du nom "
-     "masculin"),
-    ("text", "fr_name_f", "  nom français fém.", "traduction du nom "
-     "féminin"),
-    ("choice", "sym", "Classe", "lettre affichée sur la carte ; la classe "
-     "golem (') donne des PV fixes, comme il sied à un robot"),
-    ("choice", "color", "Couleur", "couleur de la lettre sur la carte"),
-    ("section", None, "Caractéristiques", ""),
-    ("int", "level", "Niveau", "niveau de base (0 à 49) : PV, toucher, "
-     "profondeur d'apparition", 0, 49, 1),
-    ("int", "move", "Vitesse", "12 = humain, 0 = immobile (tourelle), "
-     "20+ = très rapide", 0, 127, 1),
-    ("int", "ac", "Classe d'armure", "10 = sans armure, 0 = blindé, "
-     "négatif = très blindé", -128, 127, 1),
-    ("int", "mr", "Résist. magie %", "chance de résister aux sorts et "
-     "baguettes (0 à 100)", 0, 127, 5),
-    ("int", "align", "Alignement", ALIGN_HINT, -128, 127, 1),
-    ("int", "golem_hp", "PV fixes (golem)", "seulement pour la classe "
-     "golem (') : points de vie fixes (golem de fer : 120)", 1, 999, 5),
-    ("difficulty", "difficulty", "Difficulté", "calculée comme le jeu "
-     "(mstrength) ; Entrée pour forcer une valeur, vide = automatique"),
-    ("section", None, "Génération", ""),
-    ("int", "freq", "Fréquence", "0 = jamais au hasard … 7 = très "
-     "courant (la plupart : 1 à 3)", 0, 7, 1),
-    ("flags", "geno", "Drapeaux G_", "unique, groupes, génocide, "
-     "cadavre…"),
-    ("section", None, "Attaques", ""),
-] + [("attack", i, "Attaque %d" % (i + 1), "Entrée : type, dégâts, dés ; "
-      "Suppr : vider ; ←→ : changer le nombre de dés")
+     "« de », « à »…) ; Entrée pour le corriger")),
+    ("text", "name", _("Nom anglais"), _("nom interne du jeu (en "
+     "minuscules) ; c'est lui qu'on tape avec ^G en mode wizard")),
+    ("ident", "bn", _("Identifiant PM_"), _("nom C : PM_<identifiant>, en "
+     "majuscules")),
+    ("text", "name_m", _("  nom anglais masc."), _("facultatif : nom "
+     "propre au masculin (sinon le nom anglais sert pour tous)")),
+    ("text", "name_f", _("  nom anglais fém."), _("facultatif : nom propre au "
+     "féminin")),
+    ("text", "fr_name_m", _("  nom français masc."), _("traduction du nom "
+     "masculin")),
+    ("text", "fr_name_f", _("  nom français fém."), _("traduction du nom "
+     "féminin")),
+    ("choice", "sym", _("Classe"), _("lettre affichée sur la carte ; la "
+     "classe golem (') donne des PV fixes, comme il sied à un robot")),
+    ("choice", "color", _("Couleur"), _("couleur de la lettre sur la carte")),
+    ("section", None, _("Caractéristiques"), ""),
+    ("int", "level", _("Niveau"), _("niveau de base (0 à 49) : PV, toucher, "
+     "profondeur d'apparition"), 0, 49, 1),
+    ("int", "move", _("Vitesse"), _("12 = humain, 0 = immobile (tourelle), "
+     "20+ = très rapide"), 0, 127, 1),
+    ("int", "ac", _("Classe d'armure"), _("10 = sans armure, 0 = blindé, "
+     "négatif = très blindé"), -128, 127, 1),
+    ("int", "mr", _("Résist. magie %"), _("chance de résister aux sorts et "
+     "baguettes (0 à 100)"), 0, 127, 5),
+    ("int", "align", _("Alignement"), ALIGN_HINT, -128, 127, 1),
+    ("int", "golem_hp", _("PV fixes (golem)"), _("seulement pour la classe "
+     "golem (') : points de vie fixes (golem de fer : 120)"), 1, 999, 5),
+    ("difficulty", "difficulty", _("Difficulté"), _("calculée comme le jeu "
+     "(mstrength) ; Entrée pour forcer une valeur, vide = automatique")),
+    ("section", None, _("Génération"), ""),
+    ("int", "freq", _("Fréquence"), _("0 = jamais au hasard … 7 = très "
+     "courant (la plupart : 1 à 3)"), 0, 7, 1),
+    ("flags", "geno", _("Drapeaux G_"), _("unique, groupes, génocide, "
+     "cadavre…")),
+    ("section", None, _("Attaques"), ""),
+] + [("attack", i, _("Attaque %d") % (i + 1), _("Entrée : type, dégâts, dés ; "
+      "Suppr : vider ; ←→ : changer le nombre de dés"))
      for i in range(D.NATTK)] + [
-    ("section", None, "Corps", ""),
-    ("int", "weight", "Poids", "humain : 1450, golem de fer : 2000",
+    ("section", None, _("Corps"), ""),
+    ("int", "weight", _("Poids"), _("humain : 1450, golem de fer : 2000"),
      0, 65535, 50),
-    ("int", "nutrition", "Nutrition", "valeur nutritive du cadavre "
-     "(0 pour une épave de robot)", 0, 65535, 50),
-    ("choice", "sound", "Son", "bruit ou phrases du monstre (#parler)"),
-    ("choice", "size", "Taille", "taille physique"),
-    ("flags", "mr1", "Résistances", "résistances du monstre"),
-    ("flags", "mr2", "Conférées", "résistances données en mangeant le "
-     "cadavre"),
-    ("flags", "flags1", "Drapeaux M1", "corps et déplacement"),
-    ("flags", "flags2", "Drapeaux M2", "nature et comportement"),
-    ("flags", "flags3", "Drapeaux M3", "divers (infravision, attente…)"),
-    ("section", None, "Apparence et textes", ""),
-    ("choice", "tile_shape", "Silhouette (tuile)", "image des versions "
+    ("int", "nutrition", _("Nutrition"), _("valeur nutritive du cadavre "
+     "(0 pour une épave de robot)"), 0, 65535, 50),
+    ("choice", "sound", _("Son"), _("bruit ou phrases du monstre (#parler)")),
+    ("choice", "size", _("Taille"), _("taille physique")),
+    ("flags", "mr1", _("Résistances"), _("résistances du monstre")),
+    ("flags", "mr2", _("Conférées"), _("résistances données en mangeant le "
+     "cadavre")),
+    ("flags", "flags1", _("Drapeaux M1"), _("corps et déplacement")),
+    ("flags", "flags2", _("Drapeaux M2"), _("nature et comportement")),
+    ("flags", "flags3", _("Drapeaux M3"), _("divers (infravision, attente…)")),
+    ("section", None, _("Apparence et textes"), ""),
+    ("choice", "tile_shape", _("Silhouette (tuile)"), _("image des versions "
      "graphiques (Qt, X11) seulement, invisible dans le terminal ; "
-     "colorée d'après la couleur du monstre"),
-    ("longtext", "encyclo_fr", "Encyclopédie (fr)", "texte de « ; » et "
-     "« / » dans le jeu, en français"),
-    ("longtext", "encyclo_en", "Encyclopédie (en)", "même texte en "
-     "anglais (sinon le texte français est repris)"),
-    ("longtext", "notes", "Notes", "vos notes (non intégrées au jeu)"),
+     "colorée d'après la couleur du monstre")),
+    ("longtext", "encyclo_fr", _("Encyclopédie (fr)"), _("texte de « ; » et "
+     "« / » dans le jeu, en français")),
+    ("longtext", "encyclo_en", _("Encyclopédie (en)"), _("même texte en "
+     "anglais (sinon le texte français est repris)")),
+    ("longtext", "notes", _("Notes"), _("vos notes (non intégrées au jeu)")),
 ]
 
 HELP = [
-    "nhmonedit — éditeur de monstres pour NetHack 5.0 cyberpunk",
+    _("nhmonedit — éditeur de monstres pour NetHack 5.0 cyberpunk"),
     "",
-    "Deux zones : la liste des monstres du projet (à gauche) et la fiche",
-    "du monstre choisi. Tab passe de l'une à l'autre.",
+    _("Deux zones : la liste des monstres du projet (à gauche) et la fiche"),
+    _("du monstre choisi. Tab passe de l'une à l'autre."),
     "",
-    "Dans la fiche :",
-    "  ↑ ↓          champ précédent / suivant",
-    "  ← →          changer une valeur (nombre, choix, dés d'attaque)",
-    "  Entrée       modifier le champ",
-    "  Suppr        vider (attaque, texte)",
+    _("Dans la fiche :"),
+    _("  ↑ ↓          champ précédent / suivant"),
+    _("  ← →          changer une valeur (nombre, choix, dés d'attaque)"),
+    _("  Entrée       modifier le champ"),
+    _("  Suppr        vider (attaque, texte)"),
     "",
-    "Monstres :",
-    "  n            nouveau monstre d'après un modèle (robots, mechas…)",
-    "  d            dupliquer le monstre",
-    "  i            importer un monstre du jeu comme base",
-    "  Suppr / X    supprimer le monstre (dans la liste)",
-    "  < >          déplacer le monstre dans la liste",
-    "  /            aller à un monstre (tapez une partie de son nom)",
-    "  t            dessiner la tuile à la main (versions graphiques",
-    "               seulement ; sinon la silhouette suffit)",
+    _("Monstres :"),
+    _("  n            nouveau monstre d'après un modèle (robots, mechas…)"),
+    _("  d            dupliquer le monstre"),
+    _("  i            importer un monstre du jeu comme base"),
+    _("  Suppr / X    supprimer le monstre (dans la liste)"),
+    _("  < >          déplacer le monstre dans la liste"),
+    _("  /            aller à un monstre (tapez une partie de son nom)"),
+    _("  t            dessiner la tuile à la main (versions graphiques"),
+    _("               seulement ; sinon la silhouette suffit)"),
     "",
-    "Contrôle :",
-    "  v            vérifier tous les monstres",
-    "  c            voir le code C (entrée MON() de monsters.h)",
-    "  b            comparer aux monstres du jeu (difficulté proche)",
-    "  B            fiche comparée : deux monstres côte à côte (un",
-    "               autre du projet ou du jeu), différences en jaune",
+    _("Contrôle :"),
+    _("  v            vérifier tous les monstres"),
+    _("  c            voir le code C (entrée MON() de monsters.h)"),
+    _("  b            comparer aux monstres du jeu (difficulté proche)"),
+    _("  B            fiche comparée : deux monstres côte à côte (un"),
+    _("               autre du projet ou du jeu), différences en jaune"),
     "",
-    "Sources du jeu :",
-    "  I            intégrer les monstres aux sources (aperçu, puis",
-    "               confirmation ; copie des fichiers dans sauvegardes/)",
-    "  R            retirer les monstres des sources",
-    "  m            compiler (make)",
-    "  U            mettre à jour le jeu installé (make update : garde",
-    "               sysconf, scores et sauvegardes)",
-    "  j            lancer le jeu en mode wizard pour essayer",
+    _("Sources du jeu :"),
+    _("  I            intégrer les monstres aux sources (aperçu, puis"),
+    _("               confirmation ; copie des fichiers dans sauvegardes/)"),
+    _("  R            retirer les monstres des sources"),
+    _("  m            compiler (make)"),
+    _("  U            mettre à jour le jeu installé (make update : garde"),
+    _("               sysconf, scores et sauvegardes)"),
+    _("  j            lancer le jeu en mode wizard pour essayer"),
     "",
-    "Général :",
-    "  s            enregistrer le projet",
-    "  u            annuler la dernière modification",
-    "  Ctrl-R       rétablir ce qui a été annulé (aussi Ctrl-Y)",
+    _("Général :"),
+    _("  s            enregistrer le projet"),
+    _("  u            annuler la dernière modification"),
+    _("  Ctrl-R       rétablir ce qui a été annulé (aussi Ctrl-Y)"),
     "",
-    "Souris : un clic choisit un monstre ou un champ, un double clic",
-    "ouvre la fiche ou modifie le champ ; la molette fait défiler. Dans",
-    "les menus, un second clic valide. Pour sélectionner du texte dans",
-    "le terminal, maintenez Maj (NHMONEDIT_MOUSE=0 coupe la souris).",
-    "  ?            cette aide       q  quitter",
+    _("Souris : un clic choisit un monstre ou un champ, un double clic"),
+    _("ouvre la fiche ou modifie le champ ; la molette fait défiler. Dans"),
+    _("les menus, un second clic valide. Pour sélectionner du texte dans"),
+    _("le terminal, maintenez Maj (NHMONEDIT_MOUSE=0 coupe la souris)."),
+    _("  ?            cette aide       q  quitter"),
     "",
-    "En jeu (mode wizard) : Ctrl-G puis le nom ANGLAIS du monstre pour",
-    "le créer à côté de vous ; « ; » pour le regarder (encyclopédie).",
+    _("En jeu (mode wizard) : Ctrl-G puis le nom ANGLAIS du monstre pour"),
+    _("le créer à côté de vous ; « ; » pour le regarder (encyclopédie)."),
     "",
-    "Les nouveaux monstres changent la liste mons[] : l'intégration",
-    "augmente EDITLEVEL (include/patchlevel.h), les anciennes sauvegardes",
-    "et fichiers de bones ne se chargent plus.",
+    _("Les nouveaux monstres changent la liste mons[] : l'intégration"),
+    _("augmente EDITLEVEL (include/patchlevel.h), les anciennes sauvegardes"),
+    _("et fichiers de bones ne se chargent plus."),
 ]
 
 
 def align_label(v):
     if v == D.ALIGN_NONE:
-        return "A_NONE (sans alignement)"
+        return _("A_NONE (sans alignement)")
     if v < 0:
-        return "%d (chaotique)" % v
+        return _("%d (chaotique)") % v
     if v > 0:
-        return "%d (loyal)" % v
-    return "0 (neutre)"
+        return _("%d (loyal)") % v
+    return _("0 (neutre)")
+
+
+def frame_top(title, w):
+    """« ┌─ Titre ────┐ » sur w colonnes."""
+    head = "┌─ %s " % title
+    return head + "─" * max(0, w - len(head) - 1) + "┐"
 
 
 def hp_text(m):
     """Points de vie à la création (makemon.c)."""
     if m["sym"] == "S_GOLEM":
-        return "%d fixes" % m["golem_hp"]
+        return _("%d fixes") % m["golem_hp"]
     if m["level"] == 0:
         return "1d4"
     return "%dd8 (~%d)" % (m["level"], m["level"] * 9 // 2)
 
 
 def num(v):
-    """4.5 -> « 4,5 », 4.0 -> « 4 »."""
-    return ("%.1f" % v).rstrip("0").rstrip(".").replace(".", ",")
+    """4.5 -> « 4,5 » (« 4.5 » en anglais), 4.0 -> « 4 »."""
+    s = ("%.1f" % v).rstrip("0").rstrip(".")
+    return s if LANG == "en" else s.replace(".", ",")
 
 
 def attack_hint(m, attack):
@@ -198,7 +206,7 @@ def attack_hint(m, attack):
     if attack not in D.attacks_used(m):
         return None
     avg, msg, note = D.attack_preview(m, attack)
-    return "moy. %s pts — « %s »%s" % (num(avg), msg,
+    return _("moy. %s pts — « %s »%s") % (num(avg), msg,
                                        " (%s)" % note if note else "")
 
 
@@ -235,12 +243,12 @@ class Editor(Popups):
             with open(self.project, encoding="utf-8") as f:
                 data = json.load(f)
             self.monsters = [D.normalize(m) for m in data.get("monsters", [])]
-            self.msg = "Projet ouvert : %s (%d monstres)" % (
+            self.msg = _("Projet ouvert : %s (%d monstres)") % (
                 self.project, len(self.monsters))
         else:
             self.monsters = []
-            self.msg = "Nouveau projet : %s — « n » pour créer un " \
-                       "monstre" % self.project
+            self.msg = _("Nouveau projet : %s — « n » pour créer un " \
+                       "monstre") % self.project
 
     def save(self):
         data = {"format": "nhmonedit", "version": 1,
@@ -251,7 +259,7 @@ class Editor(Popups):
             f.write("\n")
         os.replace(tmp, self.project)
         self.modified = False
-        self.msg = "Enregistré : %s" % self.project
+        self.msg = _("Enregistré : %s") % self.project
 
     def game(self):
         """Monstres du jeu (sans ceux de l'éditeur), lus une fois."""
@@ -288,10 +296,10 @@ class Editor(Popups):
     def status(self, m):
         inst = self.installed()
         if m["bn"] not in inst:
-            return "non intégré", curses.A_DIM
+            return _("non intégré"), curses.A_DIM
         if inst[m["bn"]] == D.c_entry(m, marker=False):
-            return "intégré", self.colors.fg(curses.COLOR_GREEN, True)
-        return "intégré, modifié depuis", \
+            return _("intégré"), self.colors.fg(curses.COLOR_GREEN, True)
+        return _("intégré, modifié depuis"), \
             self.colors.fg(curses.COLOR_YELLOW, True)
 
     def mon(self):
@@ -311,13 +319,13 @@ class Editor(Popups):
         src, dst = (self.redo_stack, self.undo_stack) if redo else \
             (self.undo_stack, self.redo_stack)
         if not src:
-            self.msg = "Rien à rétablir" if redo else "Rien à annuler"
+            self.msg = _("Rien à rétablir") if redo else _("Rien à annuler")
             return
         dst.append((self.monsters, self.cur))
         self.monsters, self.cur = src.pop()
         self.cur = min(self.cur, max(0, len(self.monsters) - 1))
         self.modified = True
-        self.msg = "Rétabli" if redo else "Annulé"
+        self.msg = _("Rétabli") if redo else _("Annulé")
 
     # --- dessin -----------------------------------------------------------
 
@@ -329,12 +337,12 @@ class Editor(Popups):
         scr.erase()
         H, W = scr.getmaxyx()
         if H < 20 or W < 70:
-            put(scr, 0, 0, "Terminal trop petit (70x20 minimum)")
+            put(scr, 0, 0, _("Terminal trop petit (70x20 minimum)"))
             scr.refresh()
             return
-        title = " nhmonedit ▸ robots & mechas de Night City "
+        title = _(" nhmonedit ▸ robots & mechas de Night City ")
         proj = " %s%s " % (os.path.basename(self.project),
-                           " [modifié]" if self.modified else "")
+                           _(" [modifié]") if self.modified else "")
         bar = self.colors.pair(curses.COLOR_BLACK, curses.COLOR_MAGENTA)
         put(scr, 0, 0, " " * W, bar)
         put(scr, 0, 0, title, bar | curses.A_BOLD)
@@ -356,8 +364,8 @@ class Editor(Popups):
                 or f[3]
         put(scr, H - 2, 0, (" " + hint).ljust(W),
             self.colors.fg(curses.COLOR_CYAN))
-        keys = " n:nouveau d:dupl. i:importer v:vérif c:code b:comparer " \
-               "I:intégrer m:make U:update j:jouer s:enreg. ?:aide q:quitter"
+        keys = _(" n:nouveau d:dupl. i:importer v:vérif c:code b:comparer " \
+               "I:intégrer m:make U:update j:jouer s:enreg. ?:aide q:quitter")
         put(scr, H - 1, 0, (" " + self.msg).ljust(W) if self.msg else
             keys.ljust(W), self.colors.pair(curses.COLOR_BLACK,
                                             curses.COLOR_CYAN))
@@ -367,15 +375,15 @@ class Editor(Popups):
         scr = self.stdscr
         act = self.focus == "list"
         attr = self.colors.fg(curses.COLOR_MAGENTA, act)
-        put(scr, y, x, "┌─ Monstres " + "─" * (w - 13) + "┐", attr)
+        put(scr, y, x, frame_top(_("Monstres"), w), attr)
         for i in range(1, h - 1):
             put(scr, y + i, x, "│", attr)
             put(scr, y + i, x + w - 1, "│", attr)
         put(scr, y + h - 1, x, "└" + "─" * (w - 2) + "┘", attr)
         if not self.monsters:
-            put(scr, y + 2, x + 2, "(vide)", curses.A_DIM)
-            put(scr, y + 3, x + 2, "n : nouveau monstre", curses.A_DIM)
-            put(scr, y + 4, x + 2, "i : importer du jeu", curses.A_DIM)
+            put(scr, y + 2, x + 2, _("(vide)"), curses.A_DIM)
+            put(scr, y + 3, x + 2, _("n : nouveau monstre"), curses.A_DIM)
+            put(scr, y + 4, x + 2, _("i : importer du jeu"), curses.A_DIM)
             return
         rows = h - 2
         top = max(0, min(self.cur - rows // 2, len(self.monsters) - rows))
@@ -394,8 +402,9 @@ class Editor(Popups):
             name = m["fr_name"] or m["name"]
             put(scr, y + 1 + r, x + 4, name, a, w - 9)
             st, _sa = self.status(m)
-            mark = "✖" if errs else ("●" if st == "intégré" else
-                                     "◐" if st.startswith("intégré") else "")
+            mark = "✖" if errs else (
+                "●" if st == _("intégré") else
+                "◐" if st.startswith(_("intégré")) else "")
             put(scr, y + 1 + r, x + w - 4, mark,
                 self.colors.fg(curses.COLOR_RED, True) if errs else
                 self.colors.fg(curses.COLOR_GREEN, True))
@@ -413,13 +422,14 @@ class Editor(Popups):
         v = m[key]
         if kind == "choice":
             if key == "fr_gender":
-                return {"m": "masculin", "f": "féminin"}.get(v, v), 0
+                return {"m": _("masculin"), "f": _("féminin")}.get(v, v), 0
             if key == "tile_shape":
                 if v == T.SHAPE_AUTO:
-                    return "auto (%s, d'après la classe)" % T.shape_of(m), 0
+                    return _("auto (%s, d'après la classe)") % \
+                        T.shape_label(T.shape_of(m)), 0
                 if v == T.SHAPE_CUSTOM:
-                    return "personnalisée (dessinée avec t)", 0
-                return v, 0
+                    return _("personnalisée (dessinée avec t)"), 0
+                return T.shape_label(v), 0
             if key == "sym":
                 return "%s  %s" % (D.CLASS_CHAR.get(v, "?"), dict(
                     (s, d) for s, _c, d in D.CLASSES).get(v, v)), \
@@ -436,13 +446,13 @@ class Editor(Popups):
             if key == "align":
                 return align_label(v), 0
             if key == "golem_hp" and m["sym"] != "S_GOLEM":
-                return "%d (inutilisé hors classe golem)" % v, curses.A_DIM
+                return _("%d (inutilisé hors classe golem)") % v, curses.A_DIM
             return str(v), 0
         if kind == "difficulty":
             calc = D.mstrength(m)
             if v is None:
-                return "%d (calculée)" % calc, 0
-            return "%d (forcée ; calculée : %d)" % (v, calc), \
+                return _("%d (calculée)") % calc, 0
+            return _("%d (forcée ; calculée : %d)") % (v, calc), \
                 self.colors.fg(curses.COLOR_YELLOW)
         if kind == "longtext":
             s = " ".join(v.split())
@@ -452,7 +462,8 @@ class Editor(Popups):
                 return v, 0
             auto = D.french_plural(m["fr_name"]) if m["fr_name"] else "—"
             doubt = D.plural_doubts(m["fr_name"])
-            return "auto : %s%s" % (auto, "  (à vérifier)" if doubt else ""), \
+            return _("auto : %s%s") % (
+                auto, _("  (à vérifier)") if doubt else ""), \
                 self.colors.fg(curses.COLOR_YELLOW, True) if doubt \
                 else curses.A_DIM
         if not v:
@@ -464,7 +475,7 @@ class Editor(Popups):
         m = self.mon()
         act = self.focus == "form"
         attr = self.colors.fg(curses.COLOR_CYAN, act)
-        put(scr, y, x, "┌─ Fiche " + "─" * (w - 10) + "┐", attr)
+        put(scr, y, x, frame_top(_("Fiche"), w), attr)
         for i in range(1, h - 1):
             put(scr, y + i, x, "│", attr)
             put(scr, y + i, x + w - 1, "│", attr)
@@ -495,7 +506,7 @@ class Editor(Popups):
         scr = self.stdscr
         m = self.mon()
         attr = self.colors.fg(curses.COLOR_BLUE, True)
-        put(scr, y, x, "┌─ Aperçu " + "─" * (w - 11) + "┐", attr)
+        put(scr, y, x, frame_top(_("Aperçu"), w), attr)
         for i in range(1, h - 1):
             put(scr, y + i, x, "│", attr)
             put(scr, y + i, x + w - 1, "│", attr)
@@ -512,28 +523,29 @@ class Editor(Popups):
         yy += 2
         hp = hp_text(m)
         lines = [
-            ("Difficulté", "%d%s" % (D.difficulty(m), "" if
-                                     m["difficulty"] is None else " (forcée)")),
-            ("Points de vie", hp),
-            ("Dégâts max/tour", str(D.max_damage(m))),
-            ("Dégâts moy/tour", num(D.average_per_turn(m))),
-            ("Vitesse", "%d (%s)" % (m["move"], "immobile" if not m["move"]
-                                     else "lent" if m["move"] < 9 else
-                                     "normal" if m["move"] <= 12 else
-                                     "rapide" if m["move"] < 18 else
-                                     "très rapide")),
+            (_("Difficulté"), "%d%s" % (
+                D.difficulty(m),
+                "" if m["difficulty"] is None else _(" (forcée)"))),
+            (_("Points de vie"), hp),
+            (_("Dégâts max/tour"), str(D.max_damage(m))),
+            (_("Dégâts moy/tour"), num(D.average_per_turn(m))),
+            (_("Vitesse"), "%d (%s)" % (
+                m["move"], _("immobile") if not m["move"]
+                else _("lent") if m["move"] < 9 else
+                _("normal") if m["move"] <= 12 else
+                _("rapide") if m["move"] < 18 else _("très rapide"))),
         ]
         st, sa = self.status(m)
         for k, v in lines:
             put(scr, yy, x + 2, k.ljust(16), curses.A_DIM)
             put(scr, yy, x + 18, v, 0, cw - 16)
             yy += 1
-        put(scr, yy, x + 2, "Sources".ljust(16), curses.A_DIM)
+        put(scr, yy, x + 2, _("Sources").ljust(16), curses.A_DIM)
         put(scr, yy, x + 18, st, sa, cw - 16)
         yy += 1
         for n, a in enumerate(D.attacks_used(m)):
             avg, msg, _note = D.attack_preview(m, a)
-            put(scr, yy, x + 2, "Attaque %d" % (n + 1), curses.A_DIM)
+            put(scr, yy, x + 2, _("Attaque %d") % (n + 1), curses.A_DIM)
             put(scr, yy, x + 13, "%5s" % num(avg), 0)
             put(scr, yy, x + 19, msg.replace(D.monnam(m), "…", 1),
                 self.colors.fg(curses.COLOR_CYAN), cw - 17)
@@ -542,7 +554,7 @@ class Editor(Popups):
         # vérification
         res = D.validate(m, self.game(), self.others(m))
         if not res:
-            put(scr, yy, x + 2, "✔ aucun problème",
+            put(scr, yy, x + 2, _("✔ aucun problème"),
                 self.colors.fg(curses.COLOR_GREEN, True))
             return
         for g, msg in res:
@@ -569,10 +581,10 @@ class Editor(Popups):
 
     def choices(self, key):
         if key == "fr_gender":
-            return [("m", "masculin"), ("f", "féminin")]
+            return [("m", _("masculin")), ("f", _("féminin"))]
         if key == "tile_shape":
-            return [(c, "selon la classe" if c == T.SHAPE_AUTO else
-                     "tuile dessinée à la main (t)" if c == T.SHAPE_CUSTOM
+            return [(c, _("selon la classe") if c == T.SHAPE_AUTO else
+                     _("tuile dessinée à la main (t)") if c == T.SHAPE_CUSTOM
                      else "") for c in T.shape_choices()]
         if key == "sym":
             return [(s, "%s  %s" % (c, d)) for s, c, d in D.CLASSES
@@ -664,8 +676,8 @@ class Editor(Popups):
             elif kind == "plural":
                 auto = D.french_plural(m["fr_name"])
                 v = self.input_line(label, m[key] or auto,
-                                    "vide ou inchangé = pluriel calculé "
-                                    "(%s)" % auto).strip()
+                                    _("vide ou inchangé = pluriel calculé "
+                                    "(%s)") % auto).strip()
                 if v == auto:
                     v = ""
                 if v != m[key]:
@@ -680,7 +692,9 @@ class Editor(Popups):
                 ch = self.choices(key)
                 cur = [c for c, _ in ch].index(m[key]) \
                     if m[key] in [c for c, _ in ch] else 0
-                i = self.menu(label, ch, cur, filterable=len(ch) > 8)
+                shown = [(T.shape_label(c), d) for c, d in ch] \
+                    if key == "tile_shape" else ch
+                i = self.menu(label, shown, cur, filterable=len(ch) > 8)
                 if ch[i][0] != m[key]:
                     self.checkpoint()
                     m[key] = ch[i][0]
@@ -694,7 +708,7 @@ class Editor(Popups):
             elif kind == "difficulty":
                 s = self.input_line(
                     label, "" if m[key] is None else str(m[key]),
-                    "vide = calculée automatiquement (%d)" % D.mstrength(m))
+                    _("vide = calculée automatiquement (%d)") % D.mstrength(m))
                 s = s.strip()
                 v = None
                 if s:
@@ -719,24 +733,24 @@ class Editor(Popups):
         a = m["attacks"][i]
         ats = [(n, d) for n, _v, d in D.ATTACK_TYPES]
         cur = [n for n, _ in ats].index(a[0]) if a[0] in D.AT_VALUE else 0
-        k = self.menu("Attaque %d : type" % (i + 1), ats, cur)
+        k = self.menu(_("Attaque %d : type") % (i + 1), ats, cur)
         at = ats[k][0]
         # les dégâts que le jeu ne gère pas avec ce type sont signalés
         ads = [(n, d if D.attack_allows(at, n) else "✖ " + d +
-                " (sans effet avec ce type)")
+                _(" (sans effet avec ce type)"))
                for n, _v, d in D.DAMAGE_TYPES]
         names = [n for n, _ in ads]
         cur = names.index(a[1]) if a[1] in D.AD_VALUE and \
             D.attack_allows(at, a[1]) else \
             next(i for i, n in enumerate(names) if D.attack_allows(at, n))
-        k = self.menu("Attaque %d : dégâts (%s)" % (i + 1, D.AT_DESC[at]),
+        k = self.menu(_("Attaque %d : dégâts (%s)") % (i + 1, D.AT_DESC[at]),
                       ads, cur)
         ad = ads[k][0]
         dice = "%dd%d" % (a[2] or 1, a[3] or 6)
         while True:
-            s = self.input_line("Attaque %d : dés" % (i + 1), dice,
-                                "NdM : N dés à M faces (2d6) ; 0d0 pour "
-                                "un effet sans dégâts")
+            s = self.input_line(_("Attaque %d : dés") % (i + 1), dice,
+                                _("NdM : N dés à M faces (2d6) ; 0d0 pour "
+                                "un effet sans dégâts"))
             mo = re.match(r"^\s*(\d+)\s*[dD]\s*(\d+)\s*$", s)
             if mo and int(mo.group(1)) < 256 and int(mo.group(2)) < 256:
                 break
@@ -748,9 +762,9 @@ class Editor(Popups):
         if not m:
             return
         if not self.confirm(
-                "La tuile n'apparaît que dans les versions graphiques\n"
-                "(Qt, X11), pas dans le terminal. La dessiner quand même ?",
-                "Tuile"):
+                _("La tuile n'apparaît que dans les versions graphiques\n"
+                "(Qt, X11), pas dans le terminal. La dessiner quand même ?"),
+                _("Tuile")):
             return
         old = T.tile_for(m)
         new = self.tile_editor(old, m["fr_name"] or m["name"])
@@ -786,14 +800,14 @@ class Editor(Popups):
 
     def new_monster(self):
         try:
-            i = self.menu("Nouveau monstre : modèle",
+            i = self.menu(_("Nouveau monstre : modèle"),
                           T.template_list())
             m = T.from_template(i)
-            fr = self.input_line("Nom français", m["fr_name"],
-                                 "nom affiché dans le jeu")
-            en = self.input_line("Nom anglais (interne)", m["name"],
-                                 "en minuscules ; à taper avec ^G en "
-                                 "mode wizard")
+            fr = self.input_line(_("Nom français"), m["fr_name"],
+                                 _("nom affiché dans le jeu"))
+            en = self.input_line(_("Nom anglais (interne)"), m["name"],
+                                 _("en minuscules ; à taper avec ^G en "
+                                 "mode wizard"))
         except Cancel:
             return
         m["fr_name"] = fr.strip() or m["fr_name"]
@@ -801,34 +815,34 @@ class Editor(Popups):
             m["name"] = en.strip()
             m["bn"] = D.derive_bn(m["name"])
         self.add_monster(self.unique_names(m))
-        self.msg = "Monstre créé : %s" % (m["fr_name"] or m["name"])
+        self.msg = _("Monstre créé : %s") % (m["fr_name"] or m["name"])
 
     def duplicate(self):
         m = self.mon()
         if not m:
             return
         self.add_monster(self.unique_names(copy.deepcopy(m)))
-        self.msg = "Copie créée : %s" % self.mon()["name"]
+        self.msg = _("Copie créée : %s") % self.mon()["name"]
 
     def import_game(self):
         game = self.game()
         if not game:
-            self.msg = "Monstres du jeu introuvables dans %s" % self.src
+            self.msg = _("Monstres du jeu introuvables dans %s") % self.src
             return
         fr = self.fr_names()
         items = [("%s %s" % (D.CLASS_CHAR.get(g["sym"], "?"),
                              fr.get(g["name"], (g["name"],))[0]),
-                  "%s, niv %d, diff %d" % (g["name"], g["level"],
+                  _("%s, niv %d, diff %d") % (g["name"], g["level"],
                                            g["difficulty"]))
                  for g in game]
         try:
-            i = self.menu("Importer un monstre du jeu (%d)" % len(game),
+            i = self.menu(_("Importer un monstre du jeu (%d)") % len(game),
                           items)
         except Cancel:
             return
         m = self.from_game(game[i])
         self.add_monster(self.unique_names(m))
-        self.msg = "Importé : %s — renommez-le à votre goût" % m["name"]
+        self.msg = _("Importé : %s — renommez-le à votre goût") % m["name"]
 
     def from_game(self, g):
         """Copie d'un monstre du jeu avec son nom français, ses PV de
@@ -866,27 +880,27 @@ class Editor(Popups):
         m = self.mon()
         if not m:
             return
-        if not self.confirm("Supprimer « %s » du projet ?\n(il reste dans "
+        if not self.confirm(_("Supprimer « %s » du projet ?\n(il reste dans "
                             "les sources tant que vous n'intégrez pas à "
-                            "nouveau)" % (m["fr_name"] or m["name"])):
+                            "nouveau)") % (m["fr_name"] or m["name"])):
             return
         self.checkpoint()
         del self.monsters[self.cur]
         self.cur = max(0, min(self.cur, len(self.monsters) - 1))
-        self.msg = "Supprimé"
+        self.msg = _("Supprimé")
 
     def goto_monster(self):
         """/ : aller à un monstre ; les lettres tapées filtrent la liste
         (nom français, nom anglais, identifiant)."""
         if not self.monsters:
-            self.msg = "Aucun monstre dans le projet"
+            self.msg = _("Aucun monstre dans le projet")
             return
         items = [("%s %s" % (D.CLASS_CHAR.get(m["sym"], "?"),
                              m["fr_name"] or m["name"]),
                   "%s, PM_%s" % (m["name"], m["bn"]))
                  for m in self.monsters]
         try:
-            self.cur = self.menu("Aller au monstre (%d) — tapez son nom" %
+            self.cur = self.menu(_("Aller au monstre (%d) — tapez son nom") %
                                  len(items), items, self.cur)
         except Cancel:
             return
@@ -901,7 +915,7 @@ class Editor(Popups):
         ms[self.cur], ms[j] = ms[j], ms[self.cur]
         self.cur = j
 
-    # --- vues -----------------------------------------------------------------
+    # --- vues -------------------------------------------------------------
 
     def show_code(self):
         m = self.mon()
@@ -921,7 +935,7 @@ class Editor(Popups):
         if blk:
             lines += ["# dat/data-fr@cyber.base"]
             lines += [(l, self.cyan()) for l in blk.split("\n")[1:-2]]
-        self.viewer("Code de %s" % m["name"], lines)
+        self.viewer(_("Code de %s") % m["name"], lines)
 
     def show_validation(self):
         lines = []
@@ -933,7 +947,7 @@ class Editor(Popups):
                                    m["fr_name"] or m["name"], m["name"])
             lines.append((head, curses.A_BOLD))
             if not res:
-                lines.append(("   ✔ aucun problème",
+                lines.append((_("   ✔ aucun problème"),
                               self.colors.fg(curses.COLOR_GREEN, True)))
             for g, msg in res:
                 lines.append(("   %s %s" % ("✖" if g == "erreur" else "⚠",
@@ -943,8 +957,8 @@ class Editor(Popups):
                               self.colors.fg(curses.COLOR_YELLOW, True)))
             lines.append("")
         if not self.monsters:
-            lines = ["Aucun monstre dans le projet."]
-        self.viewer("Vérification : %d erreur(s)" % nerr, lines)
+            lines = [_("Aucun monstre dans le projet.")]
+        self.viewer(_("Vérification : %d erreur(s)") % nerr, lines)
         return nerr
 
     def show_compare(self):
@@ -955,10 +969,10 @@ class Editor(Popups):
         fr = self.fr_names()
         near = sorted(self.game(), key=lambda g: (abs(g["difficulty"] - d),
                                                   g["level"]))[:30]
-        lines = [("Monstres du jeu de difficulté proche de %d :" % d,
+        lines = [(_("Monstres du jeu de difficulté proche de %d :") % d,
                   curses.A_BOLD), "",
-                 "    nom                         niv  vit  CA  diff  "
-                 "dégâts max", ""]
+                 _("    nom                         niv  vit  CA  diff  "
+                 "dégâts max"), ""]
         for g in sorted(near, key=lambda g: g["difficulty"]):
             name = fr.get(g["name"], (g["name"],))[0]
             lines.append((" %s  %-27s %3d  %3d %3d  %4d  %5d" % (
@@ -968,7 +982,7 @@ class Editor(Popups):
         lines += ["", (" ▶ %-28s %3d  %3d %3d  %4d  %5d" % (
             (m["fr_name"] or m["name"])[:28], m["level"], m["move"],
             m["ac"], d, D.max_damage(m)), curses.A_BOLD)]
-        self.viewer("Comparaison", lines)
+        self.viewer(_("Comparaison"), lines)
 
     def show_side_by_side(self):
         """B : fiche comparée avec un autre monstre du projet ou du jeu."""
@@ -981,14 +995,17 @@ class Editor(Popups):
         items = [("%s %s" % (D.CLASS_CHAR.get(o["sym"], "?"),
                              (o.get("fr_name") or
                               fr.get(o["name"], (o["name"],))[0])),
-                  "%s, %s, niv %d" % (where, o["name"], o["level"]))
+                  _("%s, %s, niv %d") % ({"projet": _("projet"),
+                                          "jeu": _("jeu")}[where],
+                                         o["name"], o["level"]))
                  for o, where in others]
         # monstre d'origine d'un import (« soldier ant mk II »)
         base = re.sub(r" mk [IVX\d]+$", "", m["name"])
         cur = next((i for i, (o, w) in enumerate(others)
                     if w == "jeu" and o["name"] == base), 0)
         try:
-            i = self.menu("Comparer « %s » à…" % (m["fr_name"] or m["name"]),
+            i = self.menu(_("Comparer « %s » à…") % (m["fr_name"] or
+                                                     m["name"]),
                           items, cur)
         except Cancel:
             return
@@ -997,7 +1014,7 @@ class Editor(Popups):
             o = self.from_game(o)
         W = self.stdscr.getmaxyx()[1]
         lines, ndiff = self.compare_lines(m, o, min(W - 2, 110) - 4)
-        self.viewer("Fiche comparée : %d différence(s)" % ndiff, lines)
+        self.viewer(_("Fiche comparée : %d différence(s)") % ndiff, lines)
 
     def compare_lines(self, a, b, width):
         """Lignes de la fiche comparée (valeurs différentes en jaune) et
@@ -1032,24 +1049,25 @@ class Editor(Popups):
             ndiff += differ
             lines.append(row(f[2].strip(), self.field_value(a, f)[0],
                              self.field_value(b, f)[0], differ))
-        lines += ["", ("▸ Calculs", self.accent())]
-        for label, fn in (("Points de vie", hp_text),
-                          ("Dégâts max/tour", lambda m: str(D.max_damage(m)))):
+        lines += ["", (_("▸ Calculs"), self.accent())]
+        for label, fn in ((_("Points de vie"), hp_text),
+                          (_("Dégâts max/tour"),
+                           lambda m: str(D.max_damage(m)))):
             va, vb = fn(a), fn(b)
             lines.append(row(label, va, vb, va != vb))
         return lines, ndiff
 
     def help(self):
-        self.viewer("Aide", HELP)
+        self.viewer(_("Aide"), HELP)
 
     # --- sources -------------------------------------------------------------
 
     def check_src(self):
         err = I.check_tree(self.src)
         if err:
-            self.message_box("Sources introuvables", [
-                err, "", "Indiquez le dossier des sources avec --src ou "
-                "la variable NHMONEDIT_SRC."])
+            self.message_box(_("Sources introuvables"), [
+                err, "", _("Indiquez le dossier des sources avec --src ou "
+                "la variable NHMONEDIT_SRC.")])
             return False
         return True
 
@@ -1057,7 +1075,7 @@ class Editor(Popups):
         if not self.check_src():
             return
         if not self.monsters:
-            self.msg = "Aucun monstre à intégrer (R pour retirer)"
+            self.msg = _("Aucun monstre à intégrer (R pour retirer)")
             return
         errs = []
         for m in self.monsters:
@@ -1065,17 +1083,17 @@ class Editor(Popups):
                 if g == "erreur":
                     errs.append("%s : %s" % (m["name"], msg))
         if errs:
-            self.viewer("Intégration impossible : corrigez d'abord",
+            self.viewer(_("Intégration impossible : corrigez d'abord"),
                         errs)
             return
         try:
             files = I.plan(self.src, self.monsters)
         except I.InstallError as e:
-            self.message_box("Intégration impossible", [str(e)])
+            self.message_box(_("Intégration impossible"), [str(e)])
             return
         diff = I.diff(self.src, files)
         if not diff:
-            self.msg = "Les sources sont déjà à jour"
+            self.msg = _("Les sources sont déjà à jour")
             return
         lines = []
         for l in diff.split("\n"):
@@ -1083,15 +1101,15 @@ class Editor(Popups):
                 else self.colors.fg(curses.COLOR_RED) if l.startswith("-") \
                 else self.cyan() if l.startswith("@@") else 0
             lines.append((l, a))
-        self.viewer("Aperçu des changements (q pour continuer)", lines)
+        self.viewer(_("Aperçu des changements (q pour continuer)"), lines)
         changed = [r for r, t in files.items()
                    if open(os.path.join(self.src, r),
                            encoding="utf-8").read() != t]
-        if not self.confirm("Écrire dans les sources (%s) ?\n\n%s\n\n"
+        if not self.confirm(_("Écrire dans les sources (%s) ?\n\n%s\n\n"
                             "Une copie des fichiers va dans sauvegardes/."
                             "\nSi la liste des monstres change, EDITLEVEL "
                             "augmente :\nles anciennes sauvegardes ne se "
-                            "chargeront plus." % (
+                            "chargeront plus.") % (
                                 self.src, "\n".join("  " + c
                                                     for c in changed))):
             return
@@ -1100,24 +1118,24 @@ class Editor(Popups):
         self._inst = (None, {})
         if self.modified:
             self.save()
-        self.msg = "Intégré : %d fichier(s)%s — m pour compiler" % (
-            len(ch), ", EDITLEVEL %d" % lvl if lvl is not None else "")
+        self.msg = _("Intégré : %d fichier(s)%s — m pour compiler") % (
+            len(ch), _(", EDITLEVEL %d") % lvl if lvl is not None else "")
 
     def remove(self):
         if not self.check_src():
             return
         ids = I.installed_ids(self.src)
         if not ids:
-            self.msg = "Aucun monstre de l'éditeur dans les sources"
+            self.msg = _("Aucun monstre de l'éditeur dans les sources")
             return
-        if not self.confirm("Retirer des sources les %d monstres ajoutés "
-                            "par l'éditeur ?\n%s" % (len(ids), ", ".join(
+        if not self.confirm(_("Retirer des sources les %d monstres ajoutés "
+                            "par l'éditeur ?\n%s") % (len(ids), ", ".join(
                                 ids))):
             return
         ch, lvl, bk = I.uninstall(self.src, True, BACKUP_DIR)
         self._game = None
         self._inst = (None, {})
-        self.msg = "Retiré de %d fichier(s)" % len(ch)
+        self.msg = _("Retiré de %d fichier(s)") % len(ch)
 
     def run_external(self, title, cmd, cwd):
         """Lance une commande hors de curses, la sortie dans le terminal."""
@@ -1131,10 +1149,10 @@ class Editor(Popups):
         except KeyboardInterrupt:
             rc = -1
         color = "32" if rc == 0 else "31"
-        print("\n\033[1;%sm== terminé (code %d, %.0f s) ==\033[0m"
+        print(_("\n\033[1;%sm== terminé (code %d, %.0f s) ==\033[0m")
               % (color, rc, time.time() - t))
         try:
-            input("Entrée pour revenir à l'éditeur… ")
+            input(_("Entrée pour revenir à l'éditeur… "))
         except (EOFError, KeyboardInterrupt):
             pass
         curses.reset_prog_mode()
@@ -1147,27 +1165,27 @@ class Editor(Popups):
         if not self.check_src():
             return
         if not os.path.isfile(os.path.join(self.src, "Makefile")):
-            self.message_box("Sources non configurées", [
-                "Pas de Makefile : configurez d'abord les sources :",
+            self.message_box(_("Sources non configurées"), [
+                _("Pas de Makefile : configurez d'abord les sources :"),
                 "  cd sys/unix && sh setup.sh hints/linux.500"])
             return
         jobs = os.cpu_count() or 2
-        rc = self.run_external("compilation", "make -j%d" % jobs, self.src)
-        self.msg = "Compilation réussie — U pour mettre à jour le jeu" \
-            if rc == 0 else "La compilation a échoué (code %d)" % rc
+        rc = self.run_external(_("compilation"), "make -j%d" % jobs, self.src)
+        self.msg = _("Compilation réussie — U pour mettre à jour le jeu") \
+            if rc == 0 else _("La compilation a échoué (code %d)") % rc
 
     def make_update(self):
         if not self.check_src():
             return
         if not self.confirm(
-                "Mettre à jour le jeu installé (make update) ?\n\n"
+                _("Mettre à jour le jeu installé (make update) ?\n\n"
                 "sysconf, scores et dossier save sont conservés ;\n"
-                "le jeu précédent est gardé en nethack.old."):
+                "le jeu précédent est gardé en nethack.old.")):
             return
-        rc = self.run_external("mise à jour du jeu", "make update",
+        rc = self.run_external(_("mise à jour du jeu"), "make update",
                                self.src)
-        self.msg = "Jeu mis à jour — j pour l'essayer" if rc == 0 \
-            else "make update a échoué (code %d)" % rc
+        self.msg = _("Jeu mis à jour — j pour l'essayer") if rc == 0 \
+            else _("make update a échoué (code %d)") % rc
 
     def hackdir(self):
         for d in HACKDIRS:
@@ -1178,9 +1196,9 @@ class Editor(Popups):
     def play(self):
         d = self.hackdir()
         if not d:
-            self.message_box("Jeu introuvable", [
-                "Pas d'exécutable nethack installé. Compilez (m) puis",
-                "mettez à jour le jeu (U), ou indiquez son dossier avec",
+            self.message_box(_("Jeu introuvable"), [
+                _("Pas d'exécutable nethack installé. Compilez (m) puis"),
+                _("mettez à jour le jeu (U), ou indiquez son dossier avec"),
                 "NHMONEDIT_HACKDIR."])
             return
         exe = os.path.join(d, "nethack")
@@ -1189,19 +1207,19 @@ class Editor(Popups):
                  os.path.getmtime(os.path.join(self.src, p)) >
                  os.path.getmtime(exe)]
         names = [m["name"] for m in self.monsters]
-        lines = ["Mode wizard : Ctrl-G (créer un monstre), puis tapez le",
-                 "nom ANGLAIS du monstre. « ; » pour le regarder.", ""]
+        lines = [_("Mode wizard : Ctrl-G (créer un monstre), puis tapez le"),
+                 _("nom ANGLAIS du monstre. « ; » pour le regarder."), ""]
         if names:
-            lines += ["Vos monstres : " + ", ".join(names[:6]) +
+            lines += [_("Vos monstres : ") + ", ".join(names[:6]) +
                       ("…" if len(names) > 6 else ""), ""]
         if newer:
-            lines += ["⚠ Le jeu installé est plus ancien que monsters.h :",
-                      "  compilez (m) et mettez à jour (U) d'abord.", ""]
-        lines += ["Lancer le jeu maintenant ?"]
-        if not self.confirm("\n".join(lines), "Essayer en jeu"):
+            lines += [_("⚠ Le jeu installé est plus ancien que monsters.h :"),
+                      _("  compilez (m) et mettez à jour (U) d'abord."), ""]
+        lines += [_("Lancer le jeu maintenant ?")]
+        if not self.confirm("\n".join(lines), _("Essayer en jeu")):
             return
         cmd = "HACKDIR=%s %s -D" % (shlex.quote(d), shlex.quote(exe))
-        self.run_external("NetHack (mode wizard)", cmd, d)
+        self.run_external(_("NetHack (mode wizard)"), cmd, d)
 
     # --- souris -------------------------------------------------------------
 
@@ -1244,10 +1262,10 @@ class Editor(Popups):
         if not self.modified:
             return True
         try:
-            i = self.menu("Projet modifié", [
-                ("Enregistrer et quitter", ""),
-                ("Quitter sans enregistrer", ""),
-                ("Annuler", "")], filterable=False)
+            i = self.menu(_("Projet modifié"), [
+                (_("Enregistrer et quitter"), ""),
+                (_("Quitter sans enregistrer"), ""),
+                (_("Annuler"), "")], filterable=False)
         except Cancel:
             return False
         if i == 0:
@@ -1380,14 +1398,14 @@ def parse_args(argv):
     while args:
         a = args.pop(0)
         if a in ("-h", "--help"):
-            print(__doc__.strip())
+            print(_(__doc__.strip()))
             sys.exit(0)
         elif a == "--src" and args:
             src = args.pop(0)
         elif a.startswith("--src="):
             src = a.split("=", 1)[1]
         elif a.startswith("-"):
-            sys.exit("Option inconnue : %s (voir --help)" % a)
+            sys.exit(_("Option inconnue : %s (voir --help)") % a)
         else:
             project = a
     return os.path.abspath(project), os.path.abspath(src)

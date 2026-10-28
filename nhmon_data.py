@@ -9,142 +9,144 @@ src/mondata.c), génération du code C et vérification des valeurs.
 import copy
 import re
 
+from nhmon_i18n import LANG, _
+
 NATTK = 6
 
 # --- classes de monstres (defsym.h : MONSYM) ---------------------------
 # (S_nom, caractère, description)
 CLASSES = [
-    ("S_ANT", "a", "fourmi ou insecte"),
-    ("S_BLOB", "b", "blob"),
-    ("S_COCKATRICE", "c", "cocatrix"),
-    ("S_DOG", "d", "chien ou canidé"),
-    ("S_EYE", "e", "œil ou sphère (caméras, sondes)"),
-    ("S_FELINE", "f", "félin"),
-    ("S_GREMLIN", "g", "gremlin"),
-    ("S_HUMANOID", "h", "petit humanoïde"),
-    ("S_IMP", "i", "diablotin ou démon mineur"),
-    ("S_JELLY", "j", "gelée"),
-    ("S_KOBOLD", "k", "kobold"),
-    ("S_LEPRECHAUN", "l", "leprechaun"),
-    ("S_MIMIC", "m", "mimique"),
-    ("S_NYMPH", "n", "nymphe"),
-    ("S_ORC", "o", "orque"),
-    ("S_PIERCER", "p", "perceur"),
-    ("S_QUADRUPED", "q", "quadrupède"),
-    ("S_RODENT", "r", "rongeur"),
-    ("S_SPIDER", "s", "arachnide (araignées mécaniques)"),
-    ("S_TRAPPER", "t", "piégeur"),
-    ("S_UNICORN", "u", "licorne ou cheval"),
-    ("S_VORTEX", "v", "vortex"),
-    ("S_WORM", "w", "ver"),
-    ("S_XAN", "x", "xan ou insecte fantastique"),
-    ("S_LIGHT", "y", "lumière"),
-    ("S_ZRUTY", "z", "zruty"),
-    ("S_ANGEL", "A", "être angélique"),
-    ("S_BAT", "B", "chauve-souris ou oiseau (drones volants)"),
-    ("S_CENTAUR", "C", "centaure"),
-    ("S_DRAGON", "D", "dragon"),
-    ("S_ELEMENTAL", "E", "élémentaire"),
-    ("S_FUNGUS", "F", "champignon ou moisissure"),
-    ("S_GNOME", "G", "gnome"),
-    ("S_GIANT", "H", "humanoïde géant (mechas)"),
-    ("S_JABBERWOCK", "J", "jabberwock"),
-    ("S_KOP", "K", "Kop"),
-    ("S_LICH", "L", "liche"),
-    ("S_MUMMY", "M", "momie"),
-    ("S_NAGA", "N", "naga"),
-    ("S_OGRE", "O", "ogre"),
-    ("S_PUDDING", "P", "pudding"),
-    ("S_QUANTMECH", "Q", "mécanicien quantique"),
-    ("S_RUSTMONST", "R", "monstre de rouille"),
-    ("S_SNAKE", "S", "serpent"),
-    ("S_TROLL", "T", "troll"),
-    ("S_UMBER", "U", "umber hulk"),
-    ("S_VAMPIRE", "V", "vampire"),
-    ("S_WRAITH", "W", "spectre"),
-    ("S_XORN", "X", "xorn"),
-    ("S_YETI", "Y", "simiesque"),
-    ("S_ZOMBIE", "Z", "zombie"),
-    ("S_HUMAN", "@", "humain ou elfe (androïdes)"),
-    ("S_GHOST", " ", "fantôme"),
-    ("S_GOLEM", "'", "golem (robots : PV fixes)"),
-    ("S_DEMON", "&", "démon majeur"),
-    ("S_EEL", ";", "monstre marin"),
-    ("S_LIZARD", ":", "lézard"),
-    ("S_WORM_TAIL", "~", "queue de ver (interne)"),
+    ("S_ANT", "a", _("fourmi ou insecte")),
+    ("S_BLOB", "b", _("blob")),
+    ("S_COCKATRICE", "c", _("cocatrix")),
+    ("S_DOG", "d", _("chien ou canidé")),
+    ("S_EYE", "e", _("œil ou sphère (caméras, sondes)")),
+    ("S_FELINE", "f", _("félin")),
+    ("S_GREMLIN", "g", _("gremlin")),
+    ("S_HUMANOID", "h", _("petit humanoïde")),
+    ("S_IMP", "i", _("diablotin ou démon mineur")),
+    ("S_JELLY", "j", _("gelée")),
+    ("S_KOBOLD", "k", _("kobold")),
+    ("S_LEPRECHAUN", "l", _("leprechaun")),
+    ("S_MIMIC", "m", _("mimique")),
+    ("S_NYMPH", "n", _("nymphe")),
+    ("S_ORC", "o", _("orque")),
+    ("S_PIERCER", "p", _("perceur")),
+    ("S_QUADRUPED", "q", _("quadrupède")),
+    ("S_RODENT", "r", _("rongeur")),
+    ("S_SPIDER", "s", _("arachnide (araignées mécaniques)")),
+    ("S_TRAPPER", "t", _("piégeur")),
+    ("S_UNICORN", "u", _("licorne ou cheval")),
+    ("S_VORTEX", "v", _("vortex")),
+    ("S_WORM", "w", _("ver")),
+    ("S_XAN", "x", _("xan ou insecte fantastique")),
+    ("S_LIGHT", "y", _("lumière")),
+    ("S_ZRUTY", "z", _("zruty")),
+    ("S_ANGEL", "A", _("être angélique")),
+    ("S_BAT", "B", _("chauve-souris ou oiseau (drones volants)")),
+    ("S_CENTAUR", "C", _("centaure")),
+    ("S_DRAGON", "D", _("dragon")),
+    ("S_ELEMENTAL", "E", _("élémentaire")),
+    ("S_FUNGUS", "F", _("champignon ou moisissure")),
+    ("S_GNOME", "G", _("gnome")),
+    ("S_GIANT", "H", _("humanoïde géant (mechas)")),
+    ("S_JABBERWOCK", "J", _("jabberwock")),
+    ("S_KOP", "K", _("Kop")),
+    ("S_LICH", "L", _("liche")),
+    ("S_MUMMY", "M", _("momie")),
+    ("S_NAGA", "N", _("naga")),
+    ("S_OGRE", "O", _("ogre")),
+    ("S_PUDDING", "P", _("pudding")),
+    ("S_QUANTMECH", "Q", _("mécanicien quantique")),
+    ("S_RUSTMONST", "R", _("monstre de rouille")),
+    ("S_SNAKE", "S", _("serpent")),
+    ("S_TROLL", "T", _("troll")),
+    ("S_UMBER", "U", _("umber hulk")),
+    ("S_VAMPIRE", "V", _("vampire")),
+    ("S_WRAITH", "W", _("spectre")),
+    ("S_XORN", "X", _("xorn")),
+    ("S_YETI", "Y", _("simiesque")),
+    ("S_ZOMBIE", "Z", _("zombie")),
+    ("S_HUMAN", "@", _("humain ou elfe (androïdes)")),
+    ("S_GHOST", " ", _("fantôme")),
+    ("S_GOLEM", "'", _("golem (robots : PV fixes)")),
+    ("S_DEMON", "&", _("démon majeur")),
+    ("S_EEL", ";", _("monstre marin")),
+    ("S_LIZARD", ":", _("lézard")),
+    ("S_WORM_TAIL", "~", _("queue de ver (interne)")),
 ]
 CLASS_CHAR = {s: c for s, c, _ in CLASSES}
 
 # --- attaques (monattk.h) ----------------------------------------------
 ATTACK_TYPES = [
-    ("AT_NONE", 0, "passive (riposte au contact)"),
-    ("AT_CLAW", 1, "griffe / coup de poing"),
-    ("AT_BITE", 2, "morsure / mâchoire"),
-    ("AT_KICK", 3, "coup de pied"),
-    ("AT_BUTT", 4, "coup de tête / bélier"),
-    ("AT_TUCH", 5, "contact"),
-    ("AT_STNG", 6, "dard / aiguille"),
-    ("AT_HUGS", 7, "étreinte (pince broyeuse)"),
-    ("AT_SPIT", 10, "crachat (à distance)"),
-    ("AT_ENGL", 11, "engloutit"),
-    ("AT_BREA", 12, "souffle (lance-flammes, à distance)"),
-    ("AT_EXPL", 13, "explose au contact (kamikaze)"),
-    ("AT_BOOM", 14, "explose à sa destruction"),
-    ("AT_GAZE", 15, "regard (laser optique, à distance)"),
-    ("AT_TENT", 16, "tentacules (câbles)"),
-    ("AT_WEAP", 254, "arme (avec des mains)"),
-    ("AT_MAGC", 255, "sort (piratage)"),
+    ("AT_NONE", 0, _("passive (riposte au contact)")),
+    ("AT_CLAW", 1, _("griffe / coup de poing")),
+    ("AT_BITE", 2, _("morsure / mâchoire")),
+    ("AT_KICK", 3, _("coup de pied")),
+    ("AT_BUTT", 4, _("coup de tête / bélier")),
+    ("AT_TUCH", 5, _("contact")),
+    ("AT_STNG", 6, _("dard / aiguille")),
+    ("AT_HUGS", 7, _("étreinte (pince broyeuse)")),
+    ("AT_SPIT", 10, _("crachat (à distance)")),
+    ("AT_ENGL", 11, _("engloutit")),
+    ("AT_BREA", 12, _("souffle (lance-flammes, à distance)")),
+    ("AT_EXPL", 13, _("explose au contact (kamikaze)")),
+    ("AT_BOOM", 14, _("explose à sa destruction")),
+    ("AT_GAZE", 15, _("regard (laser optique, à distance)")),
+    ("AT_TENT", 16, _("tentacules (câbles)")),
+    ("AT_WEAP", 254, _("arme (avec des mains)")),
+    ("AT_MAGC", 255, _("sort (piratage)")),
 ]
 DAMAGE_TYPES = [
-    ("AD_PHYS", 0, "physique"),
-    ("AD_MAGM", 1, "projectiles magiques"),
-    ("AD_FIRE", 2, "feu"),
-    ("AD_COLD", 3, "froid (cryogénie)"),
-    ("AD_SLEE", 4, "sommeil (sédatif)"),
-    ("AD_DISN", 5, "désintégration"),
-    ("AD_ELEC", 6, "électricité"),
-    ("AD_DRST", 7, "poison (draine la force)"),
-    ("AD_ACID", 8, "acide"),
-    ("AD_SPC1", 9, "spécial 1 (inutilisé)"),
-    ("AD_SPC2", 10, "spécial 2 (inutilisé)"),
-    ("AD_BLND", 11, "aveugle (flash)"),
-    ("AD_STUN", 12, "étourdit"),
-    ("AD_SLOW", 13, "ralentit"),
-    ("AD_PLYS", 14, "paralyse (taser)"),
-    ("AD_DRLI", 15, "draine les niveaux"),
-    ("AD_DREN", 16, "draine l'énergie"),
-    ("AD_LEGS", 17, "blesse les jambes"),
-    ("AD_STON", 18, "pétrifie"),
-    ("AD_STCK", 19, "colle (aimant, grappin)"),
-    ("AD_SGLD", 20, "vole l'argent"),
-    ("AD_SITM", 21, "vole un objet"),
-    ("AD_SEDU", 22, "séduit et vole"),
-    ("AD_TLPT", 23, "téléporte"),
-    ("AD_RUST", 24, "rouille l'armure"),
-    ("AD_CONF", 25, "rend confus (brouillage)"),
-    ("AD_DGST", 26, "digère"),
-    ("AD_HEAL", 27, "soigne (robot médical)"),
-    ("AD_WRAP", 28, "enserre (noie)"),
-    ("AD_WERE", 29, "lycanthropie"),
-    ("AD_DRDX", 30, "draine la dextérité"),
-    ("AD_DRCO", 31, "draine la constitution"),
-    ("AD_DRIN", 32, "draine l'intelligence"),
-    ("AD_DISE", 33, "maladie"),
-    ("AD_DCAY", 34, "pourrit l'organique"),
-    ("AD_SSEX", 35, "séduction étendue"),
-    ("AD_HALU", 36, "hallucinations"),
-    ("AD_DETH", 37, "Mort (cavalier)"),
-    ("AD_PEST", 38, "Pestilence (cavalier)"),
-    ("AD_FAMN", 39, "Famine (cavalier)"),
-    ("AD_SLIM", 40, "change en slime"),
-    ("AD_ENCH", 41, "désenchante"),
-    ("AD_CORR", 42, "corrode l'armure"),
-    ("AD_POLY", 43, "polymorphe"),
-    ("AD_CLRC", 240, "sort de prêtre au hasard"),
-    ("AD_SPEL", 241, "sort de mage au hasard"),
-    ("AD_RBRE", 242, "souffle au hasard"),
-    ("AD_SAMU", 252, "frappe, vole l'Amulette"),
-    ("AD_CURS", 253, "malédiction (gremlin)"),
+    ("AD_PHYS", 0, _("physique")),
+    ("AD_MAGM", 1, _("projectiles magiques")),
+    ("AD_FIRE", 2, _("feu")),
+    ("AD_COLD", 3, _("froid (cryogénie)")),
+    ("AD_SLEE", 4, _("sommeil (sédatif)")),
+    ("AD_DISN", 5, _("désintégration")),
+    ("AD_ELEC", 6, _("électricité")),
+    ("AD_DRST", 7, _("poison (draine la force)")),
+    ("AD_ACID", 8, _("acide")),
+    ("AD_SPC1", 9, _("spécial 1 (inutilisé)")),
+    ("AD_SPC2", 10, _("spécial 2 (inutilisé)")),
+    ("AD_BLND", 11, _("aveugle (flash)")),
+    ("AD_STUN", 12, _("étourdit")),
+    ("AD_SLOW", 13, _("ralentit")),
+    ("AD_PLYS", 14, _("paralyse (taser)")),
+    ("AD_DRLI", 15, _("draine les niveaux")),
+    ("AD_DREN", 16, _("draine l'énergie")),
+    ("AD_LEGS", 17, _("blesse les jambes")),
+    ("AD_STON", 18, _("pétrifie")),
+    ("AD_STCK", 19, _("colle (aimant, grappin)")),
+    ("AD_SGLD", 20, _("vole l'argent")),
+    ("AD_SITM", 21, _("vole un objet")),
+    ("AD_SEDU", 22, _("séduit et vole")),
+    ("AD_TLPT", 23, _("téléporte")),
+    ("AD_RUST", 24, _("rouille l'armure")),
+    ("AD_CONF", 25, _("rend confus (brouillage)")),
+    ("AD_DGST", 26, _("digère")),
+    ("AD_HEAL", 27, _("soigne (robot médical)")),
+    ("AD_WRAP", 28, _("enserre (noie)")),
+    ("AD_WERE", 29, _("lycanthropie")),
+    ("AD_DRDX", 30, _("draine la dextérité")),
+    ("AD_DRCO", 31, _("draine la constitution")),
+    ("AD_DRIN", 32, _("draine l'intelligence")),
+    ("AD_DISE", 33, _("maladie")),
+    ("AD_DCAY", 34, _("pourrit l'organique")),
+    ("AD_SSEX", 35, _("séduction étendue")),
+    ("AD_HALU", 36, _("hallucinations")),
+    ("AD_DETH", 37, _("Mort (cavalier)")),
+    ("AD_PEST", 38, _("Pestilence (cavalier)")),
+    ("AD_FAMN", 39, _("Famine (cavalier)")),
+    ("AD_SLIM", 40, _("change en slime")),
+    ("AD_ENCH", 41, _("désenchante")),
+    ("AD_CORR", 42, _("corrode l'armure")),
+    ("AD_POLY", 43, _("polymorphe")),
+    ("AD_CLRC", 240, _("sort de prêtre au hasard")),
+    ("AD_SPEL", 241, _("sort de mage au hasard")),
+    ("AD_RBRE", 242, _("souffle au hasard")),
+    ("AD_SAMU", 252, _("frappe, vole l'Amulette")),
+    ("AD_CURS", 253, _("malédiction (gremlin)")),
 ]
 AT_VALUE = {n: v for n, v, _ in ATTACK_TYPES}
 AD_VALUE = {n: v for n, v, _ in DAMAGE_TYPES}
@@ -155,38 +157,38 @@ NO_ATTK = ["AT_NONE", "AD_PHYS", 0, 0]
 
 # --- sons, tailles (monflag.h) -----------------------------------------
 SOUNDS = [
-    ("MS_SILENT", 0, "silencieux"), ("MS_BARK", 1, "aboie"),
-    ("MS_MEW", 2, "miaule"), ("MS_ROAR", 3, "rugit"),
-    ("MS_BELLOW", 4, "mugit"), ("MS_GROWL", 5, "grogne"),
-    ("MS_SQEEK", 6, "couine"), ("MS_SQAWK", 7, "piaille"),
-    ("MS_CHIRP", 8, "pépie"), ("MS_HISS", 9, "siffle (vapeur)"),
-    ("MS_BUZZ", 10, "bourdonne (rotors)"),
-    ("MS_GRUNT", 11, "grogne (langage)"), ("MS_NEIGH", 12, "hennit"),
-    ("MS_MOO", 13, "meugle"), ("MS_WAIL", 14, "gémit"),
-    ("MS_GURGLE", 15, "gargouille"), ("MS_BURBLE", 16, "glougloute"),
-    ("MS_TRUMPET", 17, "barrit"), ("MS_SHRIEK", 18, "hurle (alarme)"),
-    ("MS_BONES", 19, "cliquette"), ("MS_LAUGH", 20, "rit"),
-    ("MS_MUMBLE", 21, "marmonne"), ("MS_IMITATE", 22, "imite"),
-    ("MS_WERE", 23, "lycanthrope"), ("MS_ORC", 24, "brute"),
-    ("MS_HUMANOID", 25, "parle (humanoïde)"),
-    ("MS_ARREST", 26, "« Halte, police ! »"),
-    ("MS_SOLDIER", 27, "soldat"), ("MS_GUARD", 28, "garde"),
-    ("MS_DJINNI", 29, "djinn"), ("MS_NURSE", 30, "infirmière"),
-    ("MS_SEDUCE", 31, "séduit"), ("MS_VAMPIRE", 32, "vampire"),
-    ("MS_BRIBE", 33, "réclame de l'argent"), ("MS_CUSS", 34, "insulte"),
-    ("MS_RIDER", 35, "cavalier"), ("MS_LEADER", 36, "chef de quête"),
-    ("MS_NEMESIS", 37, "némésis"), ("MS_GUARDIAN", 38, "gardien"),
-    ("MS_SELL", 39, "vend"), ("MS_ORACLE", 40, "oracle"),
-    ("MS_PRIEST", 41, "prêtre"), ("MS_SPELL", 42, "lanceur de sorts"),
-    ("MS_BOAST", 43, "se vante (géant)"), ("MS_GROAN", 44, "geint"),
+    ("MS_SILENT", 0, _("silencieux")), ("MS_BARK", 1, _("aboie")),
+    ("MS_MEW", 2, _("miaule")), ("MS_ROAR", 3, _("rugit")),
+    ("MS_BELLOW", 4, _("mugit")), ("MS_GROWL", 5, _("grogne")),
+    ("MS_SQEEK", 6, _("couine")), ("MS_SQAWK", 7, _("piaille")),
+    ("MS_CHIRP", 8, _("pépie")), ("MS_HISS", 9, _("siffle (vapeur)")),
+    ("MS_BUZZ", 10, _("bourdonne (rotors)")),
+    ("MS_GRUNT", 11, _("grogne (langage)")), ("MS_NEIGH", 12, _("hennit")),
+    ("MS_MOO", 13, _("meugle")), ("MS_WAIL", 14, _("gémit")),
+    ("MS_GURGLE", 15, _("gargouille")), ("MS_BURBLE", 16, _("glougloute")),
+    ("MS_TRUMPET", 17, _("barrit")), ("MS_SHRIEK", 18, _("hurle (alarme)")),
+    ("MS_BONES", 19, _("cliquette")), ("MS_LAUGH", 20, _("rit")),
+    ("MS_MUMBLE", 21, _("marmonne")), ("MS_IMITATE", 22, _("imite")),
+    ("MS_WERE", 23, _("lycanthrope")), ("MS_ORC", 24, _("brute")),
+    ("MS_HUMANOID", 25, _("parle (humanoïde)")),
+    ("MS_ARREST", 26, _("« Halte, police ! »")),
+    ("MS_SOLDIER", 27, _("soldat")), ("MS_GUARD", 28, _("garde")),
+    ("MS_DJINNI", 29, _("djinn")), ("MS_NURSE", 30, _("infirmière")),
+    ("MS_SEDUCE", 31, _("séduit")), ("MS_VAMPIRE", 32, _("vampire")),
+    ("MS_BRIBE", 33, _("réclame de l'argent")), ("MS_CUSS", 34, _("insulte")),
+    ("MS_RIDER", 35, _("cavalier")), ("MS_LEADER", 36, _("chef de quête")),
+    ("MS_NEMESIS", 37, _("némésis")), ("MS_GUARDIAN", 38, _("gardien")),
+    ("MS_SELL", 39, _("vend")), ("MS_ORACLE", 40, _("oracle")),
+    ("MS_PRIEST", 41, _("prêtre")), ("MS_SPELL", 42, _("lanceur de sorts")),
+    ("MS_BOAST", 43, _("se vante (géant)")), ("MS_GROAN", 44, _("geint")),
 ]
 SIZES = [
-    ("MZ_TINY", 0, "minuscule (< 60 cm)"),
-    ("MZ_SMALL", 1, "petit (60 cm - 1,20 m)"),
-    ("MZ_MEDIUM", 2, "moyen (taille humaine)"),
-    ("MZ_LARGE", 3, "grand (2 - 3,60 m)"),
-    ("MZ_HUGE", 4, "énorme (3,60 - 7,50 m)"),
-    ("MZ_GIGANTIC", 7, "gigantesque"),
+    ("MZ_TINY", 0, _("minuscule (< 60 cm)")),
+    ("MZ_SMALL", 1, _("petit (60 cm - 1,20 m)")),
+    ("MZ_MEDIUM", 2, _("moyen (taille humaine)")),
+    ("MZ_LARGE", 3, _("grand (2 - 3,60 m)")),
+    ("MZ_HUGE", 4, _("énorme (3,60 - 7,50 m)")),
+    ("MZ_GIGANTIC", 7, _("gigantesque")),
 ]
 SIZE_ALIAS = {"MZ_HUMAN": "MZ_MEDIUM"}
 
@@ -206,21 +208,21 @@ COLORS = [
 ]
 COLOR_VALUE = dict(COLORS)
 COLOR_FR = {
-    "CLR_BLACK": "noir (bleu foncé)", "CLR_RED": "rouge",
-    "CLR_GREEN": "vert", "CLR_BROWN": "brun", "CLR_BLUE": "bleu",
-    "CLR_MAGENTA": "magenta", "CLR_CYAN": "cyan", "CLR_GRAY": "gris",
-    "CLR_ORANGE": "orange", "CLR_BRIGHT_GREEN": "vert vif",
-    "CLR_YELLOW": "jaune", "CLR_BRIGHT_BLUE": "bleu vif",
-    "CLR_BRIGHT_MAGENTA": "magenta vif (néon)",
-    "CLR_BRIGHT_CYAN": "cyan vif (néon)", "CLR_WHITE": "blanc",
-    "HI_DOMESTIC": "domestique (blanc)", "HI_LORD": "seigneur (magenta)",
-    "HI_OVERLORD": "suzerain (magenta vif)", "HI_METAL": "métal (cyan)",
-    "HI_COPPER": "cuivre (jaune)", "HI_SILVER": "argent (gris)",
-    "HI_GOLD": "or (jaune)", "HI_LEATHER": "cuir (brun)",
-    "HI_CLOTH": "tissu (brun)", "HI_ORGANIC": "organique (brun)",
-    "HI_WOOD": "bois (brun)", "HI_PAPER": "papier (blanc)",
-    "HI_GLASS": "verre (cyan vif)", "HI_MINERAL": "minéral (gris)",
-    "HI_ZAP": "rayon (bleu vif)", "DRAGON_SILVER": "argent (cyan vif)",
+    "CLR_BLACK": _("noir (bleu foncé)"), "CLR_RED": _("rouge"),
+    "CLR_GREEN": _("vert"), "CLR_BROWN": _("brun"), "CLR_BLUE": _("bleu"),
+    "CLR_MAGENTA": _("magenta"), "CLR_CYAN": _("cyan"), "CLR_GRAY": _("gris"),
+    "CLR_ORANGE": _("orange"), "CLR_BRIGHT_GREEN": _("vert vif"),
+    "CLR_YELLOW": _("jaune"), "CLR_BRIGHT_BLUE": _("bleu vif"),
+    "CLR_BRIGHT_MAGENTA": _("magenta vif (néon)"),
+    "CLR_BRIGHT_CYAN": _("cyan vif (néon)"), "CLR_WHITE": _("blanc"),
+    "HI_DOMESTIC": _("domestique (blanc)"), "HI_LORD": _("seigneur (magenta)"),
+    "HI_OVERLORD": _("suzerain (magenta vif)"), "HI_METAL": _("métal (cyan)"),
+    "HI_COPPER": _("cuivre (jaune)"), "HI_SILVER": _("argent (gris)"),
+    "HI_GOLD": _("or (jaune)"), "HI_LEATHER": _("cuir (brun)"),
+    "HI_CLOTH": _("tissu (brun)"), "HI_ORGANIC": _("organique (brun)"),
+    "HI_WOOD": _("bois (brun)"), "HI_PAPER": _("papier (blanc)"),
+    "HI_GLASS": _("verre (cyan vif)"), "HI_MINERAL": _("minéral (gris)"),
+    "HI_ZAP": _("rayon (bleu vif)"), "DRAGON_SILVER": _("argent (cyan vif)"),
 }
 
 # --- poids nommés (weight.h) -------------------------------------------
@@ -231,106 +233,106 @@ WEIGHTS = {
 
 # --- résistances (MR_*), conférées en mangeant le cadavre ---------------
 RESISTS = [
-    ("MR_FIRE", 0x01, "feu"), ("MR_COLD", 0x02, "froid"),
-    ("MR_SLEEP", 0x04, "sommeil"), ("MR_DISINT", 0x08, "désintégration"),
-    ("MR_ELEC", 0x10, "électricité"), ("MR_POISON", 0x20, "poison"),
-    ("MR_ACID", 0x40, "acide"), ("MR_STONE", 0x80, "pétrification"),
+    ("MR_FIRE", 0x01, _("feu")), ("MR_COLD", 0x02, _("froid")),
+    ("MR_SLEEP", 0x04, _("sommeil")), ("MR_DISINT", 0x08, _("désintégration")),
+    ("MR_ELEC", 0x10, _("électricité")), ("MR_POISON", 0x20, _("poison")),
+    ("MR_ACID", 0x40, _("acide")), ("MR_STONE", 0x80, _("pétrification")),
 ]
 
 # --- génération (G_*) ---------------------------------------------------
 GENFLAGS = [
-    ("G_UNIQ", 0x1000, "unique (créé une seule fois)"),
-    ("G_NOHELL", 0x0800, "jamais dans la Géhenne"),
-    ("G_HELL", 0x0400, "seulement dans la Géhenne"),
-    ("G_NOGEN", 0x0200, "jamais au hasard (niveaux spéciaux)"),
-    ("G_SGROUP", 0x0080, "en petits groupes"),
-    ("G_LGROUP", 0x0040, "en grands groupes"),
-    ("G_GENO", 0x0020, "peut être génocidé"),
-    ("G_NOCORPSE", 0x0010, "ne laisse pas de cadavre (épave)"),
+    ("G_UNIQ", 0x1000, _("unique (créé une seule fois)")),
+    ("G_NOHELL", 0x0800, _("jamais dans la Géhenne")),
+    ("G_HELL", 0x0400, _("seulement dans la Géhenne")),
+    ("G_NOGEN", 0x0200, _("jamais au hasard (niveaux spéciaux)")),
+    ("G_SGROUP", 0x0080, _("en petits groupes")),
+    ("G_LGROUP", 0x0040, _("en grands groupes")),
+    ("G_GENO", 0x0020, _("peut être génocidé")),
+    ("G_NOCORPSE", 0x0010, _("ne laisse pas de cadavre (épave)")),
 ]
 
 # --- drapeaux M1, M2, M3 ------------------------------------------------
 FLAGS1 = [
-    ("M1_FLY", 0x00000001, "vole ou flotte"),
-    ("M1_SWIM", 0x00000002, "traverse l'eau"),
-    ("M1_AMORPHOUS", 0x00000004, "passe sous les portes"),
-    ("M1_WALLWALK", 0x00000008, "traverse la roche"),
-    ("M1_CLING", 0x00000010, "s'accroche au plafond"),
-    ("M1_TUNNEL", 0x00000020, "creuse la roche (foreuse)"),
-    ("M1_NEEDPICK", 0x00000040, "creuse avec une pioche"),
-    ("M1_CONCEAL", 0x00000080, "se cache sous les objets"),
-    ("M1_HIDE", 0x00000100, "se camoufle (plafond)"),
-    ("M1_AMPHIBIOUS", 0x00000200, "survit sous l'eau"),
-    ("M1_BREATHLESS", 0x00000400, "ne respire pas"),
-    ("M1_NOTAKE", 0x00000800, "ne ramasse rien"),
-    ("M1_NOEYES", 0x00001000, "sans yeux (capteurs)"),
-    ("M1_NOHANDS", 0x00002000, "sans mains"),
-    ("M1_NOLIMBS", 0x00006000, "sans membres (inclut sans mains)"),
-    ("M1_NOHEAD", 0x00008000, "sans tête"),
-    ("M1_MINDLESS", 0x00010000, "sans esprit (automate)"),
-    ("M1_HUMANOID", 0x00020000, "corps humanoïde"),
-    ("M1_ANIMAL", 0x00040000, "corps animal"),
-    ("M1_SLITHY", 0x00080000, "corps serpentin"),
-    ("M1_UNSOLID", 0x00100000, "sans corps solide (hologramme)"),
-    ("M1_THICK_HIDE", 0x00200000, "blindé (peau épaisse)"),
-    ("M1_OVIPAROUS", 0x00400000, "pond des œufs"),
-    ("M1_REGEN", 0x00800000, "se régénère (nanites)"),
-    ("M1_SEE_INVIS", 0x01000000, "voit l'invisible"),
-    ("M1_TPORT", 0x02000000, "se téléporte"),
-    ("M1_TPORT_CNTRL", 0x04000000, "contrôle la téléportation"),
-    ("M1_ACID", 0x08000000, "acide à manger"),
-    ("M1_POIS", 0x10000000, "toxique à manger"),
-    ("M1_CARNIVORE", 0x20000000, "carnivore"),
-    ("M1_HERBIVORE", 0x40000000, "herbivore"),
-    ("M1_OMNIVORE", 0x60000000, "omnivore (carnivore + herbivore)"),
-    ("M1_METALLIVORE", 0x80000000, "mange le métal (recycleur)"),
+    ("M1_FLY", 0x00000001, _("vole ou flotte")),
+    ("M1_SWIM", 0x00000002, _("traverse l'eau")),
+    ("M1_AMORPHOUS", 0x00000004, _("passe sous les portes")),
+    ("M1_WALLWALK", 0x00000008, _("traverse la roche")),
+    ("M1_CLING", 0x00000010, _("s'accroche au plafond")),
+    ("M1_TUNNEL", 0x00000020, _("creuse la roche (foreuse)")),
+    ("M1_NEEDPICK", 0x00000040, _("creuse avec une pioche")),
+    ("M1_CONCEAL", 0x00000080, _("se cache sous les objets")),
+    ("M1_HIDE", 0x00000100, _("se camoufle (plafond)")),
+    ("M1_AMPHIBIOUS", 0x00000200, _("survit sous l'eau")),
+    ("M1_BREATHLESS", 0x00000400, _("ne respire pas")),
+    ("M1_NOTAKE", 0x00000800, _("ne ramasse rien")),
+    ("M1_NOEYES", 0x00001000, _("sans yeux (capteurs)")),
+    ("M1_NOHANDS", 0x00002000, _("sans mains")),
+    ("M1_NOLIMBS", 0x00006000, _("sans membres (inclut sans mains)")),
+    ("M1_NOHEAD", 0x00008000, _("sans tête")),
+    ("M1_MINDLESS", 0x00010000, _("sans esprit (automate)")),
+    ("M1_HUMANOID", 0x00020000, _("corps humanoïde")),
+    ("M1_ANIMAL", 0x00040000, _("corps animal")),
+    ("M1_SLITHY", 0x00080000, _("corps serpentin")),
+    ("M1_UNSOLID", 0x00100000, _("sans corps solide (hologramme)")),
+    ("M1_THICK_HIDE", 0x00200000, _("blindé (peau épaisse)")),
+    ("M1_OVIPAROUS", 0x00400000, _("pond des œufs")),
+    ("M1_REGEN", 0x00800000, _("se régénère (nanites)")),
+    ("M1_SEE_INVIS", 0x01000000, _("voit l'invisible")),
+    ("M1_TPORT", 0x02000000, _("se téléporte")),
+    ("M1_TPORT_CNTRL", 0x04000000, _("contrôle la téléportation")),
+    ("M1_ACID", 0x08000000, _("acide à manger")),
+    ("M1_POIS", 0x10000000, _("toxique à manger")),
+    ("M1_CARNIVORE", 0x20000000, _("carnivore")),
+    ("M1_HERBIVORE", 0x40000000, _("herbivore")),
+    ("M1_OMNIVORE", 0x60000000, _("omnivore (carnivore + herbivore)")),
+    ("M1_METALLIVORE", 0x80000000, _("mange le métal (recycleur)")),
 ]
 FLAGS2 = [
-    ("M2_NOPOLY", 0x00000001, "le joueur ne peut pas s'y polymorpher"),
-    ("M2_UNDEAD", 0x00000002, "mort-vivant"),
-    ("M2_WERE", 0x00000004, "lycanthrope"),
-    ("M2_HUMAN", 0x00000008, "humain"),
-    ("M2_ELF", 0x00000010, "elfe"),
-    ("M2_DWARF", 0x00000020, "nain"),
-    ("M2_GNOME", 0x00000040, "gnome"),
-    ("M2_ORC", 0x00000080, "orque"),
-    ("M2_DEMON", 0x00000100, "démon"),
-    ("M2_MERC", 0x00000200, "garde ou soldat"),
-    ("M2_LORD", 0x00000400, "seigneur de son espèce"),
-    ("M2_PRINCE", 0x00000800, "suzerain de son espèce"),
-    ("M2_MINION", 0x00001000, "serviteur d'un dieu"),
-    ("M2_GIANT", 0x00002000, "géant"),
-    ("M2_SHAPESHIFTER", 0x00004000, "change de forme"),
-    ("M2_MALE", 0x00010000, "toujours mâle"),
-    ("M2_FEMALE", 0x00020000, "toujours femelle"),
-    ("M2_NEUTER", 0x00040000, "neutre (ni mâle ni femelle)"),
-    ("M2_PNAME", 0x00080000, "nom propre"),
-    ("M2_HOSTILE", 0x00100000, "toujours hostile"),
-    ("M2_PEACEFUL", 0x00200000, "toujours pacifique"),
-    ("M2_DOMESTIC", 0x00400000, "apprivoisable avec de la nourriture"),
-    ("M2_WANDER", 0x00800000, "erre au hasard (patrouille)"),
-    ("M2_STALK", 0x01000000, "vous suit d'un niveau à l'autre"),
-    ("M2_NASTY", 0x02000000, "particulièrement méchant"),
-    ("M2_STRONG", 0x04000000, "fort (ou grand)"),
-    ("M2_ROCKTHROW", 0x08000000, "lance des rochers"),
-    ("M2_GREEDY", 0x10000000, "aime l'or"),
-    ("M2_JEWELS", 0x20000000, "aime les gemmes"),
-    ("M2_COLLECT", 0x40000000, "ramasse armes et nourriture"),
-    ("M2_MAGIC", 0x80000000, "ramasse les objets magiques"),
+    ("M2_NOPOLY", 0x00000001, _("le joueur ne peut pas s'y polymorpher")),
+    ("M2_UNDEAD", 0x00000002, _("mort-vivant")),
+    ("M2_WERE", 0x00000004, _("lycanthrope")),
+    ("M2_HUMAN", 0x00000008, _("humain")),
+    ("M2_ELF", 0x00000010, _("elfe")),
+    ("M2_DWARF", 0x00000020, _("nain")),
+    ("M2_GNOME", 0x00000040, _("gnome")),
+    ("M2_ORC", 0x00000080, _("orque")),
+    ("M2_DEMON", 0x00000100, _("démon")),
+    ("M2_MERC", 0x00000200, _("garde ou soldat")),
+    ("M2_LORD", 0x00000400, _("seigneur de son espèce")),
+    ("M2_PRINCE", 0x00000800, _("suzerain de son espèce")),
+    ("M2_MINION", 0x00001000, _("serviteur d'un dieu")),
+    ("M2_GIANT", 0x00002000, _("géant")),
+    ("M2_SHAPESHIFTER", 0x00004000, _("change de forme")),
+    ("M2_MALE", 0x00010000, _("toujours mâle")),
+    ("M2_FEMALE", 0x00020000, _("toujours femelle")),
+    ("M2_NEUTER", 0x00040000, _("neutre (ni mâle ni femelle)")),
+    ("M2_PNAME", 0x00080000, _("nom propre")),
+    ("M2_HOSTILE", 0x00100000, _("toujours hostile")),
+    ("M2_PEACEFUL", 0x00200000, _("toujours pacifique")),
+    ("M2_DOMESTIC", 0x00400000, _("apprivoisable avec de la nourriture")),
+    ("M2_WANDER", 0x00800000, _("erre au hasard (patrouille)")),
+    ("M2_STALK", 0x01000000, _("vous suit d'un niveau à l'autre")),
+    ("M2_NASTY", 0x02000000, _("particulièrement méchant")),
+    ("M2_STRONG", 0x04000000, _("fort (ou grand)")),
+    ("M2_ROCKTHROW", 0x08000000, _("lance des rochers")),
+    ("M2_GREEDY", 0x10000000, _("aime l'or")),
+    ("M2_JEWELS", 0x20000000, _("aime les gemmes")),
+    ("M2_COLLECT", 0x40000000, _("ramasse armes et nourriture")),
+    ("M2_MAGIC", 0x80000000, _("ramasse les objets magiques")),
 ]
 FLAGS3 = [
-    ("M3_WANTSAMUL", 0x0001, "veut l'Amulette"),
-    ("M3_WANTSBELL", 0x0002, "veut la Cloche"),
-    ("M3_WANTSBOOK", 0x0004, "veut le Livre"),
-    ("M3_WANTSCAND", 0x0008, "veut le Candélabre"),
-    ("M3_WANTSARTI", 0x0010, "veut l'artefact de quête"),
-    ("M3_WANTSALL", 0x001f, "veut tous les objets majeurs"),
-    ("M3_COVETOUS", 0x001f, "convoite (= M3_WANTSALL)"),
-    ("M3_WAITFORU", 0x0040, "attend de vous voir (sentinelle)"),
-    ("M3_CLOSE", 0x0080, "vous laisse approcher"),
-    ("M3_INFRAVISION", 0x0100, "infravision (capteur thermique)"),
-    ("M3_INFRAVISIBLE", 0x0200, "visible en infravision (chaud)"),
-    ("M3_DISPLACES", 0x0400, "écarte les monstres de son chemin"),
+    ("M3_WANTSAMUL", 0x0001, _("veut l'Amulette")),
+    ("M3_WANTSBELL", 0x0002, _("veut la Cloche")),
+    ("M3_WANTSBOOK", 0x0004, _("veut le Livre")),
+    ("M3_WANTSCAND", 0x0008, _("veut le Candélabre")),
+    ("M3_WANTSARTI", 0x0010, _("veut l'artefact de quête")),
+    ("M3_WANTSALL", 0x001f, _("veut tous les objets majeurs")),
+    ("M3_COVETOUS", 0x001f, _("convoite (= M3_WANTSALL)")),
+    ("M3_WAITFORU", 0x0040, _("attend de vous voir (sentinelle)")),
+    ("M3_CLOSE", 0x0080, _("vous laisse approcher")),
+    ("M3_INFRAVISION", 0x0100, _("infravision (capteur thermique)")),
+    ("M3_INFRAVISIBLE", 0x0200, _("visible en infravision (chaud)")),
+    ("M3_DISPLACES", 0x0400, _("écarte les monstres de son chemin")),
 ]
 FLAG_TABLES = {"mr1": RESISTS, "mr2": RESISTS, "geno": GENFLAGS,
                "flags1": FLAGS1, "flags2": FLAGS2, "flags3": FLAGS3}
@@ -495,24 +497,29 @@ def max_damage(m):
 
 # verbes de hitmsg() (src/mhitu.c), traduits dans po/fr.po (« monverb »)
 _HIT_VERB = {
-    "AT_BITE": "mord", "AT_KICK": "donne un coup de pied",
-    "AT_STNG": "pique", "AT_BUTT": "donne un coup de corne",
-    "AT_TUCH": "vous touche", "AT_EXPL": "explose", "AT_BOOM": "explose",
+    "AT_BITE": _("mord"), "AT_KICK": _("donne un coup de pied"),
+    "AT_STNG": _("pique"), "AT_BUTT": _("donne un coup de corne"),
+    "AT_TUCH": _("vous touche"), "AT_EXPL": _("explose"),
+    "AT_BOOM": _("explose"),
 }
 # breathwep[] (src/mthrowu.c), contexte « breath »
 _BREATH_NAME = {
-    "AD_MAGM": "des éclats", "AD_FIRE": "du feu", "AD_COLD": "du givre",
-    "AD_SLEE": "du gaz soporifique",
-    "AD_DISN": "un souffle de désintégration", "AD_ELEC": "des éclairs",
-    "AD_DRST": "du gaz toxique", "AD_ACID": "de l'acide",
+    "AD_MAGM": _("des éclats"), "AD_FIRE": _("du feu"),
+    "AD_COLD": _("du givre"),
+    "AD_SLEE": _("du gaz soporifique"),
+    "AD_DISN": _("un souffle de désintégration"), "AD_ELEC": _("des éclairs"),
+    "AD_DRST": _("du gaz toxique"), "AD_ACID": _("de l'acide"),
 }
 
 
 def monnam(m):
-    """« Le robot de sécurité », « L'androïde », comme Monnam()."""
-    name = m["fr_name"] or m["name"]
+    """« Le robot de sécurité », « L'androïde », comme Monnam() ;
+    « The security bot » quand l'interface est en anglais."""
+    name = m["name"] if LANG == "en" else m["fr_name"] or m["name"]
     if "G_UNIQ" in m.get("geno", []) or "M2_PNAME" in m.get("flags2", []):
         return name[:1].upper() + name[1:]
+    if LANG == "en":
+        return "The " + name
     if name[:1].lower() in "aâàeéèêiîoôuûœh":
         return "L'" + name
     return ("La " if m.get("fr_gender") == "f" else "Le ") + name
@@ -531,30 +538,31 @@ def attack_preview(m, attack):
     avg = average_damage(attack)
     note = ""
     if at == "AT_BREA":
-        msg = "%s crache %s !" % (who, _BREATH_NAME.get(ad, "un souffle étrange"))
+        msg = _("%s crache %s !") % (
+            who, _BREATH_NAME.get(ad, _("un souffle étrange")))
     elif at == "AT_SPIT":
-        msg = "%s crache du venin !" % who
+        msg = _("%s crache du venin !") % who
     elif at == "AT_ENGL":
-        msg = "%s vous engloutit !" % who
+        msg = _("%s vous engloutit !") % who
     elif at == "AT_MAGC":
-        msg = "%s lance un sort !" % who
-        note = "sort choisi selon le niveau"
+        msg = _("%s lance un sort !") % who
+        note = _("sort choisi selon le niveau")
     elif at == "AT_GAZE":
-        msg = "%s vous fixe du regard (%s)" % (who, AD_DESC.get(ad, "?"))
+        msg = _("%s vous fixe du regard (%s)") % (who, AD_DESC.get(ad, "?"))
     elif at == "AT_TENT":
-        msg = "%s vous suce le cerveau avec ses tentacules !" % who
+        msg = _("%s vous suce le cerveau avec ses tentacules !") % who
     elif at == "AT_NONE":
-        msg = "(riposte quand vous le frappez : %s)" % AD_DESC.get(ad, "?")
+        msg = _("(riposte quand vous le frappez : %s)") % AD_DESC.get(ad, "?")
         if not n:
-            note = "dés selon le niveau : (niveau / 2 + 1)d%d" % (d or 4)
+            note = _("dés selon le niveau : (niveau / 2 + 1)d%d") % (d or 4)
     else:
-        msg = "%s %s !" % (who, _HIT_VERB.get(at, "frappe"))
+        msg = _("%s %s !") % (who, _HIT_VERB.get(at, _("frappe")))
         if at == "AT_WEAP":
-            note = "+ dégâts de l'arme tenue"
+            note = _("+ dégâts de l'arme tenue")
         elif at == "AT_HUGS":
-            note = "seulement si les deux attaques précédentes touchent"
+            note = _("seulement si les deux attaques précédentes touchent")
         elif at == "AT_BOOM":
-            note = "à sa mort"
+            note = _("à sa mort")
     return avg, msg, note
 
 
@@ -718,7 +726,7 @@ def split_args(s):
 def _inner(expr, name):
     expr = expr.strip()
     if not expr.startswith(name + "(") or not expr.endswith(")"):
-        raise ValueError("%s attendu : %s" % (name, expr[:40]))
+        raise ValueError(_("%s attendu : %s") % (name, expr[:40]))
     return expr[len(name) + 1:-1]
 
 
@@ -767,7 +775,7 @@ ATTACK_MACROS = {
 def parse_mon(args):
     """Monstre (dict) d'après les 14 arguments d'un MON()."""
     if len(args) != 14:
-        raise ValueError("MON() à %d arguments" % len(args))
+        raise ValueError(_("MON() à %d arguments") % len(args))
     m = new_monster()
     nam = args[0]
     if nam.startswith("NAMS("):
@@ -898,15 +906,15 @@ def plural_doubts(tr):
     for k, w in enumerate(words):
         lw = w.lower()
         if len(w) >= 2 and w.isupper():
-            out.append("« %s » est un sigle (invariable)" % w)
+            out.append(_("« %s » est un sigle (invariable)") % w)
         elif k and w[:1].isupper():
-            out.append("« %s » est un nom propre (pas de « s »)" % w)
+            out.append(_("« %s » est un nom propre (pas de « s »)") % w)
         elif lw.endswith(_PLURAL_IRREGULAR) and len(lw) > 3:
-            out.append("« %s » fait peut-être son pluriel en -aux" % w)
+            out.append(_("« %s » fait peut-être son pluriel en -aux") % w)
         elif lw in _PLURAL_OU_X:
-            out.append("« %s » prend un x au pluriel" % w)
+            out.append(_("« %s » prend un x au pluriel") % w)
         elif lw in _PLURAL_INVARIABLE:
-            out.append("« %s » prend un s au pluriel, pas un x" % w)
+            out.append(_("« %s » prend un s au pluriel, pas un x") % w)
     return out
 
 
@@ -920,37 +928,37 @@ _BREATH = ("AD_MAGM", "AD_FIRE", "AD_COLD", "AD_SLEE", "AD_DISN",
 ATTACK_RULES = {
     # type : (dégâts acceptés, gravité hors liste, explication)
     "AT_BREA": (_BREATH + ("AD_RBRE", "AD_SPC1", "AD_SPC2"), "erreur",
-                "un souffle n'existe qu'en projectiles magiques, feu, "
+                _("un souffle n'existe qu'en projectiles magiques, feu, "
                 "froid, sommeil, désintégration, électricité, poison, "
-                "acide ou au hasard (breamu(), BZ_VALID_ADTYP)"),
+                "acide ou au hasard (breamu(), BZ_VALID_ADTYP)")),
     "AT_SPIT": (("AD_ACID", "AD_BLND", "AD_DRST"), "erreur",
-                "on ne crache que de l'acide ou du venin aveuglant "
-                "(spitmm())"),
+                _("on ne crache que de l'acide ou du venin aveuglant "
+                "(spitmm())")),
     "AT_GAZE": (("AD_STON", "AD_CONF", "AD_STUN", "AD_BLND", "AD_FIRE"),
                 "erreur",
-                "un regard ne pétrifie, confond, étourdit, aveugle ou "
-                "brûle (gazemu())"),
+                _("un regard ne pétrifie, confond, étourdit, aveugle ou "
+                "brûle (gazemu())")),
     "AT_EXPL": (("AD_COLD", "AD_FIRE", "AD_ELEC", "AD_BLND", "AD_HALU"),
                 "erreur",
-                "une explosion au contact est de froid, de feu, "
-                "électrique, aveuglante ou hallucinogène (explmu())"),
+                _("une explosion au contact est de froid, de feu, "
+                "électrique, aveuglante ou hallucinogène (explmu())")),
     "AT_BOOM": (("AD_PHYS",) + _BREATH, "erreur",
-                "une explosion à la destruction est physique ou du type "
-                "d'un souffle (mon_explodes())"),
+                _("une explosion à la destruction est physique ou du type "
+                "d'un souffle (mon_explodes())")),
     "AT_MAGC": (("AD_SPEL", "AD_CLRC", "AD_FIRE", "AD_COLD", "AD_MAGM"),
                 "erreur",
-                "un sort est de mage (AD_SPEL), de prêtre (AD_CLRC), de "
-                "feu, de froid ou de projectiles magiques (castmu())"),
+                _("un sort est de mage (AD_SPEL), de prêtre (AD_CLRC), de "
+                "feu, de froid ou de projectiles magiques (castmu())")),
     "AT_ENGL": (("AD_DGST", "AD_PHYS", "AD_ACID", "AD_BLND", "AD_ELEC",
                  "AD_COLD", "AD_FIRE", "AD_DISE", "AD_DREN", "AD_WRAP"),
                 "attention",
-                "l'engloutissement n'a pas d'effet avec ces dégâts "
-                "(gulpmu())"),
+                _("l'engloutissement n'a pas d'effet avec ces dégâts "
+                "(gulpmu())")),
     "AT_NONE": (("AD_FIRE", "AD_ACID", "AD_STON", "AD_RUST", "AD_CORR",
                  "AD_MAGM", "AD_ENCH", "AD_PLYS", "AD_COLD", "AD_STUN",
                  "AD_ELEC", "AD_SLIM"), "attention",
-                "la riposte passive n'a pas d'effet avec ces dégâts "
-                "(passive())"),
+                _("la riposte passive n'a pas d'effet avec ces dégâts "
+                "(passive())")),
 }
 # dégâts qui n'ont de sens qu'avec un type d'attaque précis
 _ONLY_WITH = {
@@ -979,30 +987,30 @@ def check_attacks(m):
         n = i + 1
         if at in ATTACK_RULES and ad not in ATTACK_RULES[at][0]:
             grav, why = ATTACK_RULES[at][1], ATTACK_RULES[at][2]
-            out.append((grav, "Attaque %d (%s %s) : %s"
+            out.append((grav, _("Attaque %d (%s %s) : %s")
                         % (n, at[3:], ad[3:], why)))
         elif ad in _ONLY_WITH and at not in _ONLY_WITH[ad]:
             if _ONLY_WITH[ad]:
-                out.append(("attention", "Attaque %d : %s ne sert qu'avec "
-                            "%s" % (n, ad, " ou ".join(_ONLY_WITH[ad]))))
+                out.append(("attention", _("Attaque %d : %s ne sert qu'avec "
+                            "%s") % (n, ad, " ou ".join(_ONLY_WITH[ad]))))
             else:
-                out.append(("attention", "Attaque %d : %s n'est pas "
-                            "utilisé par le jeu" % (n, ad)))
+                out.append(("attention", _("Attaque %d : %s n'est pas "
+                            "utilisé par le jeu") % (n, ad)))
         elif at == "AT_BREA" and ad in ("AD_SPC1", "AD_SPC2"):
-            out.append(("attention", "Attaque %d : souffle %s sans nom "
-                        "(« strange breath »)" % (n, ad)))
+            out.append(("attention", _("Attaque %d : souffle %s sans nom "
+                        "(« strange breath »)") % (n, ad)))
         if at == "AT_NONE":
             if passive_seen:
-                out.append(("attention", "Attaque %d : seule la première "
-                            "riposte passive (AT_NONE) compte" % n))
+                out.append(("attention", _("Attaque %d : seule la première "
+                            "riposte passive (AT_NONE) compte") % n))
             passive_seen = True
         if at == "AT_HUGS":
             prev = m["attacks"][i - 2:i] if i >= 2 else []
             if len(prev) < 2 or any(a[0] == "AT_NONE" for a in prev):
-                out.append(("attention", "Attaque %d : une étreinte ne "
+                out.append(("attention", _("Attaque %d : une étreinte ne "
                             "réussit que si les deux attaques précédentes "
                             "ont touché ; placez-la après deux attaques "
-                            "au corps à corps" % n))
+                            "au corps à corps") % n))
     return out
 
 
@@ -1022,107 +1030,108 @@ def validate(m, game=None, project=None):
         out.append(("attention", msg))
 
     if not BN_RE.match(m["bn"]):
-        err("Identifiant PM_ invalide : majuscules, chiffres et _")
+        err(_("Identifiant PM_ invalide : majuscules, chiffres et _"))
     if not m["name"].strip():
-        err("Nom anglais vide")
+        err(_("Nom anglais vide"))
     elif m["name"] != m["name"].strip() or re.search(r'["(),\\]', m["name"]):
-        err("Nom anglais : pas d'espace au bord, ni guillemet, "
-            "parenthèse, virgule ou barre oblique inverse")
+        err(_("Nom anglais : pas d'espace au bord, ni guillemet, "
+            "parenthèse, virgule ou barre oblique inverse"))
     if bool(m["name_m"]) != bool(m["name_f"]):
-        err("Noms par genre : il faut le masculin ET le féminin")
+        err(_("Noms par genre : il faut le masculin ET le féminin"))
     others = list(game or []) + list(project or [])
     names = {m["name"], m["name_m"], m["name_f"]} - {""}
     for o in others:
         if o["bn"] == m["bn"]:
-            err("Identifiant PM_%s déjà utilisé (%s)" % (m["bn"], o["name"]))
+            err(_("Identifiant PM_%s déjà utilisé (%s)") % (m["bn"],
+                                                           o["name"]))
         onames = {o["name"], o["name_m"], o["name_f"]} - {""}
         for n in names & onames:
-            err("Nom « %s » déjà utilisé" % n)
+            err(_("Nom « %s » déjà utilisé") % n)
     if m["sym"] not in CLASS_CHAR:
-        err("Classe inconnue : %s" % m["sym"])
+        err(_("Classe inconnue : %s") % m["sym"])
     for key, lo, hi, label in (
-            ("level", 0, 49, "Niveau"), ("move", 0, 127, "Vitesse"),
-            ("ac", -128, 127, "Classe d'armure"),
-            ("mr", 0, 127, "Résistance à la magie"),
-            ("align", -128, 127, "Alignement"),
-            ("weight", 0, 65535, "Poids"),
-            ("nutrition", 0, 65535, "Nutrition"),
-            ("freq", 0, 7, "Fréquence")):
+            ("level", 0, 49, _("Niveau")), ("move", 0, 127, _("Vitesse")),
+            ("ac", -128, 127, _("Classe d'armure")),
+            ("mr", 0, 127, _("Résistance à la magie")),
+            ("align", -128, 127, _("Alignement")),
+            ("weight", 0, 65535, _("Poids")),
+            ("nutrition", 0, 65535, _("Nutrition")),
+            ("freq", 0, 7, _("Fréquence"))):
         if not lo <= m[key] <= hi:
-            err("%s hors limites (%d..%d)" % (label, lo, hi))
+            err(_("%s hors limites (%d..%d)") % (label, lo, hi))
     d = difficulty(m)
     if not 0 <= d <= 255:
-        err("Difficulté hors limites (0..255)")
+        err(_("Difficulté hors limites (0..255)"))
     if m["difficulty"] is not None and m["difficulty"] != mstrength(m):
-        warn("Difficulté manuelle %d, calculée %d"
+        warn(_("Difficulté manuelle %d, calculée %d")
              % (m["difficulty"], mstrength(m)))
     for i, (at, ad, dn, dd) in enumerate(m["attacks"]):
         if at not in AT_VALUE:
-            err("Attaque %d : type %s inconnu" % (i + 1, at))
+            err(_("Attaque %d : type %s inconnu") % (i + 1, at))
         if ad not in AD_VALUE:
-            err("Attaque %d : dégât %s inconnu" % (i + 1, ad))
+            err(_("Attaque %d : dégât %s inconnu") % (i + 1, ad))
         if not (0 <= dn <= 255 and 0 <= dd <= 255):
-            err("Attaque %d : dés hors limites (0..255)" % (i + 1))
+            err(_("Attaque %d : dés hors limites (0..255)") % (i + 1))
         if at == "AT_WEAP" and has_flag(m, "flags1", "M1_NOHANDS"):
-            warn("Attaque %d : arme sans mains (M1_NOHANDS)" % (i + 1))
+            warn(_("Attaque %d : arme sans mains (M1_NOHANDS)") % (i + 1))
         if ad in ("AD_DETH", "AD_PEST", "AD_FAMN"):
-            warn("Attaque %d : dégât réservé aux Cavaliers" % (i + 1))
+            warn(_("Attaque %d : dégât réservé aux Cavaliers") % (i + 1))
         if at == "AT_ENGL" and m["size"] in ("MZ_TINY", "MZ_SMALL"):
-            warn("Attaque %d : engloutir demande une grande taille"
+            warn(_("Attaque %d : engloutir demande une grande taille")
                  % (i + 1))
     out += check_attacks(m)
     used = attacks_used(m)
     if m["attacks"][:len(used)] != used:
-        warn("Attaques : un emplacement vide avant une attaque "
-             "(le jeu s'arrête au premier vide pour certaines actions)")
+        warn(_("Attaques : un emplacement vide avant une attaque "
+             "(le jeu s'arrête au premier vide pour certaines actions)"))
     if not used:
-        warn("Aucune attaque")
+        warn(_("Aucune attaque"))
     if m["sym"] == "S_GOLEM":
         if m["golem_hp"] <= 0:
-            err("Classe golem : PV fixes obligatoires (sinon 0 PV)")
+            err(_("Classe golem : PV fixes obligatoires (sinon 0 PV)"))
         if m["level"] <= 0:
-            err("Classe golem : niveau au moins 1 (PV par niveau)")
+            err(_("Classe golem : niveau au moins 1 (PV par niveau)"))
     if m["sound"] not in [s for s, _, _ in SOUNDS]:
-        err("Son inconnu : %s" % m["sound"])
+        err(_("Son inconnu : %s") % m["sound"])
     if m["size"] not in [s for s, _, _ in SIZES]:
-        err("Taille inconnue : %s" % m["size"])
+        err(_("Taille inconnue : %s") % m["size"])
     if m["color"] not in COLOR_VALUE:
-        err("Couleur inconnue : %s" % m["color"])
+        err(_("Couleur inconnue : %s") % m["color"])
     for field in ("mr1", "mr2", "geno", "flags1", "flags2", "flags3"):
         for n in m[field]:
             if n not in FLAG_VALUE:
-                err("Drapeau inconnu : %s" % n)
+                err(_("Drapeau inconnu : %s") % n)
     f2 = m["flags2"]
     if "M2_HOSTILE" in f2 and "M2_PEACEFUL" in f2:
-        err("À la fois hostile et pacifique")
+        err(_("À la fois hostile et pacifique"))
     sexes = [x for x in ("M2_MALE", "M2_FEMALE", "M2_NEUTER") if x in f2]
     if len(sexes) > 1:
-        err("Plusieurs sexes : %s" % ", ".join(sexes))
+        err(_("Plusieurs sexes : %s") % ", ".join(sexes))
     if "G_HELL" in m["geno"] and "G_NOHELL" in m["geno"]:
-        err("G_HELL et G_NOHELL à la fois")
+        err(_("G_HELL et G_NOHELL à la fois"))
     if "G_NOGEN" not in m["geno"] and "G_UNIQ" not in m["geno"] \
             and m["freq"] == 0:
-        warn("Fréquence 0 : jamais créé au hasard (ajoutez G_NOGEN)")
+        warn(_("Fréquence 0 : jamais créé au hasard (ajoutez G_NOGEN)"))
     if "G_NOCORPSE" not in m["geno"] and m["nutrition"] == 0:
-        warn("Laisse un cadavre de valeur nutritive nulle "
-             "(G_NOCORPSE pour une épave de robot)")
+        warn(_("Laisse un cadavre de valeur nutritive nulle "
+             "(G_NOCORPSE pour une épave de robot)"))
     if m["fr_name"][:1].isupper() and not has_flag(m, "flags2", "M2_PNAME"):
-        warn("Nom français avec majuscule : il restera ainsi au milieu "
-             "des phrases (« le Mecha… ») ; M2_PNAME pour un nom propre")
+        warn(_("Nom français avec majuscule : il restera ainsi au milieu "
+             "des phrases (« le Mecha… ») ; M2_PNAME pour un nom propre"))
     if not m["fr_name"].strip():
-        warn("Pas de nom français : le jeu affichera le nom anglais")
+        warn(_("Pas de nom français : le jeu affichera le nom anglais"))
     elif not m["fr_plural"].strip() and "G_UNIQ" not in m["geno"] \
             and "M2_PNAME" not in m["flags2"]:
         for why in plural_doubts(m["fr_name"]):
-            warn("Pluriel calculé « %s » : %s ; corrigez-le dans "
-                 "« Pluriel français »" % (french_plural(m["fr_name"]), why))
+            warn(_("Pluriel calculé « %s » : %s ; corrigez-le dans "
+                 "« Pluriel français »") % (french_plural(m["fr_name"]), why))
     if m["fr_gender"] not in ("m", "f"):
-        err("Genre français : m ou f")
+        err(_("Genre français : m ou f"))
     if m["name_m"] and not (m["fr_name_m"] and m["fr_name_f"]):
-        warn("Noms par genre sans leur traduction française")
+        warn(_("Noms par genre sans leur traduction française"))
     if m["tile_shape"] == "personnalisée" and \
             not any(c != "." for row in m["tile"] for c in row):
-        warn("Tuile personnalisée vide (interfaces graphiques seulement)")
+        warn(_("Tuile personnalisée vide (interfaces graphiques seulement)"))
     return out
 
 

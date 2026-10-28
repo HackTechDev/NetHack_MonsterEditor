@@ -14,6 +14,7 @@ import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
+os.environ["NHMONEDIT_LANG"] = "fr"     # messages vérifiés en français
 
 import nhmon_data as D  # noqa: E402
 import nhmon_install as I  # noqa: E402

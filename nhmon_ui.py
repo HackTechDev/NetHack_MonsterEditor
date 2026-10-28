@@ -8,6 +8,7 @@ import time
 import unicodedata
 
 import nhmon_data as D
+from nhmon_i18n import _
 import nhmon_templates as T
 
 ESC = "\x1b"
@@ -288,14 +289,14 @@ class Popups:
         get_key(win)
         self.redraw()
 
-    def confirm(self, question, title="Confirmation"):
+    def confirm(self, question, title=_("Confirmation")):
         lines = question.split("\n")
         w = min(max(width(l) for l in lines + [title]) + 6, 100)
         win = centered(self.stdscr, len(lines) + 4, max(w, 30))
         box(win, title, self.accent())
         for i, l in enumerate(lines):
             put(win, 1 + i, 2, l)
-        put(win, len(lines) + 2, 2, "[o]ui / [n]on", self.cyan())
+        put(win, len(lines) + 2, 2, _("[o]ui / [n]on"), self.cyan())
         win.refresh()
         while True:
             k = get_key(win)
@@ -329,7 +330,7 @@ class Popups:
                 if hint:
                     put(win, 3, 2, hint, curses.A_DIM)
                 put(win, 4 if hint else 3, 2,
-                    "Entrée : valider   Échap : annuler", curses.A_DIM)
+                    _("Entrée : valider   Échap : annuler"), curses.A_DIM)
                 win.move(2, 2 + width("".join(text[off:pos])))
                 win.refresh()
                 k = get_key(win)
@@ -362,7 +363,7 @@ class Popups:
             self.redraw()
 
     def input_int(self, prompt, value, lo, hi, hint=""):
-        hint = hint or "entier de %d à %d" % (lo, hi)
+        hint = hint or _("entier de %d à %d") % (lo, hi)
         text = str(value)
         while True:
             text = self.input_line(prompt, text, hint)
@@ -372,7 +373,7 @@ class Popups:
                 v = None
             if v is not None and lo <= v <= hi:
                 return v
-            hint = "⚠ valeur invalide : un entier de %d à %d" % (lo, hi)
+            hint = _("⚠ valeur invalide : un entier de %d à %d") % (lo, hi)
 
     def menu(self, title, items, current=0, filterable=True):
         """items : liste de (libellé, description). Renvoie l'indice
@@ -400,8 +401,8 @@ class Popups:
                     top = idx - rows + 1
                 win.erase()
                 box(win, title, self.accent())
-                put(win, 1, 2, ("filtre : " + flt) if flt else
-                    "tapez pour filtrer  ↑↓ Entrée Échap", curses.A_DIM)
+                put(win, 1, 2, (_("filtre : ") + flt) if flt else
+                    _("tapez pour filtrer  ↑↓ Entrée Échap"), curses.A_DIM)
                 for r, i in enumerate(shown[top:top + rows]):
                     a, b = items[i]
                     attr = curses.A_REVERSE if i == sel else 0
@@ -476,8 +477,8 @@ class Popups:
                     top = cur - rows + 1
                 win.erase()
                 box(win, title, self.accent())
-                put(win, 1, 2, "Espace ou clic : cocher   Entrée : valider"
-                    "   Échap : annuler", curses.A_DIM)
+                put(win, 1, 2, _("Espace ou clic : cocher   Entrée : valider"
+                    "   Échap : annuler"), curses.A_DIM)
                 for r, (n, d) in enumerate(items[top:top + rows]):
                     i = top + r
                     mark = "[x]" if n in sel else "[ ]"
@@ -530,8 +531,8 @@ class Popups:
                 box(win, title, self.accent())
                 for r, (l, a) in enumerate(lines[top:top + rows]):
                     put(win, 1 + r, 2, l[left:].expandtabs(8), a, w - 4)
-                put(win, h - 1, 2, " ↑↓ PgUp PgDn ←→  q/Échap : fermer "
-                    " %d-%d/%d " % (top + 1, min(top + rows, len(lines)),
+                put(win, h - 1, 2, _(" ↑↓ PgUp PgDn ←→  q/Échap : fermer "
+                    " %d-%d/%d ") % (top + 1, min(top + rows, len(lines)),
                                     len(lines)), curses.A_DIM)
                 win.refresh()
                 k = get_key(win)
@@ -592,8 +593,8 @@ class Popups:
                 box(win, title, self.accent())
                 for j, (i, s) in enumerate(vis[top:top + rows]):
                     put(win, 1 + j, 2, lines[i][s:s + tw])
-                put(win, h - 1, 2, " Échap : terminer   Entrée : "
-                    "nouveau paragraphe ", curses.A_DIM)
+                put(win, h - 1, 2, _(" Échap : terminer   Entrée : "
+                    "nouveau paragraphe "), curses.A_DIM)
                 vi, vs = vis[cur]
                 win.move(1 + cur - top, 2 + (c - vs))
                 win.refresh()
@@ -659,23 +660,23 @@ class Popups:
         color = "P"
         S = D.TILE_SIZE
         help_lines = [
-            "←↑→↓ : déplacer     Espace : peindre",
-            "A-Z . 0 1 : choisir la couleur et peindre",
-            "Tab / + - : couleur suivante / précédente",
-            "p : pipette    f : remplir la zone",
-            "r : remplacer cette couleur partout",
-            "m : symétrie gauche -> droite",
-            "h : retourner     g : silhouette",
-            "x : tout effacer  u : annuler",
-            "souris : clic peindre, clic droit pipette,",
-            "         molette couleur     Échap : terminer",
+            _("←↑→↓ : déplacer     Espace : peindre"),
+            _("A-Z . 0 1 : choisir la couleur et peindre"),
+            _("Tab / + - : couleur suivante / précédente"),
+            _("p : pipette    f : remplir la zone"),
+            _("r : remplacer cette couleur partout"),
+            _("m : symétrie gauche -> droite"),
+            _("h : retourner     g : silhouette"),
+            _("x : tout effacer  u : annuler"),
+            _("souris : clic peindre, clic droit pipette,"),
+            _("         molette couleur     Échap : terminer"),
         ]
         enable_mouse(motion=True)
         try:
             while True:
                 self.stdscr.erase()
                 H, W = self.stdscr.getmaxyx()
-                put(self.stdscr, 0, 0, (" Tuile : %s " % title).ljust(W),
+                put(self.stdscr, 0, 0, (_(" Tuile : %s ") % title).ljust(W),
                     self.colors.pair(curses.COLOR_BLACK,
                                      curses.COLOR_MAGENTA) | curses.A_BOLD)
                 oy, ox = 2, 2
@@ -693,14 +694,14 @@ class Popups:
                         put(self.stdscr, oy + j, ox + 2 * i, s, a)
                 # aperçu en taille réelle (demi-blocs)
                 px = ox + 2 * S + 3
-                put(self.stdscr, oy, px, "Aperçu", curses.A_DIM)
+                put(self.stdscr, oy, px, _("Aperçu"), curses.A_DIM)
                 for j in range(0, S, 2):
                     for i in range(S):
                         put(self.stdscr, oy + 1 + j // 2, px + i, "▀",
                             self.colors.halfblock(grid[j][i], grid[j + 1][i]))
                 # palette
                 qx = px + S + 3
-                put(self.stdscr, oy, qx, "Palette", curses.A_DIM)
+                put(self.stdscr, oy, qx, _("Palette"), curses.A_DIM)
                 for k, c in enumerate(pal):
                     yy = oy + 1 + k % 15
                     xx = qx + (k // 15) * 12
@@ -711,7 +712,7 @@ class Popups:
                 for k, l in enumerate(help_lines):
                     put(self.stdscr, oy + S + 1 + k if oy + S + 1 + k < H
                         else H - 1, 2, l, curses.A_DIM)
-                put(self.stdscr, oy + 10, px, "Couleur %s" % color)
+                put(self.stdscr, oy + 10, px, _("Couleur %s") % color)
                 put(self.stdscr, oy + 11, px, "%s" % (rgb[color],),
                     curses.A_DIM)
                 self.stdscr.refresh()
@@ -795,7 +796,9 @@ class Popups:
                 elif k == "g":
                     shapes = list(T.SHAPES)
                     try:
-                        i = self.menu("Silhouette", [(s, "") for s in shapes],
+                        i = self.menu(_("Silhouette"),
+                                      [(T.shape_label(s), "")
+                                       for s in shapes],
                                       filterable=False)
                     except Cancel:
                         continue
@@ -804,7 +807,7 @@ class Popups:
                         shapes[i], color if color != "." else "P")]
                 elif k == "q":
                     if grid == orig or self.confirm(
-                            "Garder les modifications de la tuile ?"):
+                            _("Garder les modifications de la tuile ?")):
                         return ["".join(r) for r in grid]
                     return ["".join(r) for r in orig]
         finally:

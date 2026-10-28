@@ -12,6 +12,7 @@ tuile dessinée à la main (ou importée du jeu).
 import copy
 
 import nhmon_data as D
+from nhmon_i18n import _
 
 # --- silhouettes (16 lignes de 16 pixels) --------------------------------
 SHAPES = {
@@ -143,6 +144,19 @@ COLOR_LETTER = {
 }
 
 
+# libellés affichés (les noms français restent ceux du fichier projet)
+SHAPE_LABEL = {
+    "auto": _("auto"), "personnalisée": _("personnalisée"),
+    "humanoïde": _("humanoïde"), "mecha": _("mecha"), "drone": _("drone"),
+    "sphère": _("sphère"), "araignée": _("araignée"),
+    "chenilles": _("chenilles"),
+}
+
+
+def shape_label(s):
+    return SHAPE_LABEL.get(s, s)
+
+
 def shape_choices():
     return [SHAPE_AUTO] + list(SHAPES) + [SHAPE_CUSTOM]
 
@@ -184,7 +198,7 @@ def _m(**kw):
 ROBOT = ["M1_BREATHLESS", "M1_MINDLESS"]
 
 TEMPLATES = [
-    ("Robot de sécurité", "humanoïde, matraque électrique, classe golem",
+    (_("Robot de sécurité"), _("humanoïde, matraque électrique, classe golem"),
      _m(bn="SECURITY_BOT", name="security bot",
         fr_name="robot de sécurité", fr_gender="m", sym="S_GOLEM",
         level=6, move=10, ac=4, mr=10, align=0,
@@ -202,7 +216,7 @@ TEMPLATES = [
         "trois ans de retard.",
         encyclo_en="Standard corporate patrol unit. Programmed to "
         "de-escalate, which it does with a 50,000-volt baton.")),
-    ("Drone de surveillance", "sphère volante, flash aveuglant",
+    (_("Drone de surveillance"), _("sphère volante, flash aveuglant"),
      _m(bn="SURVEILLANCE_DRONE", name="surveillance drone",
         fr_name="drone de surveillance", fr_gender="m", sym="S_EYE",
         level=2, move=15, ac=7, mr=0, align=0,
@@ -219,7 +233,7 @@ TEMPLATES = [
         "faciale, aveugle surtout les visages qu'il reconnaît.",
         encyclo_en="A small rotor-borne camera. Its facial-recognition "
         "floodlight mostly blinds the faces it recognizes.")),
-    ("Drone d'assaut", "volant, rotors tranchants, arc électrique",
+    (_("Drone d'assaut"), _("volant, rotors tranchants, arc électrique"),
      _m(bn="ASSAULT_DRONE", name="assault drone",
         fr_name="drone d'assaut", fr_gender="m", sym="S_BAT",
         level=8, move=20, ac=3, mr=0, align=-3,
@@ -235,7 +249,7 @@ TEMPLATES = [
         "Les gangs les volent, les reprogramment et les revendent aux "
         "corporations qui les avaient perdus.",
         encyclo_en="Military quadrotor fitted with an arc projector.")),
-    ("Drone kamikaze", "sphère qui explose au contact",
+    (_("Drone kamikaze"), _("sphère qui explose au contact"),
      _m(bn="KAMIKAZE_DRONE", name="kamikaze drone",
         fr_name="drone kamikaze", fr_gender="m", sym="S_EYE",
         level=6, move=13, ac=4, mr=0, align=0,
@@ -253,7 +267,7 @@ TEMPLATES = [
         "fois.",
         encyclo_en="A thermobaric charge, four propellers and a "
         "tracking chip. It does one thing, once.")),
-    ("Araignée-robot", "accrochée au plafond, dard sédatif",
+    (_("Araignée-robot"), _("accrochée au plafond, dard sédatif"),
      _m(bn="SPIDER_BOT", name="spider bot",
         fr_name="araignée-robot", fr_gender="f", sym="S_SPIDER",
         level=5, move=15, ac=3, mr=0, align=0,
@@ -271,7 +285,7 @@ TEMPLATES = [
         "au sédatif tout ce qui passe dessous.",
         encyclo_en="Eight-legged maintenance robot repurposed as an "
         "ambush trap.")),
-    ("Androïde", "humain synthétique armé, ramasse les objets",
+    (_("Androïde"), _("humain synthétique armé, ramasse les objets"),
      _m(bn="ANDROID", name="android",
         fr_name="androïde", fr_gender="m", sym="S_HUMAN",
         level=8, move=12, ac=5, mr=20, align=-2,
@@ -288,7 +302,7 @@ TEMPLATES = [
         "objets des autres, par curiosité, dit-il.",
         encyclo_en="Indistinguishable from a human, except under a "
         "Voight-Kampff test or a metal detector.")),
-    ("Robot recycleur", "dévore le métal, rouille l'armure",
+    (_("Robot recycleur"), _("dévore le métal, rouille l'armure"),
      _m(bn="RECYCLER_BOT", name="recycler bot",
         fr_name="robot recycleur", fr_gender="m", sym="S_RUSTMONST",
         level=5, move=12, ac=2, mr=0, align=0,
@@ -306,7 +320,7 @@ TEMPLATES = [
         "épave et une armure portée.",
         encyclo_en="Autonomous scrap collector. It cannot tell wreckage "
         "from worn armor.")),
-    ("Mecha de combat", "géant blindé, lance-flammes",
+    (_("Mecha de combat"), _("géant blindé, lance-flammes"),
      _m(bn="COMBAT_MECH", name="combat mech",
         fr_name="mecha de combat", fr_gender="m", sym="S_GIANT",
         level=13, move=9, ac=0, mr=30, align=-5,
@@ -325,7 +339,7 @@ TEMPLATES = [
         "gauche était vendu comme « outil de désherbage urbain ».",
         encyclo_en="A four-meter remote-piloted exoframe. The left-arm "
         "flamethrower was sold as an urban weed-control tool.")),
-    ("Mecha titan", "boss de fin : canon à plasma, piétine",
+    (_("Mecha titan"), _("boss de fin : canon à plasma, piétine"),
      _m(bn="TITAN_MECH", name="titan mech",
         fr_name="mecha titan", fr_gender="m", sym="S_GIANT",
         level=20, move=8, ac=-4, mr=60, align=-8,
@@ -346,7 +360,7 @@ TEMPLATES = [
         "toujours un convoi qui n'existe plus.",
         encyclo_en="A lost military prototype whose autopilot still "
         "escorts a convoy that no longer exists.")),
-    ("Tourelle de sécurité", "immobile, attend l'intrus, tir de laser",
+    (_("Tourelle de sécurité"), _("immobile, attend l'intrus, tir de laser"),
      _m(bn="SECURITY_TURRET", name="security turret",
         fr_name="tourelle de sécurité", fr_gender="f", sym="S_GOLEM",
         level=7, move=0, ac=2, mr=20, align=0,
@@ -364,7 +378,7 @@ TEMPLATES = [
         "d'accueil de la maison.",
         encyclo_en="A ceiling-mounted laser turret. A siren, then a "
         "beam: the lobby's welcome policy.")),
-    ("Robot vierge", "valeurs de départ d'un robot (classe golem)",
+    (_("Robot vierge"), _("valeurs de départ d'un robot (classe golem)"),
      _m(shape=SHAPE_AUTO)),
 ]
 

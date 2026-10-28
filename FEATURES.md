@@ -11,7 +11,8 @@ touchés, le [README](README.md) ou `?` dans l'éditeur.
 - Crée des monstres pour NetHack 5.0 (branche `cybernethack`) et les
   ajoute aux sources du jeu ; pensé pour les robots et les mechas de
   Night City, mais tout monstre est possible.
-- Interface en français, saisie des accents (UTF-8).
+- Interface en français ou en anglais, choisie par `NHMONEDIT_LANG`
+  (`fr`, `en`) ou sinon la locale ; saisie des accents (UTF-8).
 - Utilisable entièrement au clavier, ou à la souris (voir Saisie).
 - Annulation (`u`) des 100 dernières modifications du projet, et
   rétablissement (Ctrl-R ou Ctrl-Y) de ce qui a été annulé.

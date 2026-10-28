@@ -15,7 +15,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 |---|---|---|
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
-| 3. Saisie et affichage | 5 / 6 | interface en anglais |
+| 3. Saisie et affichage | 6 / 6 | — |
 | 4. Projets et fichiers | 0 / 5 | tout |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
@@ -110,8 +110,15 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    glissé pour peindre (un trait = une annulation), clic droit pipette,
    clic sur la palette, molette pour la couleur. `NHMONEDIT_MOUSE=0`
    coupe la souris.*
-3. **Interface en anglais** **[moyen]** : textes passés par `_()` et
-   catalogue anglais, choisis par la locale, comme l'éditeur de cartes.
+3. ✅ **Fait** — **Interface en anglais** **[moyen]** : textes passés
+   par `_()` et catalogue anglais, choisis par la locale, comme
+   l'éditeur de cartes. *Réalisé : `nhmon_i18n.py` (`NHMONEDIT_LANG`,
+   sinon la locale) et `nhmon_i18n_en.py` (environ 680 textes : fiche,
+   aide, menus, descriptions des constantes du jeu, vérifications,
+   modèles) ; en anglais, l'aperçu des attaques reprend les messages
+   anglais du jeu (« The security bot hits! »). Les noms français des
+   monstres et ce qui est écrit dans les sources ne sont pas traduits.
+   `tests/test_i18n.py` vérifie qu'aucun texte ne manque.*
 4. ✅ **Fait** — **Recherche dans la liste** **[facile]** : `/` pour
    aller à un monstre par son nom quand le projet en compte beaucoup.
    *Réalisé : `/` ouvre la liste des monstres, que quelques lettres
