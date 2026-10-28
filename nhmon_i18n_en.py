@@ -969,8 +969,6 @@ EN = {
     "déjà dans le projet": "already in the project",
     "  p            menu du projet : fusionner un autre projet,":
         "  p            project menu: merge another project,",
-    "               exporter ou importer un monstre…":
-        "               export or import a monster…",
     "Sauvegarde de secours du %s trouvée\n(session interrompue). La "
     "récupérer ?":
         "Backup from %s found\n(interrupted session). Recover it?",
@@ -978,4 +976,26 @@ EN = {
     "Sauvegarde de secours illisible : %s": "Unreadable backup: %s",
     "Sauvegarde de secours récupérée (%d monstres) — s pour enregistrer":
         "Backup recovered (%d monsters) — s to save",
+    "%s n'est pas un fichier de modèles": "%s is not a template file",
+    "(perso) ": "(mine) ",
+    "Enregistrer le monstre comme modèle…": "Save the monster as a template…",
+    "proposé ensuite par n": "then offered by n",
+    "Supprimer un modèle personnel…": "Delete a personal template…",
+    "Nom du modèle": "Template name",
+    "affiché dans le menu de n": "shown in the n menu",
+    "Description du modèle": "Template description",
+    "facultative : ce qui le distingue": "optional: what makes it special",
+    "Le modèle « %s » existe déjà. Le remplacer ?":
+        "Template \"%s\" already exists. Replace it?",
+    "Enregistrement impossible": "Cannot save",
+    "Modèle enregistré : %s — proposé par n":
+        "Template saved: %s — offered by n",
+    "Aucun modèle personnel": "No personal template",
+    "Supprimer un modèle personnel": "Delete a personal template",
+    "Supprimer le modèle « %s » ?": "Delete template \"%s\"?",
+    "Modèle supprimé : %s": "Template deleted: %s",
+    "               exporter ou importer un monstre, enregistrer le":
+        "               export or import a monster, save the monster",
+    "               monstre comme modèle personnel…":
+        "               as a personal template…",
 }

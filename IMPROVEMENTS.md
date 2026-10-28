@@ -16,7 +16,7 @@ de ce que fait l'éditeur aujourd'hui est dans [FEATURES.md](FEATURES.md).
 | 1. Limites connues | 1 / 5 | tuiles graphiques, encyclopédie, projets, EDITLEVEL |
 | 2. Vérification | 1 / 5 | sons, corps, équilibrage, contrôle complet |
 | 3. Saisie et affichage | 6 / 6 | — |
-| 4. Projets et fichiers | 3 / 5 | modèles, configuration |
+| 4. Projets et fichiers | 4 / 5 | configuration |
 | 5. Intégration avec le jeu | 0 / 6 | tout |
 | 6. Robots : nouvelles règles de jeu | 0 / 6 | tout |
 | 7. Relation avec l'éditeur de cartes | 0 / 3 | tout |
@@ -160,9 +160,13 @@ Ce que l'éditeur fait mal ou ne vérifie pas aujourd'hui.
    une fois par minute tant que le projet est modifié (même sans
    toucher au clavier), proposé au lancement s'il est plus récent que
    le projet, effacé à l'enregistrement et à la sortie.*
-4. **Bibliothèque de modèles personnels** **[moyen]** : enregistrer un
-   monstre comme modèle, proposé ensuite par `n` à côté des modèles
-   fournis.
+4. ✅ **Fait** — **Bibliothèque de modèles personnels** **[moyen]** :
+   enregistrer un monstre comme modèle, proposé ensuite par `n` à côté
+   des modèles fournis. *Réalisé : menu Projet, « Enregistrer le
+   monstre comme modèle… » (nom, description, remplacement confirmé) et
+   « Supprimer un modèle personnel… » ; modèles rangés dans
+   `~/.config/nhmonedit/modeles.json` (ou `NHMONEDIT_TEMPLATES`),
+   communs à tous les projets, marqués « (perso) » dans `n`.*
 5. **Fichier de configuration** **[facile]** : dossier des sources, du
    jeu, options de compilation, projet par défaut, au lieu des seules
    variables d'environnement.

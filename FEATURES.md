@@ -167,6 +167,11 @@ Tous les champs d'une entrée `MON()` de `include/monsters.h`.
 - Export d'un monstre dans un fichier à échanger
   (`<identifiant>.nhmon.json`, remplacement confirmé), et import de ce
   fichier dans un autre projet, avec les mêmes règles que la fusion.
+- Modèles personnels : un monstre s'enregistre comme modèle (nom et
+  description), proposé ensuite par `n` après les modèles fournis,
+  marqué « (perso) » ; ils sont communs à tous les projets
+  (`~/.config/nhmonedit/modeles.json`, ou `NHMONEDIT_TEMPLATES`) et se
+  suppriment depuis le menu Projet.
 
 ## Difficulté et équilibrage
 

@@ -70,6 +70,10 @@ texte d'encyclopédie : robot de sécurité, drone de surveillance, drone
 d'assaut, drone kamikaze, araignée-robot, androïde, robot recycleur,
 mecha de combat, mecha titan, tourelle de sécurité, robot vierge.
 
+Vos propres modèles s'ajoutent à la liste : menu Projet (`p`),
+« Enregistrer le monstre comme modèle… » (fichier
+`~/.config/nhmonedit/modeles.json`, commun à tous les projets).
+
 `i` importe n'importe quel monstre du jeu (avec son nom français, sa
 tuile et ses PV de golem) comme point de départ ; il est renommé « mk II ».
 
@@ -94,7 +98,7 @@ grands mechas, `e` aux sphères et drones-caméras, `B` aux drones volants,
 | `v` `c` `b` `B` | vérifier, voir le code C, comparer, fiche comparée |
 | `I` `R` | intégrer aux sources, retirer des sources |
 | `m` `U` `j` | compiler, mettre à jour le jeu installé, jouer |
-| `p` | menu du projet : fusionner un autre projet, exporter ou importer un monstre |
+| `p` | menu du projet : fusionner un autre projet, exporter ou importer un monstre, modèles personnels |
 | `s` `u` Ctrl-R `?` `q` | enregistrer, annuler, rétablir, aide, quitter |
 
 **Souris** : un clic choisit un monstre ou un champ, un double clic

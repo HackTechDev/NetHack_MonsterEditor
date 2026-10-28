@@ -1,6 +1,7 @@
 """Fichiers de l'éditeur : projets (liste de monstres en JSON), fusion
 de projets, monstres exportés un par un (*.nhmon.json), sauvegarde de
-secours (projet.json.nhmonedit-autosave)."""
+secours (projet.json.nhmonedit-autosave), modèles personnels
+(~/.config/nhmonedit/modeles.json)."""
 
 import json
 import os
@@ -13,6 +14,14 @@ MONSTER_FORMAT = "nhmonedit-monstre"
 MONSTER_SUFFIX = ".nhmon.json"
 AUTOSAVE_SUFFIX = ".nhmonedit-autosave"
 AUTOSAVE_DELAY = 60         # secondes
+TEMPLATES_FORMAT = "nhmonedit-modeles"
+CONFIG_DIR = os.path.join(os.environ.get("XDG_CONFIG_HOME") or
+                          os.path.expanduser("~/.config"), "nhmonedit")
+
+
+def templates_path():
+    return os.environ.get("NHMONEDIT_TEMPLATES") or \
+        os.path.join(CONFIG_DIR, "modeles.json")
 
 
 class ProjectError(Exception):
@@ -82,6 +91,31 @@ def drop_autosave(project):
         os.remove(autosave_path(project))
     except OSError:
         pass
+
+
+def read_templates(path):
+    """Modèles personnels : [(nom, description, monstre)] ; fichier
+    absent : liste vide."""
+    if not os.path.isfile(path):
+        return []
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError) as e:
+        raise ProjectError(_("%s illisible : %s") % (path, e))
+    if not isinstance(data, dict) or data.get("format") != TEMPLATES_FORMAT:
+        raise ProjectError(_("%s n'est pas un fichier de modèles") % path)
+    return [(t.get("name", "?"), t.get("description", ""),
+             D.normalize(t.get("monster", {})))
+            for t in data.get("templates", [])]
+
+
+def write_templates(path, templates):
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    write_json(path, {"format": TEMPLATES_FORMAT, "version": 1,
+                      "templates": [{"name": n, "description": d,
+                                     "monster": m}
+                                    for n, d, m in templates]})
 
 
 def same_monster(a, b):

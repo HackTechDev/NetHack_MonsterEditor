@@ -376,6 +376,16 @@ class TestEditor(unittest.TestCase):
             self.assertIsNone(P.pending_autosave(ed.project))
             self.assertFalse(os.path.exists(auto))
 
+    def test_personal_templates(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "sous", "modeles.json")
+            self.assertEqual(P.read_templates(path), [])
+            m = T.from_template(9)
+            P.write_templates(path, [("Tourelle Militech", "plafond", m)])
+            (name, desc, back), = P.read_templates(path)
+            self.assertEqual((name, desc), ("Tourelle Militech", "plafond"))
+            self.assertTrue(P.same_monster(back, m))
+
     def test_filter_ignores_accents(self):
         self.assertIn(U.fold("securite"), U.fold("Robot de Sécurité"))
         self.assertEqual(U.fold("araignée-robot"), "araignee-robot")

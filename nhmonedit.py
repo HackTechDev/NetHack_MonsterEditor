@@ -153,7 +153,8 @@ HELP = [
     "",
     _("Projet :"),
     _("  p            menu du projet : fusionner un autre projet,"),
-    _("               exporter ou importer un monstre…"),
+    _("               exporter ou importer un monstre, enregistrer le"),
+    _("               monstre comme modèle personnel…"),
     "",
     _("Général :"),
     _("  s            enregistrer le projet"),
@@ -800,11 +801,24 @@ class Editor(Popups):
         self.focus = "form"
         self.field = 1
 
-    def new_monster(self):
+    def personal_templates(self):
+        """Modèles personnels, ou [] (avec un message) si le fichier est
+        illisible."""
         try:
-            i = self.menu(_("Nouveau monstre : modèle"),
-                          T.template_list())
-            m = T.from_template(i)
+            return P.read_templates(P.templates_path())
+        except P.ProjectError as e:
+            self.msg = str(e)
+            return []
+
+    def new_monster(self):
+        mine = self.personal_templates()
+        items = T.template_list() + [(n, _("(perso) ") + d)
+                                     for n, d, _m in mine]
+        try:
+            i = self.menu(_("Nouveau monstre : modèle"), items)
+            nb = len(T.template_list())
+            m = T.from_template(i) if i < nb else \
+                copy.deepcopy(mine[i - nb][2])
             fr = self.input_line(_("Nom français"), m["fr_name"],
                                  _("nom affiché dans le jeu"))
             en = self.input_line(_("Nom anglais (interne)"), m["name"],
@@ -969,6 +983,11 @@ class Editor(Popups):
              _("un fichier .nhmon.json à échanger"), self.export_monster),
             (_("Importer un monstre exporté…"),
              _("fichier .nhmon.json"), self.import_monster),
+            (_("Enregistrer le monstre comme modèle…"),
+             _("proposé ensuite par n"), self.save_template),
+            (_("Supprimer un modèle personnel…"),
+             P.templates_path().replace(os.path.expanduser("~"), "~", 1),
+             self.delete_template),
         ]
         try:
             i = self.menu(_("Projet : %s") % os.path.basename(self.project),
@@ -1045,6 +1064,59 @@ class Editor(Popups):
         added, _same = self.add_monsters(new)
         self.msg = _("Importé : %s") % (self.mon()["name"] if added else
                                         _("déjà dans le projet"))
+
+    def save_template(self):
+        m = self.mon()
+        if not m:
+            self.msg = _("Aucun monstre dans le projet")
+            return
+        mine = self.personal_templates()
+        name = m["fr_name"] or m["name"]
+        try:
+            name = self.input_line(_("Nom du modèle"),
+                                   name[:1].upper() + name[1:],
+                                   _("affiché dans le menu de n")).strip()
+            desc = self.input_line(_("Description du modèle"), "",
+                                   _("facultative : ce qui le distingue"))
+        except Cancel:
+            return
+        if not name:
+            return
+        old = [i for i, (n, _d, _m) in enumerate(mine) if n == name]
+        if old and not self.confirm(_("Le modèle « %s » existe déjà. Le "
+                                      "remplacer ?") % name):
+            return
+        tpl = (name, desc.strip(), copy.deepcopy(m))
+        if old:
+            mine[old[0]] = tpl
+        else:
+            mine.append(tpl)
+        try:
+            P.write_templates(P.templates_path(), mine)
+        except OSError as e:
+            self.message_box(_("Enregistrement impossible"), [str(e)])
+            return
+        self.msg = _("Modèle enregistré : %s — proposé par n") % name
+
+    def delete_template(self):
+        mine = self.personal_templates()
+        if not mine:
+            self.msg = _("Aucun modèle personnel")
+            return
+        try:
+            i = self.menu(_("Supprimer un modèle personnel"),
+                          [(n, d) for n, d, _m in mine])
+        except Cancel:
+            return
+        if not self.confirm(_("Supprimer le modèle « %s » ?") % mine[i][0]):
+            return
+        name = mine.pop(i)[0]
+        try:
+            P.write_templates(P.templates_path(), mine)
+        except OSError as e:
+            self.message_box(_("Enregistrement impossible"), [str(e)])
+            return
+        self.msg = _("Modèle supprimé : %s") % name
 
     def add_monsters(self, new):
         """Ajoute des monstres à la fin du projet. Renvoie (ajoutés,
