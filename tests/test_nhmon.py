@@ -430,6 +430,15 @@ def bare_editor(monsters=()):
 
 
 class TestEditor(unittest.TestCase):
+    def test_menu_helpers(self):
+        self.assertEqual(U.help_line("↑↓ naviguer", "", "Échap annuler"),
+                         "↑↓ naviguer · Échap annuler")
+        lines = U.wrap("humain synthétique armé, ramasse les objets", 20)
+        self.assertEqual(lines, ["humain synthétique", "armé, ramasse les",
+                                 "objets"])
+        self.assertTrue(all(U.width(l) <= 20 for l in lines))
+        self.assertEqual(U.wrap("", 20), [])
+
     def test_tile_field(self):
         ed = bare_editor([T.from_template(0)])
         ed.field = [f[0] for f in E.FIELDS].index("tile")

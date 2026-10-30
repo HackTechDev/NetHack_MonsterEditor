@@ -4,6 +4,7 @@ visionneuse, confirmation) et éditeur de tuile 16x16."""
 
 import curses
 import os
+import re
 import time
 import unicodedata
 
@@ -146,15 +147,56 @@ def put(win, y, x, s, attr=0, maxw=None):
         pass        # dernière case de la fenêtre
 
 
-def box(win, title="", attr=0):
+# Les fenêtres surgissantes reprennent le menu du lanceur NetHack
+# (../Nethack_Launcher) : cadre double cyan, titre cyan centré, ligne
+# choisie en inverse sur toute la largeur, description en magenta, aide
+# pâle dont les parties sont séparées par « · ».
+
+def box(win, title="", attr=0, title_attr=None):
     h, w = win.getmaxyx()
-    put(win, 0, 0, "╭" + "─" * (w - 2) + "╮", attr)
+    put(win, 0, 0, "╔" + "═" * (w - 2) + "╗", attr)
     for y in range(1, h - 1):
-        put(win, y, 0, "│", attr)
-        put(win, y, w - 1, "│", attr)
-    put(win, h - 1, 0, "╰" + "─" * (w - 2) + "╯", attr)
+        put(win, y, 0, "║", attr)
+        put(win, y, w - 1, "║", attr)
+    put(win, h - 1, 0, "╚" + "═" * (w - 2) + "╝", attr)
     if title:
-        put(win, 0, 2, " %s " % title, attr | curses.A_BOLD)
+        s = clip(" %s " % title, w - 4)
+        put(win, 0, (w - width(s)) // 2, s,
+            attr | curses.A_BOLD if title_attr is None else title_attr)
+
+
+def separator(win, y, attr=0):
+    """Ligne fine qui coupe le cadre (entre la liste et l'aide)."""
+    h, w = win.getmaxyx()
+    put(win, y, 0, "╟" + "─" * (w - 2) + "╢", attr)
+
+
+def help_line(*parts):
+    return " · ".join(p for p in parts if p)
+
+
+def wrap(s, n):
+    """Coupe s en lignes de n colonnes au plus, aux espaces."""
+    out, cur = [], ""
+    for word in s.split():
+        if cur and width(cur) + 1 + width(word) > n:
+            out.append(cur)
+            cur = word
+        else:
+            cur = cur + " " + word if cur else word
+    if cur:
+        out.append(cur)
+    return [clip(l, n) for l in out]
+
+
+def put_keys(win, y, x, s, key_attr, attr=0):
+    """Écrit s en mettant en valeur les touches « [k] », comme le
+    lanceur ; renvoie la colonne suivante."""
+    for part in re.split(r"(\[[^\]]+\])", s):
+        if part:
+            put(win, y, x, part, key_attr if part.startswith("[") else attr)
+            x += width(part)
+    return x
 
 
 # --- souris -------------------------------------------------------------
@@ -277,15 +319,23 @@ class Popups:
     self.redraw() sont fournis par l'éditeur."""
 
     def accent(self):
+        """Titres de section (les groupes du lanceur)."""
         return self.colors.fg(curses.COLOR_MAGENTA, True)
 
     def cyan(self):
+        """Titres des fenêtres et touches."""
         return self.colors.fg(curses.COLOR_CYAN, True)
+
+    def frame(self, win, title):
+        box(win, title, self.colors.fg(curses.COLOR_CYAN), self.cyan())
+
+    def selected(self):
+        return curses.A_REVERSE | curses.A_BOLD
 
     def message_box(self, title, lines):
         w = min(max([width(l) for l in lines] + [width(title) + 6]) + 4, 100)
         win = centered(self.stdscr, len(lines) + 4, w)
-        box(win, title, self.accent())
+        self.frame(win, title)
         for i, l in enumerate(lines):
             put(win, 2 + i, 2, l)
         win.refresh()
@@ -296,10 +346,11 @@ class Popups:
         lines = question.split("\n")
         w = min(max(width(l) for l in lines + [title]) + 6, 100)
         win = centered(self.stdscr, len(lines) + 4, max(w, 30))
-        box(win, title, self.accent())
+        self.frame(win, title)
         for i, l in enumerate(lines):
             put(win, 1 + i, 2, l)
-        put(win, len(lines) + 2, 2, _("[o]ui / [n]on"), self.cyan())
+        x = put_keys(win, len(lines) + 2, 2, _("[o]  oui"), self.cyan())
+        put_keys(win, len(lines) + 2, x + 4, _("[n]  non"), self.cyan())
         win.refresh()
         while True:
             k = get_key(win)
@@ -323,7 +374,7 @@ class Popups:
         try:
             while True:
                 win.erase()
-                box(win, prompt, self.accent())
+                self.frame(win, prompt)
                 if pos < off:
                     off = pos
                 if pos - off >= fw:
@@ -333,7 +384,8 @@ class Popups:
                 if hint:
                     put(win, 3, 2, hint, curses.A_DIM)
                 put(win, 4 if hint else 3, 2,
-                    _("Entrée : valider   Échap : annuler"), curses.A_DIM)
+                    help_line(_("Entrée valider"), _("Échap annuler")),
+                    curses.A_DIM)
                 win.move(2, 2 + width("".join(text[off:pos])))
                 win.refresh()
                 k = get_key(win)
@@ -384,8 +436,12 @@ class Popups:
         H, W = self.stdscr.getmaxyx()
         lw = max([width(a) for a, _ in items] + [10])
         dw = max([width(b) for _, b in items] + [0])
-        w = min(max(lw + dw + 8, width(title) + 8, 40), W - 2)
-        h = min(len(items) + 4, H - 2)
+        keys = help_line(_("↑↓ naviguer"), _("Entrée valider"),
+                         filterable and _("tapez pour filtrer"),
+                         _("Échap annuler"))
+        w = min(max(lw + dw + 8, width(title) + 8, width(keys) + 14),
+                W - 2)
+        rows, dh, h = self.list_size(items, lw, w)
         win = centered(self.stdscr, h, w)
         flt = ""
         sel = current if 0 <= current < len(items) else 0
@@ -396,30 +452,36 @@ class Popups:
                          if fold(flt) in fold(a + " " + b)]
                 if sel not in shown:
                     sel = shown[0] if shown else -1
-                rows = h - 4
                 idx = shown.index(sel) if sel in shown else 0
                 if idx < top:
                     top = idx
                 if idx >= top + rows:
                     top = idx - rows + 1
                 win.erase()
-                box(win, title, self.accent())
-                put(win, 1, 2, (_("filtre : ") + flt) if flt else
-                    _("tapez pour filtrer  ↑↓ Entrée Échap"), curses.A_DIM)
+                self.frame(win, title)
                 for r, i in enumerate(shown[top:top + rows]):
                     a, b = items[i]
-                    attr = curses.A_REVERSE if i == sel else 0
-                    line = a.ljust(lw) + ("  " + b if b else "")
-                    put(win, 2 + r, 2, line.ljust(w - 4), attr, w - 4)
-                if len(shown) > rows:
-                    put(win, h - 1, w - 12, " %d/%d " % (idx + 1, len(shown)))
+                    if i == sel:
+                        line = " " + a.ljust(lw) + ("  " + b if b else "")
+                        put(win, 1 + r, 1, line.ljust(w - 2),
+                            self.selected(), w - 2)
+                    else:
+                        put(win, 1 + r, 2, a, 0, w - 4)
+                        put(win, 1 + r, 4 + lw, b, curses.A_DIM, w - 6 - lw)
+                count = " %d/%d" % (idx + 1, len(shown)) \
+                    if len(shown) > rows else ""
+                self.list_footer(
+                    win, rows, dh, sel >= 0 and items[sel][1],
+                    help_line(_("filtre : ") + flt, _("Échap efface"))
+                    if flt else keys if shown else _("aucun choix"),
+                    count, bool(flt))
                 win.refresh()
                 k = get_key(win)
                 if is_enter(k) and sel >= 0:
                     return sel
                 if isinstance(k, Mouse) and shown:
                     pos = k.inside(win)
-                    r = pos[0] - 2 if pos else -1
+                    r = pos[0] - 1 if pos else -1
                     if wheel(k):
                         idx = max(0, min(len(shown) - 1, idx + 3 * wheel(k)))
                     elif 0 <= r < rows and top + r < len(shown):
@@ -461,35 +523,72 @@ class Popups:
         finally:
             self.redraw()
 
+    def list_size(self, items, cw, w):
+        """Lignes de la liste, de la description et de la fenêtre. La
+        description complète de la ligne choisie s'affiche sous la liste
+        quand la colonne de droite (après cw colonnes) la coupe ; sa
+        place est celle de la plus longue, pour que l'aide ne bouge
+        pas."""
+        H, W = self.stdscr.getmaxyx()
+        cut = [b for _, b in items if width(b) > w - 6 - cw]
+        dh = min(3, max([len(wrap(b, w - 4)) for b in cut] + [0]))
+        extra = 4 + (dh + 1 if dh else 0)
+        if len(items) + extra > H - 2:
+            dh, extra = 0, 4
+        rows = max(1, min(len(items), H - 2 - extra))
+        return rows, dh, rows + extra
+
+    def list_footer(self, win, rows, dh, desc, keys, count="", hot=False):
+        """Sous la liste : description en magenta, puis l'aide."""
+        h, w = win.getmaxyx()
+        line = self.colors.fg(curses.COLOR_CYAN)
+        if dh:
+            separator(win, rows + 1, line)
+            for j, l in enumerate(wrap(desc or "", w - 4)[:dh]):
+                put(win, rows + 2 + j, 2, l,
+                    self.colors.fg(curses.COLOR_MAGENTA))
+        separator(win, h - 3, line)
+        put(win, h - 2, 2, keys, self.cyan() if hot else curses.A_DIM,
+            w - 5 - len(count))
+        if count:
+            put(win, h - 2, w - 2 - len(count), count, curses.A_DIM)
+
     def checklist(self, title, items, selected):
         """items : liste de (nom, description) ; selected : noms cochés.
         Renvoie la liste des noms cochés (dans l'ordre de items)."""
         H, W = self.stdscr.getmaxyx()
         sel = set(selected)
         lw = max(width(a) for a, _ in items)
-        w = min(max(lw + max(width(b) for _, b in items) + 12, 40), W - 2)
-        h = min(len(items) + 5, H - 2)
+        keys = help_line(_("Espace ou clic cocher"), _("Entrée valider"),
+                         _("Échap annuler"))
+        w = min(max(lw + max(width(b) for _, b in items) + 12,
+                    width(title) + 8, width(keys) + 22), W - 2)
+        # « [x] » et son espace avant le nom
+        rows, dh, h = self.list_size(items, lw + 4, w)
         win = centered(self.stdscr, h, w)
         cur, top = 0, 0
         try:
             while True:
-                rows = h - 4
                 if cur < top:
                     top = cur
                 if cur >= top + rows:
                     top = cur - rows + 1
                 win.erase()
-                box(win, title, self.accent())
-                put(win, 1, 2, _("Espace ou clic : cocher   Entrée : valider"
-                    "   Échap : annuler"), curses.A_DIM)
+                self.frame(win, title)
                 for r, (n, d) in enumerate(items[top:top + rows]):
-                    i = top + r
                     mark = "[x]" if n in sel else "[ ]"
-                    attr = curses.A_REVERSE if i == cur else 0
-                    if n in sel:
-                        attr |= self.cyan()
-                    put(win, 2 + r, 2, ("%s %s  %s" % (mark, n.ljust(lw), d))
-                        .ljust(w - 4), attr, w - 4)
+                    if top + r == cur:
+                        put(win, 1 + r, 1, (" %s %s  %s" % (mark, n.ljust(lw),
+                            d)).ljust(w - 2), self.selected(), w - 2)
+                        continue
+                    put(win, 1 + r, 2, mark,
+                        self.cyan() if n in sel else curses.A_DIM)
+                    put(win, 1 + r, 6, n, curses.A_BOLD if n in sel else 0,
+                        w - 8)
+                    put(win, 1 + r, 8 + lw, d, curses.A_DIM, w - 10 - lw)
+                self.list_footer(win, rows, dh, items[cur][1], keys, " "
+                                 + _("cochés : %d/%d") % (len(sel),
+                                                          len(items)))
                 win.refresh()
                 k = get_key(win)
                 if is_enter(k):
@@ -498,7 +597,7 @@ class Popups:
                     raise Cancel
                 if isinstance(k, Mouse):
                     pos = k.inside(win)
-                    r = pos[0] - 2 if pos else -1
+                    r = pos[0] - 1 if pos else -1
                     if wheel(k):
                         cur = max(0, min(len(items) - 1, cur + 3 * wheel(k)))
                     elif k.kind in ("click", "double") and 0 <= r < rows \
@@ -531,12 +630,13 @@ class Popups:
             while True:
                 rows = h - 3
                 win.erase()
-                box(win, title, self.accent())
+                self.frame(win, title)
                 for r, (l, a) in enumerate(lines[top:top + rows]):
                     put(win, 1 + r, 2, l[left:].expandtabs(8), a, w - 4)
-                put(win, h - 1, 2, _(" ↑↓ PgUp PgDn ←→  q/Échap : fermer "
-                    " %d-%d/%d ") % (top + 1, min(top + rows, len(lines)),
-                                    len(lines)), curses.A_DIM)
+                put(win, h - 1, 2, " %s " % help_line(
+                    _("↑↓ PgUp PgDn ←→ défiler"), _("q/Échap fermer"),
+                    "%d-%d/%d" % (top + 1, min(top + rows, len(lines)),
+                                  len(lines))), curses.A_DIM, w - 4)
                 win.refresh()
                 k = get_key(win)
                 if k in (ESC, "q", "\n", "\r", curses.KEY_ENTER):
@@ -593,11 +693,12 @@ class Popups:
                 if cur >= top + rows:
                     top = cur - rows + 1
                 win.erase()
-                box(win, title, self.accent())
+                self.frame(win, title)
                 for j, (i, s) in enumerate(vis[top:top + rows]):
                     put(win, 1 + j, 2, lines[i][s:s + tw])
-                put(win, h - 1, 2, _(" Échap : terminer   Entrée : "
-                    "nouveau paragraphe "), curses.A_DIM)
+                put(win, h - 1, 2, " %s " % help_line(
+                    _("Échap terminer"), _("Entrée nouveau paragraphe")),
+                    curses.A_DIM, w - 4)
                 vi, vs = vis[cur]
                 win.move(1 + cur - top, 2 + (c - vs))
                 win.refresh()

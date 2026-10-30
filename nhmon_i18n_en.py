@@ -516,19 +516,24 @@ EN = {
 
     # --- nhmon_ui.py ---------------------------------------------------
     "Confirmation": "Confirmation",
-    "[o]ui / [n]on": "[y]es / [n]o",
-    "Entrée : valider   Échap : annuler": "Enter: accept   Esc: cancel",
+    "[o]  oui": "[y]  yes",
+    "[n]  non": "[n]  no",
+    "Entrée valider": "Enter accept",
+    "Échap annuler": "Esc cancel",
     "entier de %d à %d": "integer from %d to %d",
     "⚠ valeur invalide : un entier de %d à %d":
         "⚠ invalid value: an integer from %d to %d",
     "filtre : ": "filter: ",
-    "tapez pour filtrer  ↑↓ Entrée Échap": "type to filter  ↑↓ Enter Esc",
-    "Espace ou clic : cocher   Entrée : valider   Échap : annuler":
-        "Space or click: toggle   Enter: accept   Esc: cancel",
-    " ↑↓ PgUp PgDn ←→  q/Échap : fermer  %d-%d/%d ":
-        " ↑↓ PgUp PgDn ←→  q/Esc: close  %d-%d/%d ",
-    " Échap : terminer   Entrée : nouveau paragraphe ":
-        " Esc: done   Enter: new paragraph ",
+    "Échap efface": "Esc clears",
+    "aucun choix": "no choice",
+    "↑↓ naviguer": "↑↓ move",
+    "tapez pour filtrer": "type to filter",
+    "Espace ou clic cocher": "Space or click toggle",
+    "cochés : %d/%d": "checked: %d/%d",
+    "↑↓ PgUp PgDn ←→ défiler": "↑↓ PgUp PgDn ←→ scroll",
+    "q/Échap fermer": "q/Esc close",
+    "Échap terminer": "Esc done",
+    "Entrée nouveau paragraphe": "Enter new paragraph",
     "←↑→↓ : déplacer     Espace : peindre": "←↑→↓: move     Space: paint",
     "A-Z . 0 1 : choisir la couleur et peindre":
         "A-Z . 0 1: pick the color and paint",
