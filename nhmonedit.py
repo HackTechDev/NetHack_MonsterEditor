@@ -38,6 +38,16 @@ BACKUP_DIR = os.path.join(HERE, "sauvegardes")
 ALIGN_HINT = _("négatif : chaotique, 0 : neutre, positif : loyal ; " \
              "-128 : sans alignement (A_NONE)")
 
+# barre des touches : (touche, libellé, rang) ; quand la place manque,
+# les rangs les plus hauts disparaissent d'abord, le rang 0 jamais
+KEYBAR = [
+    ("n", _("nouveau"), 1), ("d", _("dupl."), 7), ("i", _("importer"), 6),
+    ("v", _("vérif"), 4), ("c", _("code"), 5), ("b", _("comparer"), 8),
+    ("I", _("intégrer"), 2), ("m", _("make"), 9), ("U", _("update"), 10),
+    ("j", _("jouer"), 3), ("s", _("enreg."), 1), ("?", _("aide"), 0),
+    ("q", _("quitter"), 0),
+]
+
 # (type, clé, libellé, aide[, min, max, pas])
 FIELDS = [
     ("section", None, _("Identité"), ""),
@@ -378,12 +388,31 @@ class Editor(Popups, Game):
                 or f[3]
         put(scr, H - 2, 0, (" " + hint).ljust(W),
             self.colors.fg(curses.COLOR_CYAN))
-        keys = _(" n:nouveau d:dupl. i:importer v:vérif c:code b:comparer " \
-               "I:intégrer m:make U:update j:jouer s:enreg. ?:aide q:quitter")
-        put(scr, H - 1, 0, (" " + self.msg).ljust(W) if self.msg else
-            keys.ljust(W), self.colors.pair(curses.COLOR_BLACK,
-                                            curses.COLOR_CYAN))
+        if self.msg:
+            put(scr, H - 1, 0, " " + self.msg, curses.A_BOLD)
+        else:
+            self.draw_keys(H - 1, W)
         scr.refresh()
+
+    def draw_keys(self, y, W):
+        """Barre des touches, comme l'aide du lanceur : touche en cyan,
+        parties séparées par « · ». Celles qui ne tiennent pas sont
+        laissées de côté (? les montre toutes)."""
+        keys = list(KEYBAR)
+        while 1 + sum(len(k) + 1 + len(label) + 3 for k, label, _r in keys) \
+                - 3 > W - 1:
+            drop = max(keys, key=lambda e: e[2])
+            if not drop[2]:
+                break
+            keys.remove(drop)
+        scr, x = self.stdscr, 1
+        for i, (k, label, _r) in enumerate(keys):
+            if i:
+                put(scr, y, x, " · ", curses.A_DIM)
+                x += 3
+            put(scr, y, x, k, self.cyan())
+            put(scr, y, x + len(k) + 1, label, curses.A_DIM)
+            x += len(k) + 1 + len(label)
 
     def draw_list(self, y, x, h, w):
         scr = self.stdscr

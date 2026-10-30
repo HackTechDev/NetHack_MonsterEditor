@@ -782,10 +782,11 @@ EN = {
     " nhmonedit ▸ robots & mechas de Night City ":
         " nhmonedit ▸ robots & mechs of Night City ",
     " [modifié]": " [modified]",
-    " n:nouveau d:dupl. i:importer v:vérif c:code b:comparer I:intégrer "
-    "m:make U:update j:jouer s:enreg. ?:aide q:quitter":
-        " n:new d:dup. i:import v:check c:code b:compare I:add m:make "
-        "U:update j:play s:save ?:help q:quit",
+    # barre des touches
+    "nouveau": "new", "dupl.": "dup.", "importer": "import",
+    "vérif": "check", "code": "code", "comparer": "compare",
+    "intégrer": "add", "make": "make", "update": "update", "jouer": "play",
+    "enreg.": "save", "aide": "help", "quitter": "quit",
     "Monstres": "Monsters",
     "(vide)": "(empty)",
     "n : nouveau monstre": "n: new monster",
